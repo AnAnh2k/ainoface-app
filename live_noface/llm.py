@@ -7,11 +7,11 @@ import requests
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
-
+# https://blast-float-hear-kit.trycloudflare.com
 # Default to Slink LLM API
 LLM_API_BASE_URL = os.getenv(
     "LLM_API_BASE_URL",
-    os.getenv("OLLAMA_BASE_URL", "http://autolive.slink.ai.vn:8080"),
+    os.getenv("OLLAMA_BASE_URL", "https://blast-float-hear-kit.trycloudflare.com"),
 )
 
 UNREAD_COUNT = 0
