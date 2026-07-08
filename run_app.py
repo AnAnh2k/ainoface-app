@@ -3,6 +3,7 @@ import sys
 import subprocess
 import time
 import urllib.request
+import runpy
 import webview
 
 # Force UTF-8 for stdout and stderr to avoid encoding crashes on Windows
@@ -61,6 +62,10 @@ if len(sys.argv) > 1:
         from test_vieneu.main import app as fastapi_app
         import uvicorn
         uvicorn.run(fastapi_app, host='127.0.0.1', port=8005, loop="asyncio", log_level="warning")
+        sys.exit(0)
+    elif arg == "--run-live":
+        sys.path.append(os.path.abspath(os.path.join(app_dir, 'live_noface')))
+        runpy.run_module('live_noface.live', run_name='__main__')
         sys.exit(0)
 
 # Main launcher process logic below
