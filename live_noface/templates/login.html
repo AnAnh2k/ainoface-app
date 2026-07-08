@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Hệ thống Live AI</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3d7cff;
+            --primary-hover: #1e60eb;
+            --bg-body: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --text-dark: #0f172a;
+            --text-light: #f8fafc;
+            --font-main: 'Outfit', sans-serif;
+            --font-cyber: 'Orbitron', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-body);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-light);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Beautiful glowing background blobs */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(61, 124, 255, 0.15);
+            filter: blur(80px);
+            z-index: 0;
+            animation: float-blobs 12s ease-in-out infinite alternate;
+        }
+
+        body::before {
+            top: 15%;
+            left: 20%;
+        }
+
+        body::after {
+            bottom: 15%;
+            right: 20%;
+            background: rgba(254, 44, 85, 0.15);
+            animation-delay: -6s;
+        }
+
+        @keyframes float-blobs {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(40px, 30px) scale(1.2); }
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(30, 41, 59, 0.7); /* Translucent dark slate */
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px;
+            box-sizing: border-box;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            z-index: 1;
+            transform: translateY(0);
+            animation: fade-in-up 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        @keyframes fade-in-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-title {
+            text-align: center;
+            font-family: var(--font-cyber);
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #3d7cff, #a855f7, #fe2c55);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            text-shadow: 0 4px 12px rgba(61, 124, 255, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        input {
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.6);
+            color: #ffffff;
+            font-size: 15px;
+            outline: none;
+            font-family: var(--font-main);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(61, 124, 255, 0.25);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .error-message {
+            background: rgba(254, 44, 85, 0.1);
+            border: 1px solid rgba(254, 44, 85, 0.2);
+            color: #fda4af;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #ffffff;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: var(--font-main);
+            outline: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 12px rgba(61, 124, 255, 0.3);
+            border-bottom: 3px solid #1e40af;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(61, 124, 255, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+            border-bottom-width: 1px;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+
+        button:hover::after {
+            left: 100%;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 12.5px;
+            color: #64748b;
+            margin-top: 25px;
+        }
+        
+        .footer-note a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        /* Custom Password Input Toggle Styling */
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding-right: 48px; /* Leave space for the eye icon */
+            box-sizing: border-box;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            cursor: pointer;
+            color: #cbd5e1; /* Bright/light gray */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease, transform 0.2s ease;
+            user-select: none;
+            -webkit-user-select: none;
+            z-index: 10;
+        }
+
+        .password-toggle:hover {
+            color: #ffffff; /* Extremely bright white on hover */
+            transform: scale(1.1);
+        }
+
+        .password-toggle:active {
+            transform: scale(0.95);
+        }
+
+        .password-toggle svg {
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+        }
+
+        /* Hide the native dark browser password reveal eye on Edge/Chrome */
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none;
+        }
+
+        /* Register tabs UI styling */
+        .tabs-auth {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            font-family: var(--font-cyber);
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 1px;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .tab.active {
+            color: #00f0ff;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+            background: rgba(0, 240, 255, 0.05);
+        }
+
+        .tab:hover:not(.active) {
+            color: #ffffff;
+        }
+
+        .confirm-password-group {
+            display: none;
+        }
+
+        .register-mode .confirm-password-group {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card" id="login-card-container">
+        <div class="logo-title">S LIVE AI</div>
+
+        <div class="tabs-auth">
+            <span id="tab-login" class="tab active">ĐĂNG NHẬP</span>
+            <span id="tab-register" class="tab">ĐĂNG KÝ</span>
+        </div>
+        
+        <div id="error-box" class="error-message"></div>
+
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username" id="username-label">Tài khoản</label>
+                <input type="text" id="username" name="username" placeholder="Nhập tài khoản" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mật khẩu</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required autocomplete="current-password">
+                    <span role="button" id="toggle-password" class="password-toggle" aria-label="Hiện mật khẩu">
+                        <!-- Bright Eye SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group confirm-password-group" id="confirm-password-wrapper">
+                <label for="confirm-password">Xác nhận mật khẩu</label>
+                <div class="password-wrapper">
+                    <input type="password" id="confirm-password" placeholder="Nhập lại mật khẩu">
+                </div>
+            </div>
+            
+            <button type="submit" id="submit-btn">Đăng nhập</button>
+        </form>
+        
+        <div class="footer-note" id="footer-note-text">
+            Đăng nhập để điều khiển hệ thống livestream MC AI thông minh.
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('login-form');
+        const errorBox = document.getElementById('error-box');
+        const cardContainer = document.getElementById('login-card-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+
+        let isRegisterMode = false;
+
+        // Switch to Login Tab
+        tabLogin.addEventListener('click', () => {
+            if (!isRegisterMode) return;
+            isRegisterMode = false;
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            cardContainer.classList.remove('register-mode');
+            submitBtn.textContent = 'Đăng nhập';
+            confirmPasswordInput.required = false;
+            errorBox.style.display = 'none';
+            form.reset();
+        });
+
+        // Switch to Register Tab
+        tabRegister.addEventListener('click', () => {
+            if (isRegisterMode) return;
+            isRegisterMode = true;
+            tabRegister.classList.add('active');
+            tabLogin.classList.remove('active');
+            cardContainer.classList.add('register-mode');
+            submitBtn.textContent = 'Đăng ký tài khoản';
+            confirmPasswordInput.required = true;
+            errorBox.style.display = 'none';
+            form.reset();
+        });
+
+        async function readJsonResponse(response) {
+            const text = await response.text();
+            if (!text) return {};
+            try {
+                return JSON.parse(text);
+            } catch (err) {
+                return {
+                    success: false,
+                    error: 'Không kết nối được server. Vui lòng kiểm tra backend.'
+                };
+            }
+        }
+
+        function showMessage(message, type = 'error') {
+            errorBox.textContent = message;
+            errorBox.className = 'error-message';
+            if (type === 'success') {
+                errorBox.style.background = 'rgba(16, 185, 129, 0.1)';
+                errorBox.style.color = '#a7f3d0';
+                errorBox.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+            } else {
+                errorBox.style.background = 'rgba(255, 0, 85, 0.1)';
+                errorBox.style.color = '#fda4af';
+                errorBox.style.borderColor = 'rgba(255, 0, 85, 0.2)';
+            }
+            errorBox.style.display = 'block';
+        }
+
+        // Check query parameters for error message
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('error')) {
+            errorBox.textContent = urlParams.get('error');
+            errorBox.className = 'error-message';
+            errorBox.style.display = 'block';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorBox.style.display = 'none';
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            if (isRegisterMode) {
+                const confirmPassword = confirmPasswordInput.value;
+                if (password !== confirmPassword) {
+                    errorBox.textContent = 'Mật khẩu xác nhận không khớp.';
+                    errorBox.className = 'error-message';
+                    errorBox.style.display = 'block';
+                    return;
+                }
+
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Đang đăng ký...';
+                    const response = await fetch('/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await readJsonResponse(response);
+                    if (response.ok && data.success) {
+                        if (data.token || data.user) {
+                            window.location.href = '/';
+                            return;
+                        }
+                        // Registration success! Switch to login mode
+                        isRegisterMode = false;
+                        tabLogin.classList.add('active');
+                        tabRegister.classList.remove('active');
+                        cardContainer.classList.remove('register-mode');
+                        submitBtn.textContent = 'Đăng nhập';
+                        confirmPasswordInput.required = false;
+                        form.reset();
+                        
+                        usernameInput.value = username;
+                        showMessage(data.message || 'Đăng ký thành công! Vui lòng đăng nhập lại.', 'success');
+                        passwordInput.focus();
+                    } else {
+                        showMessage(data.error || 'Đăng ký tài khoản thất bại.');
+                    }
+                } catch (err) {
+                    showMessage('Không kết nối được server. Vui lòng kiểm tra backend.');
+                } finally {
+                    submitBtn.disabled = false;
+                    if (isRegisterMode) {
+                        submitBtn.textContent = 'Đăng ký tài khoản';
+                    }
+                }
+            } else {
+                try {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Đang đăng nhập...';
+                    const response = await fetch('/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const data = await readJsonResponse(response);
+                    if (response.ok && data.success) {
+                        window.location.href = '/';
+                    } else {
+                        showMessage(data.error || 'Sai tài khoản hoặc mật khẩu.');
+                        errorBox.style.animation = 'none';
+                        errorBox.offsetHeight; /* trigger reflow */
+                        errorBox.style.animation = null;
+                    }
+                } catch (err) {
+                    showMessage('Không kết nối được server. Vui lòng kiểm tra backend.');
+                } finally {
+                    submitBtn.disabled = false;
+                    if (!isRegisterMode) {
+                        submitBtn.textContent = 'Đăng nhập';
+                    }
+                }
+            }
+        });
+
+        // Show/Hide Password Toggle JS
+        const togglePassword = document.getElementById('toggle-password');
+
+        togglePassword.addEventListener('click', () => {
+            const isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            
+            if (isPassword) {
+                // Eye Off SVG
+                togglePassword.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                `;
+                togglePassword.setAttribute('aria-label', 'Ẩn mật khẩu');
+            } else {
+                // Eye SVG
+                togglePassword.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                `;
+                togglePassword.setAttribute('aria-label', 'Hiện mật khẩu');
+            }
+        });
+    </script>
+</body>
+</html>
