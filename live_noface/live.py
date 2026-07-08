@@ -1,5 +1,5 @@
 from TikTokLive import TikTokLiveClient
-from TikTokLive.events import ConnectEvent, CommentEvent, GiftEvent
+from TikTokLive.events import ConnectEvent, CommentEvent, GiftEvent, LikeEvent, FollowEvent
 import os
 import sys
 import json
@@ -78,7 +78,7 @@ def _clean_comment_reply(text: str, user_name: str) -> str:
     return text
 
 
-def _enforce_ivy_comment_response(user_name: str, llm_response: str, comment_text: str = '') -> str:
+def _enforce_comment_response(user_name: str, llm_response: str, comment_text: str = '') -> str:
     """Keep replies concise, on-brand, and ready for TTS."""
     cleaned = _clean_comment_reply(llm_response, user_name)
     greeting = f'Chào {user_name}'
@@ -93,7 +93,7 @@ def _enforce_ivy_comment_response(user_name: str, llm_response: str, comment_tex
         if intro_lower == first_name_fragment or intro_lower.startswith(first_name_fragment + ' '):
             intro_core = ''
 
-    cta = 'Bạn inbox để được tư vấn cho bé nhé.'
+    cta = 'Bạn inbox để được tư vấn thêm nhé.'
     if intro_core:
         intro_core = intro_core.lstrip(' ,.-:;')
         return f'{greeting}. {intro_core} {cta}'
@@ -106,29 +106,25 @@ def _build_grounded_comment_reply(user_name: str, comment_text: str) -> str:
 
     if any(keyword in text for keyword in ['giá', 'gia', 'bao nhiêu', 'bao nhieu', 'cost', 'price']):
         return (
-            f'Chào {user_name}. Bộ Bát Đĩa của chúng tôi mua lẻ từ 10 đến 15 nghìn một món. '
-            'Bộ Combo 6 món chỉ 30 nghìn, tiết kiệm hơn so với mua lẻ. '
-            'Hôm nay giảm thêm 10% cho 50 khách đầu tiên chốt đơn. Bạn inbox để được tư vấn nhé.'
+            f'Chào {user_name}. Sản phẩm của chúng tôi đang có giá rất tốt. '
+            'Bạn inbox để được báo giá chi tiết nhé.'
         )
 
     if any(keyword in text for keyword in ['ưu đãi', 'uu dai', 'khuyến mãi', 'khuyen mai', 'giảm', 'giam', 'sale', 'deal']):
         return (
-            f'Chào {user_name}. Hôm nay Bộ Bát Đĩa có ưu đãi cực tốt. '
-            'Giảm ngay 10% cho 50 khách đầu tiên chốt đơn, hỗ trợ phí ship lên đến 30 nghìn, cam kết 1 đổi 1 hoặc hoàn tiền 100% nếu bị bể vỡ trong vận chuyển. '
-            'Bạn inbox để giữ ưu đãi nhé.'
+            f'Chào {user_name}. Hôm nay shop đang có chương trình ưu đãi cực tốt. '
+            'Bạn inbox ngay để nhận ưu đãi nhé.'
         )
 
-    if any(keyword in text for keyword in ['chức năng', 'chuc nang', 'làm gì', 'lam gi', 'công dụng', 'cong dung', 'sản phẩm', 'san pham', 'bát', 'đĩa', 'tư vấn', 'tu van']):
+    if any(keyword in text for keyword in ['chức năng', 'chuc nang', 'làm gì', 'lam gi', 'công dụng', 'cong dung', 'sản phẩm', 'san pham', 'tư vấn', 'tu van']):
         return (
-            f'Chào {user_name}. Bộ Bát Đĩa tối giản sang trọng. '
-            'Sứ an toàn nung 1000 độ, khử sạch chì, chống trầy xước, chịu lò vi sóng lò nướng máy rửa bát. '
-            'Ngoài ra còn lớp men nano chống bám dầu mỡ, rửa vô cùng nhanh và sạch, nâng tầm không gian bàn ăn. '
-            'Bạn inbox để được tư vấn nhé.'
+            f'Chào {user_name}. Sản phẩm của shop chất lượng cao, được nhiều khách hàng tin dùng. '
+            'Bạn inbox để được tư vấn chi tiết nhé.'
         )
 
     if any(keyword in text for keyword in ['hello', 'hi', 'xin chào', 'xin chao', 'chào', 'chao', 'alo', 'hey']):
         return (
-            f'Chào {user_name}. Chúng tôi bán Bộ Bát Đĩa chất lượng cao, giá tốt nhất. '
+            f'Chào {user_name}. Cảm ơn bạn đã ghé thăm livestream. '
             'Bạn inbox để được tư vấn nhé.'
         )
 
@@ -170,31 +166,23 @@ def send_to_tts(text: str, sessionid: str = 'current', event: bool = False, prio
 
 
 def generate_live_response(user_name: str, event_text: str, event_type: str = 'comment') -> str:
-    """Generate a Vietnamese response for TikTok comment or gift using gemma3:1b."""
+    """Generate a Vietnamese response for TikTok comment or gift."""
     try:
         if event_type == 'gift':
             system_prompt = (
-                'Bạn là Robot Ivy, robot trợ lý ảo hỗ trợ học tập thông minh. '
+                'Bạn là trợ lý bán hàng livestream trên TikTok. '
                 'Khi có người tặng quà, hãy cảm ơn ngắn gọn bằng tiếng Việt, ấm áp, tự nhiên, không emoji, không ký tự đặc biệt. '
-                'Có thể nhắc rất ngắn gọn rằng Ivy là người bạn gia sư công nghệ đồng hành cùng học sinh, sinh viên.'
+                'Có thể mời họ xem sản phẩm đang bán trên livestream.'
             )
             user_message = f'Người dùng {user_name} đã tặng: {event_text}. Hãy cảm ơn họ thật ngắn gọn.'
         else:
             system_prompt = (
-                'Bạn là Robot Ivy, robot trợ lý ảo hỗ trợ học tập thông minh, nhỏ gọn và đáng yêu. '
-                'Ivy là người bạn gia sư công nghệ cho học sinh, sinh viên. '
-                'Trả lời bình luận bằng tiếng Việt tự nhiên, ngắn gọn, đúng ý người dùng, thân thiện như đang livestream bán hàng tư vấn. '
-                'Phải luôn bám các thông tin sản phẩm sau: '
-                'Robot Ivy giải đáp kiến thức 24/7 các môn Toán, Lý, Hóa, Văn, Anh... từ cơ bản đến nâng cao. '
-                'Ivy luyện giao tiếp ngoại ngữ, nói chuyện bằng tiếng Anh hoặc ngôn ngữ khác, có thể sửa lỗi phát âm trực tiếp. '
-                'Ivy hỗ trợ quản lý thời gian, nhắc nhở học tập, lập thời khóa biểu, Pomodoro, và hạn chế nghiện điện thoại. '
-                'Ivy có thể tự tạo quiz nhanh để kiểm tra và ôn tập sau giờ học. '
-                'Giá robot vật lý là 499.000đ mua đứt trọn đời. Phí dịch vụ AI là 99.000đ mỗi tháng để duy trì bộ não AI. '
-                'Khi cần học nhiều có thể đóng tiền dùng, lúc nghỉ hè hoặc không dùng nữa thì ngừng đóng, không ràng buộc, không phát sinh chi phí ẩn. '
-                'Ưu đãi hôm nay: giảm ngay 10% cho 50 khách hàng đầu tiên bấm vào giỏ hàng chốt đơn Robot Ivy, và miễn phí dùng thử full tính năng nâng cao trong 3 ngày đầu tiên. '
-                'Nếu người dùng hỏi giá, phải nêu rõ 499.000đ cho robot và 99.000đ/tháng cho dịch vụ AI. '
-                'Nếu người dùng hỏi công dụng, ưu tiên trả lời về học tập, ngoại ngữ, nhắc lịch, Pomodoro và quiz. '
-                'Không được xin lỗi dưới bất kỳ hình thức nào, không nói mình là ai ngoài Robot Ivy, không lặp lời chào, không emoji, không ký tự đặc biệt. '
+                'Bạn là trợ lý bán hàng livestream trên TikTok. '
+                'Trả lời bình luận bằng tiếng Việt tự nhiên, ngắn gọn dưới 30 từ, thân thiện như đang livestream bán hàng tư vấn. '
+                'Nếu người dùng hỏi giá, mời họ inbox để được báo giá chi tiết. '
+                'Nếu người dùng hỏi về sản phẩm, trả lời ngắn gọn và mời inbox để tư vấn thêm. '
+                'Nếu người dùng chào hỏi, chào lại thân thiện và mời xem sản phẩm. '
+                'Không được xin lỗi dưới bất kỳ hình thức nào, không lặp lời chào, không emoji, không ký tự đặc biệt. '
                 'Câu trả lời nên có 1 câu chào theo tên người dùng và 1 câu mời inbox hoặc chốt đơn nếu phù hợp.'
             )
             user_message = f'Comment từ {user_name}: {event_text}.'
@@ -214,12 +202,10 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
                 prompt_text = f"Người dùng {user_name} đã tặng {event_text}. Hãy viết một câu cảm ơn ngắn gọn, ấm áp bằng tiếng Việt."
             else:
                 prompt_text = (
-                    f"Bạn là Robot Ivy, robot trợ lý học tập cho học sinh, sinh viên. "
+                    f"Bạn là trợ lý bán hàng livestream trên TikTok. "
                     f"Hãy trả lời bình luận bằng tiếng Việt tự nhiên, cực kỳ ngắn gọn dưới 30 từ, thân thiện.\n"
-                    f"Thông tin sản phẩm:\n"
-                    f"- Giá robot: 499.000đ mua đứt trọn đời, phí AI: 99.000đ/tháng.\n"
-                    f"- Công dụng: giải đáp học tập 24/7 (Toán, Lý, Hóa, Văn, Anh...), luyện tiếng Anh, Pomodoro.\n"
-                    f"- Ưu đãi hôm nay: giảm 10% cho 50 khách đầu tiên, dùng thử full tính năng 3 ngày.\n\n"
+                    f"Nếu người dùng hỏi giá, mời họ inbox để báo giá chi tiết.\n"
+                    f"Nếu người dùng hỏi sản phẩm, trả lời ngắn gọn và mời inbox tư vấn.\n\n"
                     f"Bình luận từ {user_name}: {event_text}\n"
                     f"Trả lời:"
                 )
@@ -254,7 +240,7 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
             raise ValueError('Empty response from LLM')
 
         if event_type == 'comment':
-            response = _enforce_ivy_comment_response(user_name, response, event_text)
+            response = _enforce_comment_response(user_name, response, event_text)
 
         if not response.startswith('Cảm ơn') and event_type == 'gift':
             response = f'Cảm ơn {user_name}. {response}'
@@ -263,10 +249,10 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
         print(f'ERROR: LLM generation failed: {e}')
         if event_type == 'comment':
             return (
-                f'Chào {user_name}. Robot Ivy giá 499.000đ mua đứt trọn đời, phí AI 99.000đ mỗi tháng. '
-                'Hôm nay giảm ngay 10% cho 50 khách đầu tiên và miễn phí dùng thử full tính năng 3 ngày đầu tiên. Bạn inbox để được tư vấn nhé.'
+                f'Chào {user_name}. Cảm ơn bạn đã ghé thăm livestream. '
+                'Bạn inbox để được tư vấn sản phẩm nhé.'
             )
-        return f'Cảm ơn {user_name}. Robot Ivy đồng hành cùng bạn học tập thông minh mỗi ngày.'
+        return f'Cảm ơn {user_name} đã ủng hộ livestream của chúng tôi.'
 
 
 @client.on(ConnectEvent)
@@ -313,6 +299,35 @@ async def on_gift(event: GiftEvent) -> None:
 
 
 client.add_listener(GiftEvent, on_gift)
+
+
+async def on_like(event: LikeEvent) -> None:
+    user_name = event.user.nickname
+    like_count = event.count
+    print(f'LIKE: {user_name} liked x{like_count}')
+
+    tts_text = f'Cảm ơn {user_name} đã thả {like_count} tim cho chúng tôi.'
+    if send_to_tts(tts_text, event=True, priority=1):
+        print('[OK] Like TTS sent')
+    else:
+        print('[ERR] Like TTS failed')
+
+
+client.add_listener(LikeEvent, on_like)
+
+
+async def on_follow(event: FollowEvent) -> None:
+    user_name = event.user.nickname
+    print(f'FOLLOW: {user_name} followed')
+
+    tts_text = f'Chào mừng {user_name} đã theo dõi kênh. Cảm ơn bạn rất nhiều nhé.'
+    if send_to_tts(tts_text, event=True, priority=0):
+        print('[OK] Follow TTS sent')
+    else:
+        print('[ERR] Follow TTS failed')
+
+
+client.add_listener(FollowEvent, on_follow)
 
 
 if __name__ == '__main__':
