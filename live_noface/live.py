@@ -17,7 +17,7 @@ from openai import OpenAI
 
 # Configuration
 LIVE_APP_URL = os.getenv('LIVE_APP_URL', 'http://127.0.0.1:5000')
-OLLAMA_BASE_URL = os.getenv('LLM_API_BASE_URL') or os.getenv('OLLAMA_BASE_URL', 'http://autolive.slink.ai.vn:8080')
+OLLAMA_BASE_URL = os.getenv('LLM_API_BASE_URL') or os.getenv('OLLAMA_BASE_URL', 'https://blast-float-hear-kit.trycloudflare.com')
 OLLAMA_MODEL = 'qwen2.5:3b'
 
 # Create the client
@@ -37,6 +37,62 @@ client_llm = OpenAI(
     api_key=os.getenv('OLLAMA_API_KEY', 'ollama'),
     base_url=OLLAMA_BASE_URL,
 )
+
+_debug_event_logged = set()
+
+
+def _event_value(obj, field):
+    if obj is None:
+        return None
+    if isinstance(obj, dict):
+        return obj.get(field)
+    return getattr(obj, field, None)
+
+
+def _extract_viewer_count(event) -> int | None:
+    fields = (
+        'viewer_count', 'viewerCount', 'viewers', 'viewerCountTotal',
+        'room_user_count', 'roomUserCount', 'total_user_count', 'user_count',
+    )
+    for field in fields:
+        value = _event_value(event, field)
+        if isinstance(value, int) and value >= 0:
+            return value
+
+    for nested_name in ('room_info', 'roomInfo', 'live_room', 'liveRoom', 'data'):
+        nested = _event_value(event, nested_name)
+        for field in fields:
+            value = _event_value(nested, field)
+            if isinstance(value, int) and value >= 0:
+                return value
+    return None
+
+
+def _debug_event_payload(kind: str, event) -> None:
+    if kind in _debug_event_logged:
+        return
+    _debug_event_logged.add(kind)
+    try:
+        keys = sorted([key for key in vars(event).keys() if not key.startswith('_')])
+        print(f'[LIVE EVENT SAMPLE] {kind}: fields={keys}')
+    except Exception as exc:
+        print(f'[LIVE EVENT SAMPLE] {kind}: unable to inspect payload: {exc}')
+
+
+def post_live_event(event_type: str, **payload) -> None:
+    try:
+        payload['type'] = event_type
+        data = json.dumps(payload).encode('utf-8')
+        req = urllib.request.Request(
+            LIVE_APP_URL.rstrip('/') + '/live-event',
+            data=data,
+            headers={'Content-Type': 'application/json'},
+            method='POST'
+        )
+        with urllib.request.urlopen(req, timeout=1):
+            pass
+    except Exception as exc:
+        print(f'WARN: Could not post live stats event {event_type}: {exc}')
 
 
 def _sanitize_tts_text(text: str) -> str:
@@ -258,6 +314,12 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
 @client.on(ConnectEvent)
 async def on_connect(event: ConnectEvent):
     print(f'Connected to @{event.unique_id} (Room ID: {client.room_id})')
+    _debug_event_payload('connect', event)
+    post_live_event(
+        'connect',
+        username=str(event.unique_id).lstrip('@'),
+        viewerCount=_extract_viewer_count(event)
+    )
     # Emit a machine-readable marker so the controller can detect a successful connection
     try:
         print(f'LIVE:CONNECTED:{event.unique_id}')
@@ -269,6 +331,8 @@ async def on_comment(event: CommentEvent) -> None:
     user_name = event.user.nickname
     comment_text = event.comment
     print(f'COMMENT: {user_name} -> {comment_text}')
+    _debug_event_payload('comment', event)
+    post_live_event('comment', viewerCount=_extract_viewer_count(event))
 
     ai_response = generate_live_response(user_name, comment_text, event_type='comment')
     print(f'AI Response: {ai_response}')
@@ -305,6 +369,8 @@ async def on_like(event: LikeEvent) -> None:
     user_name = event.user.nickname
     like_count = event.count
     print(f'LIKE: {user_name} liked x{like_count}')
+    _debug_event_payload('like', event)
+    post_live_event('like', count=like_count, viewerCount=_extract_viewer_count(event))
 
     tts_text = f'Cảm ơn {user_name} đã thả {like_count} tim cho chúng tôi.'
     if send_to_tts(tts_text, event=True, priority=1):

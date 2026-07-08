@@ -5,9 +5,21 @@ import sys
 import os
 import time
 from queue import Queue, Empty
+from collections import deque
 from flask import Flask, render_template, request, jsonify, Response, session, redirect, url_for
-from llm import llm_continuous
-from utils.tts import call_tts_service as _call_tts_service, stream_tts_audio
+try:
+    from live_noface.llm import llm_continuous
+except ImportError:
+    from llm import llm_continuous
+
+try:
+    from live_noface.utils.tts import call_tts_service as _call_tts_service, stream_tts_audio
+except ImportError:
+    try:
+        from .utils.tts import call_tts_service as _call_tts_service, stream_tts_audio
+    except ImportError:
+        from utils.tts import call_tts_service as _call_tts_service, stream_tts_audio
+
 
 _tts_cache = {}
 def call_tts_service(text: str, voice: str = 'Trúc Ly') -> tuple[bytes, str, int]:
@@ -72,7 +84,8 @@ def load_or_create_config():
         config_data = {
             "username": "admin",
             "password": default_pw,
-            "secret_key": secrets.token_hex(24)
+            "secret_key": secrets.token_hex(24),
+            "central_api_url": "http://127.0.0.1:5050"
         }
         with open(CONFIG_PATH, 'w') as f:
             json.dump(config_data, f, indent=4)
@@ -82,11 +95,21 @@ def load_or_create_config():
         
     # Auto-hashing check
     password_val = config_data.get("password")
+    needs_save = False
     if password_val:
         config_data["password_hash"] = generate_password_hash(password_val)
         del config_data["password"]
-        if "secret_key" not in config_data:
-            config_data["secret_key"] = secrets.token_hex(24)
+        needs_save = True
+        
+    if "secret_key" not in config_data:
+        config_data["secret_key"] = secrets.token_hex(24)
+        needs_save = True
+        
+    if "central_api_url" not in config_data:
+        config_data["central_api_url"] = "http://127.0.0.1:5050"
+        needs_save = True
+        
+    if needs_save:
         with open(CONFIG_PATH, 'w') as f:
             json.dump(config_data, f, indent=4)
             
@@ -114,7 +137,7 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax'    # Hạn chế cookie gửi đi trong request chéo trang (CSRF protection)
 )
 
-CENTRAL_API_URL = "http://127.0.0.1:5050"
+CENTRAL_API_URL = os.getenv("AINOFACE_CENTRAL_API_URL", config.get("central_api_url", "http://127.0.0.1:5050")).rstrip("/")
 
 def call_central_api(endpoint, method='GET', data=None, token=None):
     url = f"{CENTRAL_API_URL}{endpoint}"
@@ -137,29 +160,108 @@ def call_central_api(endpoint, method='GET', data=None, token=None):
             return json.loads(body), e.code
         except:
             return {'success': False, 'error': body or str(e)}, e.code
+    except urllib.error.URLError:
+        return {
+            'success': False,
+            'error': 'Không kết nối được server. Vui lòng kiểm tra backend.'
+        }, 503
+    except TimeoutError:
+        return {
+            'success': False,
+            'error': 'Không kết nối được server. Vui lòng kiểm tra backend.'
+        }, 503
     except Exception as e:
         return {'success': False, 'error': str(e)}, 500
 
 # Global queue for audio stream
 tts_queue = Queue()
 comments_queue = Queue()
+live_stats_lock = threading.Lock()
+live_stats = {
+    'connected': False,
+    'username': None,
+    'currentViewers': None,
+    'commentEvents': deque(),
+    'heartEvents': deque(),
+    'ordersCount': None,
+    'lastEventAt': None,
+}
 # Process handle for the external live listener
 live_process = None
+
+
+def parse_tiktok_username(value: str) -> str:
+    raw = (value or '').strip()
+    if not raw:
+        return ''
+    match = re.search(r'@([A-Za-z0-9_.]+)', raw)
+    if match:
+        return match.group(1).strip('._')
+    raw = raw.split('?', 1)[0].split('#', 1)[0].rstrip('/')
+    if '/' in raw:
+        raw = raw.rsplit('/', 1)[-1]
+    raw = raw.lstrip('@').strip()
+    if not re.fullmatch(r'[A-Za-z0-9_.]{2,24}', raw):
+        return ''
+    return raw.strip('._')
+
+
+def tiktok_connect_error_response(status_code=500):
+    return jsonify({
+        'success': False,
+        'error': 'Không thể khởi động bộ kết nối TikTok Live. Vui lòng kiểm tra cài đặt hoặc thử lại.'
+    }), status_code
+
+
+def reset_live_stats(username=None, connected=False):
+    with live_stats_lock:
+        live_stats['connected'] = connected
+        live_stats['username'] = username
+        live_stats['currentViewers'] = None
+        live_stats['commentEvents'].clear()
+        live_stats['heartEvents'].clear()
+        live_stats['ordersCount'] = None
+        live_stats['lastEventAt'] = time.time() if connected else None
+
+
+def prune_live_stats(now=None):
+    now = now or time.time()
+    cutoff = now - 60
+    while live_stats['commentEvents'] and live_stats['commentEvents'][0] < cutoff:
+        live_stats['commentEvents'].popleft()
+    while live_stats['heartEvents'] and live_stats['heartEvents'][0][0] < cutoff:
+        live_stats['heartEvents'].popleft()
+
+
+def live_stats_snapshot():
+    with live_stats_lock:
+        prune_live_stats()
+        hearts_per_minute = sum(item[1] for item in live_stats['heartEvents'])
+        return {
+            'success': True,
+            'connected': live_stats['connected'],
+            'username': live_stats['username'],
+            'currentViewers': live_stats['currentViewers'],
+            'commentsPerMinute': len(live_stats['commentEvents']),
+            'heartsPerMinute': hearts_per_minute,
+            'ordersCount': live_stats['ordersCount'],
+            'lastEventAt': live_stats['lastEventAt'],
+        }
 
 @app.before_request
 def require_login():
     if request.endpoint == 'static':
         return
-    if request.path in ('/login', '/logout'):
+    if request.path in ('/login', '/logout', '/register'):
         return
-    if request.path == '/human':
+    if request.path in ('/human', '/live-event'):
         # Allow TikTok Live local listener process to call /human
         if request.remote_addr in ('127.0.0.1', '::1', 'localhost'):
             return
             
     if not session.get('logged_in'):
         # If it's an API request, return 401 JSON error instead of redirecting
-        if request.path.startswith(('/stream', '/tts', '/add-tts', '/start-live', '/stop-live', '/comments-stream', '/audio-stream', '/set-unread-count')):
+        if request.path.startswith(('/api/', '/stream', '/tts', '/add-tts', '/start-live', '/stop-live', '/comments-stream', '/audio-stream', '/set-unread-count')):
             return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập để tiếp tục.'}), 401
         return redirect(url_for('login'))
 
@@ -179,6 +281,12 @@ def set_unread_count():
 def register():
     data = request.get_json(silent=True) or {}
     res_data, status_code = call_central_api('/api/auth/register', method='POST', data=data)
+    if status_code == 201 and res_data.get('success') and res_data.get('token'):
+        session['logged_in'] = True
+        session['auth_token'] = res_data.get('token')
+        user_data = res_data.get('user') or {}
+        session['username'] = user_data.get('username') or data.get('username', '').strip()
+        session.permanent = True
     return jsonify(res_data), status_code
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -210,7 +318,7 @@ def logout():
     session_id = session.get('session_id')
     auth_token = session.get('auth_token')
     if session_id and auth_token:
-        call_central_api('/api/user/session/end', method='POST', data={'sessionId': session_id}, token=auth_token)
+        call_central_api('/api/billing/session/end', method='POST', data={'sessionId': session_id}, token=auth_token)
     session.clear()
     return redirect(url_for('login'))
 
@@ -221,7 +329,7 @@ def session_start():
         return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
     
     data = request.get_json(silent=True) or {}
-    res_data, status_code = call_central_api('/api/user/session/start', method='POST', data=data, token=auth_token)
+    res_data, status_code = call_central_api('/api/billing/session/start', method='POST', data=data, token=auth_token)
     if status_code == 200 and res_data.get('success'):
         session['session_id'] = res_data.get('sessionId')
     return jsonify(res_data), status_code
@@ -236,9 +344,9 @@ def session_heartbeat():
     if not session_id:
         return jsonify({'success': False, 'error': 'Không tìm thấy phiên làm việc.'}), 400
         
-    res_data, status_code = call_central_api('/api/user/session/heartbeat', method='POST', data={'sessionId': session_id}, token=auth_token)
+    res_data, status_code = call_central_api('/api/billing/session/heartbeat', method='POST', data={'sessionId': session_id}, token=auth_token)
     # If expired, clear session_id
-    if res_data.get('status') == 'expired':
+    if res_data.get('status') in ('expired', 'ended', 'stopped', 'locked') or res_data.get('action') in ('stop_live', 'force_logout'):
         session.pop('session_id', None)
     return jsonify(res_data), status_code
 
@@ -252,7 +360,7 @@ def session_end():
     if not session_id:
         return jsonify({'success': False, 'error': 'Không tìm thấy phiên làm việc.'}), 400
         
-    res_data, status_code = call_central_api('/api/user/session/end', method='POST', data={'sessionId': session_id}, token=auth_token)
+    res_data, status_code = call_central_api('/api/billing/session/end', method='POST', data={'sessionId': session_id}, token=auth_token)
     session.pop('session_id', None)
     return jsonify(res_data), status_code
 
@@ -264,6 +372,11 @@ def user_profile():
     
     res_data, status_code = call_central_api('/api/user/profile', method='GET', token=auth_token)
     return jsonify(res_data), status_code
+
+
+@app.route('/api/live/stats', methods=['GET'])
+def api_live_stats():
+    return jsonify(live_stats_snapshot())
 
 @app.route('/stream')
 def stream():
@@ -361,6 +474,42 @@ def human():
         return jsonify({'code': 1, 'error': str(exc)}), 500
 
 
+@app.route('/live-event', methods=['POST'])
+def live_event():
+    """Receive realtime TikTok event stats from live.py."""
+    if request.remote_addr not in ('127.0.0.1', '::1', 'localhost'):
+        return jsonify({'success': False, 'error': 'Forbidden'}), 403
+
+    payload = request.get_json(silent=True) or {}
+    event_type = (payload.get('type') or '').strip().lower()
+    now = time.time()
+
+    with live_stats_lock:
+        prune_live_stats(now)
+        if event_type == 'connect':
+            live_stats['connected'] = True
+            live_stats['username'] = payload.get('username') or live_stats['username']
+        elif event_type == 'disconnect':
+            live_stats['connected'] = False
+        elif event_type == 'comment':
+            live_stats['connected'] = True
+            live_stats['commentEvents'].append(now)
+        elif event_type in ('like', 'heart'):
+            live_stats['connected'] = True
+            try:
+                count = int(payload.get('count') or 1)
+            except Exception:
+                count = 1
+            live_stats['heartEvents'].append((now, max(1, count)))
+
+        viewer_count = payload.get('viewerCount')
+        if isinstance(viewer_count, int) and viewer_count >= 0:
+            live_stats['currentViewers'] = viewer_count
+        live_stats['lastEventAt'] = now
+
+    return jsonify({'success': True})
+
+
 @app.route('/comments-stream')
 def comments_stream():
     """SSE stream cung cấp comments đến web UI."""
@@ -438,9 +587,10 @@ def start_live():
         return jsonify({'success': False, 'error': 'Live listener already running.'}), 400
 
     payload = request.get_json(silent=True) or {}
-    room = (payload.get('room') or payload.get('username') or '').strip()
+    room = parse_tiktok_username(payload.get('room') or payload.get('username') or '')
     if not room:
-        return jsonify({'success': False, 'error': 'Missing room/username.'}), 400
+        return jsonify({'success': False, 'error': 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.'}), 400
+    reset_live_stats(username=room, connected=False)
 
     env = os.environ.copy()
     env['TIKTOK_USER'] = room
@@ -453,13 +603,16 @@ def start_live():
     try:
         # Determine launch command based on PyInstaller frozen status
         if getattr(sys, 'frozen', False):
-            # When frozen, run the compiled live_client.exe executable located inside _internal
-            app_dir = os.path.dirname(sys.executable)
-            cmd = [os.path.join(app_dir, '_internal', 'live_client.exe')]
+            # Reuse the bundled launcher executable; no separate live_client.exe is produced by the spec.
+            cmd = [sys.executable, '--run-live']
         else:
             # When in development, run live.py using system python
             app_dir = os.path.dirname(os.path.abspath(__file__))
-            cmd = [sys.executable, os.path.join(app_dir, 'live.py')]
+            live_script = os.path.join(app_dir, 'live.py')
+            if not os.path.exists(live_script):
+                print(f"[LIVE ERROR] Missing TikTok connector script: {live_script}")
+                return tiktok_connect_error_response()
+            cmd = [sys.executable, live_script]
 
         proc = subprocess.Popen(
             cmd,
@@ -472,8 +625,12 @@ def start_live():
             creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith('win') else 0,
         )
         live_process = proc
+    except FileNotFoundError as e:
+        print(f"[LIVE ERROR] TikTok connector command not found: {e}")
+        return tiktok_connect_error_response()
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+        print(f"[LIVE ERROR] Failed to start TikTok connector: {e}")
+        return tiktok_connect_error_response()
 
     # Wait for a live-ready marker from stdout
     start_t = time.time()
@@ -492,6 +649,10 @@ def start_live():
             if line:
                 stdout_lines.append(line.strip())
                 if marker in line:
+                    with live_stats_lock:
+                        live_stats['connected'] = True
+                        live_stats['username'] = room
+                        live_stats['lastEventAt'] = time.time()
                     return jsonify({'success': True}), 200
             else:
                 # no new stdout; check stderr
@@ -538,6 +699,7 @@ def stop_live():
         except Exception:
             live_process.kill()
         live_process = None
+        reset_live_stats()
         return jsonify({'success': True}), 200
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
