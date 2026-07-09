@@ -17,7 +17,7 @@ from openai import OpenAI
 
 # Configuration
 LIVE_APP_URL = os.getenv('LIVE_APP_URL', 'http://127.0.0.1:5000')
-OLLAMA_BASE_URL = os.getenv('LLM_API_BASE_URL') or os.getenv('OLLAMA_BASE_URL', 'https://blast-float-hear-kit.trycloudflare.com')
+OLLAMA_BASE_URL = os.getenv('LLM_API_BASE_URL') or os.getenv('OLLAMA_BASE_URL', 'https://luck-tvs-schedules-palace.trycloudflare.com')
 OLLAMA_MODEL = 'qwen2.5:3b'
 
 # Create the client
@@ -146,6 +146,9 @@ def _enforce_comment_response(user_name: str, llm_response: str, comment_text: s
     name_parts = [part for part in re.split(r'\s+|[-–—]+', user_name) if part]
     if name_parts:
         first_name_fragment = name_parts[0].lower()
+
+
+
         if intro_lower == first_name_fragment or intro_lower.startswith(first_name_fragment + ' '):
             intro_core = ''
 
@@ -270,11 +273,47 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
             with requests.post(generate_url, json=payload, timeout=15) as r:
                 if r.status_code != 200:
                     raise RuntimeError(f"Slink API error {r.status_code}")
-                lines = []
+                
+                extracted_tokens = []
                 for line in r.iter_lines(decode_unicode=True):
-                    if line:
-                        lines.append(line.strip())
-                response = " ".join(lines).strip()
+                    if not line:
+                        continue
+                    line_str = line.strip()
+                    if line_str.startswith("data:"):
+                        line_str = line_str[5:].strip()
+                    if not line_str:
+                        continue
+                    try:
+                        data = json.loads(line_str)
+                        if isinstance(data, dict):
+                            val = data.get("response") or data.get("text") or data.get("content")
+                            if val is None and "choices" in data and isinstance(data["choices"], list) and len(data["choices"]) > 0:
+                                choice = data["choices"][0]
+                                if isinstance(choice, dict):
+                                    val = choice.get("text") or (choice.get("delta", {}).get("content") if "delta" in choice else None) or (choice.get("message", {}).get("content") if "message" in choice else None)
+                            if val is not None:
+                                extracted_tokens.append(str(val))
+                            else:
+                                extracted_tokens.append(line_str)
+                        else:
+                            extracted_tokens.append(str(data))
+                    except Exception:
+                        extracted_tokens.append(line_str)
+                
+                # Smart join tokens/sentences
+                response = ""
+                for part in extracted_tokens:
+                    if not response:
+                        response = part
+                    else:
+                        if part.startswith(" ") or part.startswith("\n") or response.endswith(" ") or response.endswith("\n"):
+                            response += part
+                        else:
+                            if (response[-1].isalnum() or response[-1] in ['.', ',', '!', '?', ';', ':']) and part[0].isalnum():
+                                response += " " + part
+                            else:
+                                response += part
+                response = response.strip()
         else:
             completion = client_llm.chat.completions.create(
                 model=OLLAMA_MODEL,

@@ -117,19 +117,15 @@ Bạn hãy sử dụng terminal trong môi trường ảo của bạn và cài t
 
 ## BƯỚC 3: TIẾN HÀNH ĐÓNG GÓI THÀNH APP DESKTOP (`.exe`)
 
-Sau khi cài đặt xong các thư viện cần thiết ở Bước 2, bạn đứng ở thư mục gốc của dự án để chạy lệnh đóng gói:
+Sau khi cài đặt xong các thư viện cần thiết ở Bước 2, bạn đứng ở thư mục `app-ainoface` để chạy lệnh đóng gói:
 
-1. Di chuyển ra thư mục gốc:
+1. Di chuyển vào thư mục `app-ainoface`:
    ```powershell
-   cd D:\interntaks\Ainofaoce
+   cd D:\interntaks\Ainofaoce\app-ainoface
    ```
-2. Chạy lệnh đóng gói bằng PyInstaller:
+2. Chạy lệnh đóng gói bằng PyInstaller (đoạn mã này tự động sao lưu cấu hình `config.json` cũ để tránh bị xóa sạch khi đóng gói lại):
    ```powershell
-   pyinstaller --noconfirm --onedir --windowed --name "Live_AI_SLive" `
-     --add-data "live_noface/templates;live_noface/templates" `
-     --add-data "live_noface/static;live_noface/static" `
-     --add-data "live_noface/config.json;live_noface" `
-     run_app.py
+   Stop-Process -Name "Live_AI_SLive" -ErrorAction SilentlyContinue ; Stop-Process -Name "live_client" -ErrorAction SilentlyContinue ; $backup = "D:\interntaks\Ainofaoce\app-ainoface\dist_backup" ; New-Item -ItemType Directory -Force -Path $backup | Out-Null ; if (Test-Path "D:\interntaks\Ainofaoce\app-ainoface\dist\Live_AI_SLive\config.json") { Copy-Item "D:\interntaks\Ainofaoce\app-ainoface\dist\Live_AI_SLive\config.json" -Destination $backup -Force } ; & "D:\interntaks\Ainofaoce\app-ainoface\test_vieneu\venv\Scripts\pyinstaller.exe" --clean --noconfirm --onedir --windowed --name "Live_AI_SLive" --icon "D:\interntaks\Ainofaoce\app-ainoface\icon.ico" --paths "D:\interntaks\Ainofaoce\app-ainoface\live_noface" --paths "D:\interntaks\Ainofaoce\app-ainoface\test_vieneu" --distpath "D:\interntaks\Ainofaoce\app-ainoface\dist" --workpath "D:\interntaks\Ainofaoce\app-ainoface\build" --specpath "D:\interntaks\Ainofaoce\app-ainoface" --collect-data vieneu --collect-data sea_g2p --add-data "D:\interntaks\Ainofaoce\app-ainoface\live_noface\templates;live_noface/templates" D:\interntaks\Ainofaoce\app-ainoface\run_app.py ; & "D:\interntaks\Ainofaoce\app-ainoface\test_vieneu\venv\Scripts\pyinstaller.exe" --clean --noconfirm --onefile --console --name "live_client" --icon "D:\interntaks\Ainofaoce\app-ainoface\icon.ico" --paths "D:\interntaks\Ainofaoce\app-ainoface\live_noface" --paths "D:\interntaks\Ainofaoce\app-ainoface\test_vieneu" --distpath "D:\interntaks\Ainofaoce\app-ainoface\dist" --workpath "D:\interntaks\Ainofaoce\app-ainoface\build" --specpath "D:\interntaks\Ainofaoce\app-ainoface" D:\interntaks\Ainofaoce\app-ainoface\live_noface\live.py ; Move-Item -Path "D:\interntaks\Ainofaoce\app-ainoface\dist\live_client.exe" -Destination "D:\interntaks\Ainofaoce\app-ainoface\dist\Live_AI_SLive\_internal\live_client.exe" -Force ; if (Test-Path "$backup\config.json") { Copy-Item "$backup\config.json" -Destination "D:\interntaks\Ainofaoce\app-ainoface\dist\Live_AI_SLive\config.json" -Force } else { if (Test-Path "D:\interntaks\Ainofaoce\app-ainoface\config.json") { Copy-Item "D:\interntaks\Ainofaoce\app-ainoface\config.json" -Destination "D:\interntaks\Ainofaoce\app-ainoface\dist\Live_AI_SLive\config.json" -Force } } ; Remove-Item -Path $backup -Recurse -Force -ErrorAction SilentlyContinue
    ```
 
 ### **Giải thích các tham số trong câu lệnh:**

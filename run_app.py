@@ -42,8 +42,7 @@ if os.path.exists(hub_dir):
             pass
 
 if model_exists:
-    os.environ["HF_HUB_OFFLINE"] = "1"
-    print("Local model weights detected. Lock to OFFLINE mode for instant startup.")
+    print("Local model weights detected. Ready for startup.")
 else:
     print("Local model weights not found. Online mode active for first-run download.")
 

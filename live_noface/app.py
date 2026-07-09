@@ -1,9 +1,27 @@
+import os
+import time
 import json
 import threading
 import subprocess
 import sys
-import os
-import time
+
+# Load configuration and initialize LLM API base URLs in environment variables
+CONFIG_PATH = 'config.json'
+DEFAULT_CENTRAL_API_URL = "https://ainoface-backend.onrender.com"
+DEFAULT_LLM_URL = "https://luck-tvs-schedules-palace.trycloudflare.com"
+
+if not os.environ.get("LLM_API_BASE_URL") and not os.environ.get("OLLAMA_BASE_URL"):
+    llm_url = DEFAULT_LLM_URL
+    if os.path.exists(CONFIG_PATH):
+        try:
+            with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+                cfg = json.load(f)
+                llm_url = cfg.get("llm_api_base_url") or cfg.get("ollama_base_url") or DEFAULT_LLM_URL
+        except Exception:
+            pass
+    os.environ["LLM_API_BASE_URL"] = llm_url
+    os.environ["OLLAMA_BASE_URL"] = llm_url
+
 from queue import Queue, Empty
 from collections import deque
 from flask import Flask, render_template, request, jsonify, Response, session, redirect, url_for
@@ -36,8 +54,6 @@ def call_tts_service(text: str, voice: str = 'Trúc Ly') -> tuple[bytes, str, in
 import urllib.error
 import urllib.request
 import re
-from werkzeug.security import generate_password_hash, check_password_hash
-import secrets
 
 def split_text_into_sentences(text: str) -> list[str]:
     if not text:
@@ -78,57 +94,25 @@ def add_header(response):
 CONFIG_PATH = 'config.json'
 
 def load_or_create_config():
-    default_pw = None
     if not os.path.exists(CONFIG_PATH):
-        default_pw = "admin123"
         config_data = {
-            "username": "admin",
-            "password": default_pw,
-            "secret_key": secrets.token_hex(24),
-            "central_api_url": "http://127.0.0.1:5050"
+            "central_api_url": "https://ainoface-backend.onrender.com"
         }
-        with open(CONFIG_PATH, 'w') as f:
+        with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
             json.dump(config_data, f, indent=4)
             
-    with open(CONFIG_PATH, 'r') as f:
+    with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
         config_data = json.load(f)
         
-    # Auto-hashing check
-    password_val = config_data.get("password")
-    needs_save = False
-    if password_val:
-        config_data["password_hash"] = generate_password_hash(password_val)
-        del config_data["password"]
-        needs_save = True
-        
-    if "secret_key" not in config_data:
-        config_data["secret_key"] = secrets.token_hex(24)
-        needs_save = True
-        
     if "central_api_url" not in config_data:
-        config_data["central_api_url"] = "http://127.0.0.1:5050"
-        needs_save = True
-        
-    if needs_save:
-        with open(CONFIG_PATH, 'w') as f:
+        config_data["central_api_url"] = "https://ainoface-backend.onrender.com"
+        with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
             json.dump(config_data, f, indent=4)
             
-        # Print to credentials.txt if this was just created
-        if default_pw:
-            with open('credentials.txt', 'w', encoding='utf-8') as f:
-                f.write("Thông tin đăng nhập hệ thống Live AI:\n")
-                f.write("-------------------------------------\n")
-                f.write("Username: admin\n")
-                f.write(f"Password: {default_pw}\n\n")
-                f.write("Lưu ý: Mật khẩu này được sinh ngẫu nhiên để bảo mật.\n")
-                f.write("Bạn có thể đổi mật khẩu bất kỳ lúc nào bằng cách sửa file 'config.json'.\n")
-                f.write("Điền mật khẩu mới dạng văn bản thường vào trường \"password\": \"mật_khẩu_của_bạn\".\n")
-                f.write("Hệ thống sẽ tự động mã hóa nó và lưu lại dạng bảo mật ở lần chạy tiếp theo.")
-            print("[AI AUTH] Generated credentials.txt with random password.")
     return config_data
 
 config = load_or_create_config()
-app.secret_key = config.get('secret_key', os.urandom(24))
+app.secret_key = os.urandom(24)
 
 # Cấu hình bảo mật nâng cao cho Session Cookie
 app.config.update(
@@ -387,27 +371,93 @@ def stream():
     quit_event = threading.Event()
     sentence_queue = Queue()
 
-    def on_token(token: str):
-        sentence_queue.put({"type": "token", "text": token})
-
     def on_sentence(sentence: str):
         sentence_queue.put({"type": "sentence", "text": sentence})
 
     def run_continuous():
-        llm_continuous(prompt, quit_event, on_token=on_token, on_sentence=on_sentence, interval=0)
+        import requests
+        original_post = requests.post
+        error_msg = [None]
+
+        def mock_post(*args, **kwargs):
+            try:
+                resp = original_post(*args, **kwargs)
+                orig_raise = resp.raise_for_status
+                def mock_raise():
+                    try:
+                        orig_raise()
+                    except Exception as e:
+                        if resp.status_code == 404:
+                            error_msg[0] = "Sai endpoint API AI hoặc server AI chưa mở route tạo kịch bản."
+                        else:
+                            error_msg[0] = f"Lỗi HTTP {resp.status_code} từ máy chủ AI tại {args[0]}."
+                        raise e
+                resp.raise_for_status = mock_raise
+                return resp
+            except Exception as e:
+                error_msg[0] = f"Không thể kết nối tới máy chủ AI tại {args[0]}. Chi tiết: {str(e)}"
+                raise e
+
+        requests.post = mock_post
+        
+        generated_sentences = []
+        def local_on_sentence(sentence):
+            generated_sentences.append(sentence)
+            on_sentence(sentence)
+
+        try:
+            # First call with the base prompt
+            llm_continuous(prompt, quit_event, on_sentence=local_on_sentence)
+            
+            # Loop for subsequent script sentences
+            for i in range(12):
+                if quit_event.is_set():
+                    break
+                if error_msg[0]:
+                    break
+                
+                time.sleep(0.3)
+                cont_prompt = "Hãy nói tiếp câu thoại tiếp theo của kịch bản livestream ở trên, không lặp lại lời chào hỏi."
+                llm_continuous(cont_prompt, quit_event, on_sentence=local_on_sentence, history=generated_sentences[-5:])
+                
+            if error_msg[0]:
+                print(f"[AI ERROR] {error_msg[0]}")
+                sentence_queue.put({"type": "ai_error", "text": error_msg[0]})
+        except Exception as e:
+            if not error_msg[0]:
+                error_msg[0] = f"Lỗi gọi AI: {str(e)}"
+            print(f"[AI ERROR Exception] {error_msg[0]}")
+            sentence_queue.put({"type": "ai_error", "text": error_msg[0]})
+        finally:
+            requests.post = original_post
 
     thread = threading.Thread(target=run_continuous, daemon=True)
     thread.start()
 
     def event_stream():
+        sent_any = False
+        last_activity = time.time()
+        timeout_limit = 20.0  # 20 seconds inactivity timeout
         try:
             while not quit_event.is_set():
+                if time.time() - last_activity > timeout_limit:
+                    yield f"event: ai_error\ndata: Hết thời gian chờ phản hồi từ máy chủ AI (Timeout).\n\n"
+                    break
+
                 try:
                     msg = sentence_queue.get(timeout=1)
+                    last_activity = time.time()
+                    if msg['type'] in ('sentence', 'token'):
+                        sent_any = True
                     yield f"event: {msg['type']}\ndata: {msg['text']}\n\n"
                 except Empty:
                     if not thread.is_alive():
                         break
+            
+            # If the stream finished and we never sent anything, send an error to close connection
+            if not sent_any and not quit_event.is_set():
+                yield f"event: ai_error\ndata: Máy chủ AI không phản hồi hoặc trả về nội dung rỗng.\n\n"
+
             while not sentence_queue.empty():
                 msg = sentence_queue.get_nowait()
                 yield f"event: {msg['type']}\ndata: {msg['text']}\n\n"
