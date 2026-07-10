@@ -1750,7 +1750,7 @@
                 </div>
             </div>
             <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                <button type="button" class="btn-red" onclick="cancelPendingInvoice()" style="height: 38px; border-radius: 8px; padding: 0 15px; font-weight: bold; flex: 1;">Hủy hóa đơn</button>
+                <button type="button" class="btn-red" id="btn-cancel-invoice" onclick="cancelPendingInvoice()" style="height: 38px; border-radius: 8px; padding: 0 15px; font-weight: bold; flex: 1;">Hủy hóa đơn</button>
                 <button type="button" class="btn-green" onclick="closeQrModal()" style="height: 38px; border-radius: 8px; padding: 0 15px; flex: 1;">Tôi đã chuyển tiền</button>
             </div>
         </div>
@@ -1770,7 +1770,7 @@
             </div>
             <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
                 <button type="button" class="btn-gray" onclick="closeCancelConfirmModal()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Bỏ qua</button>
-                <button type="button" class="btn-red" onclick="executeCancelPendingInvoice()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold;">Hủy hóa đơn</button>
+                <button type="button" class="btn-red" id="btn-execute-cancel-invoice" onclick="executeCancelPendingInvoice()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold;">Hủy hóa đơn</button>
             </div>
         </div>
     </div>
@@ -3001,8 +3001,9 @@
                     if (data.status === 'completed') {
                         localStorage.removeItem('active_pending_invoice_id');
                         
-                        // Đóng modal QR nếu đang mở
+                        // Đóng các modal nạp tiền và xác nhận nếu đang mở
                         document.getElementById('qr-modal').style.display = 'none';
+                        document.getElementById('cancel-confirm-modal').style.display = 'none';
                         
                         // Hiển thị thông tin lên payment-success-modal
                         const inv = data.invoice;
@@ -3028,6 +3029,7 @@
                     } else if (data.status === 'cancelled') {
                         localStorage.removeItem('active_pending_invoice_id');
                         document.getElementById('qr-modal').style.display = 'none';
+                        document.getElementById('cancel-confirm-modal').style.display = 'none';
                         
                         if (invoicePollingInterval) {
                             clearInterval(invoicePollingInterval);
@@ -3310,33 +3312,69 @@
         }
 
         async function executeCancelPendingInvoice() {
-            closeCancelConfirmModal();
-            
-            if (!activeInvoiceId) return;
-            
-            localStorage.removeItem('active_pending_invoice_id');
-            
-            if (invoicePollingInterval) {
-                clearInterval(invoicePollingInterval);
-                invoicePollingInterval = null;
+            if (!activeInvoiceId) {
+                closeCancelConfirmModal();
+                return;
             }
+
+            const btnCancel = document.getElementById('btn-cancel-invoice');
+            const btnExecute = document.getElementById('btn-execute-cancel-invoice');
+            if (btnCancel) btnCancel.disabled = true;
+            if (btnExecute) btnExecute.disabled = true;
             
             try {
                 const res = await fetch(`/api/invoice/cancel/${activeInvoiceId}`, { method: 'POST' });
                 const data = await res.json();
+                
+                // Đóng modal xác nhận hủy
+                closeCancelConfirmModal();
+                
                 if (res.ok && data.success) {
+                    localStorage.removeItem('active_pending_invoice_id');
+                    if (invoicePollingInterval) {
+                        clearInterval(invoicePollingInterval);
+                        invoicePollingInterval = null;
+                    }
                     showAppAlert('Thành công', 'Đã hủy hóa đơn nạp tiền thành công.');
+                    document.getElementById('qr-modal').style.display = 'none';
+                    activeInvoiceId = null;
+                    loadUserProfile();
                 } else {
-                    showAppAlert('Lỗi', data.error || 'Hủy hóa đơn thất bại.');
+                    // Nếu backend báo hóa đơn đã được thanh toán thành công (completed) do admin vừa duyệt
+                    if (data.isCompleted || (data.invoice && data.invoice.status === 'completed')) {
+                        localStorage.removeItem('active_pending_invoice_id');
+                        if (invoicePollingInterval) {
+                            clearInterval(invoicePollingInterval);
+                            invoicePollingInterval = null;
+                        }
+                        
+                        document.getElementById('qr-modal').style.display = 'none';
+                        
+                        // Hiển thị thông tin lên payment-success-modal
+                        const inv = data.invoice;
+                        document.getElementById('success-det-code').textContent = inv.code;
+                        document.getElementById('success-det-time').textContent = new Date().toLocaleString('vi-VN');
+                        document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+                        
+                        const mins = Math.floor(inv.secondsChanged / 60);
+                        document.getElementById('success-det-hours').textContent = `+${mins} phút`;
+                        
+                        document.getElementById('payment-success-modal').style.display = 'flex';
+                        activeInvoiceId = null;
+                        loadUserProfile();
+                    } else {
+                        showAppAlert('Lỗi', data.error || 'Hủy hóa đơn thất bại.');
+                        if (btnCancel) btnCancel.disabled = false;
+                        if (btnExecute) btnExecute.disabled = false;
+                    }
                 }
             } catch (err) {
                 console.error('Cancel invoice error:', err);
+                closeCancelConfirmModal();
                 showAppAlert('Lỗi', 'Không thể kết nối máy chủ để hủy hóa đơn.');
+                if (btnCancel) btnCancel.disabled = false;
+                if (btnExecute) btnExecute.disabled = false;
             }
-            
-            activeInvoiceId = null;
-            document.getElementById('qr-modal').style.display = 'none';
-            loadUserProfile();
         }
 
         function showAppAlert(title, message) {
@@ -3447,6 +3485,11 @@
         function showInvoiceCheckout(invoice) {
             activeInvoiceId = invoice._id;
             
+            const btnCancel = document.getElementById('btn-cancel-invoice');
+            const btnExecute = document.getElementById('btn-execute-cancel-invoice');
+            if (btnCancel) btnCancel.disabled = false;
+            if (btnExecute) btnExecute.disabled = false;
+
             const profile = userProfileData || {};
             const bankDetails = profile.bankDetails || {};
             
