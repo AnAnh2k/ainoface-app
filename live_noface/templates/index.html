@@ -779,6 +779,15 @@
         }
 
         .history-tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 10px 0;
+            color: var(--text-muted) !important;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
             transition: all 0.2s ease;
         }
 
@@ -787,8 +796,8 @@
         }
 
         .history-tab-btn.active {
-            color: var(--primary) !important;
-            border-bottom-color: var(--primary) !important;
+            color: #fff !important;
+            border-bottom: 2px solid var(--primary) !important;
         }
 
         label {
@@ -1879,8 +1888,8 @@
             <div class="modal-body" style="padding: 10px 0;">
                 <!-- Tab Headers -->
                 <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px;">
-                    <button type="button" id="tab-invoices-btn" class="history-tab-btn active" onclick="switchHistoryTab('invoices')" style="flex: 1; background: none; border: none; border-bottom: 2px solid var(--primary); padding: 10px 0; color: #fff; cursor: pointer; font-weight: bold; font-size: 13px;">💳 Lịch sử nạp tiền</button>
-                    <button type="button" id="tab-sessions-btn" class="history-tab-btn" onclick="switchHistoryTab('sessions')" style="flex: 1; background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 0; color: var(--text-muted); cursor: pointer; font-weight: bold; font-size: 13px;">🎬 Lịch sử phiên live</button>
+                    <button type="button" id="tab-invoices-btn" class="history-tab-btn active" onclick="switchHistoryTab('invoices')">💳 Lịch sử nạp tiền</button>
+                    <button type="button" id="tab-sessions-btn" class="history-tab-btn" onclick="switchHistoryTab('sessions')">🎬 Lịch sử phiên live</button>
                 </div>
                 
                 <!-- Tab 1: Invoices List -->
