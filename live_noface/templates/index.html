@@ -49,9 +49,9 @@
             background-image: radial-gradient(circle at 10% 20%, rgba(4, 13, 31, 0.9) 0%, rgba(13, 20, 38, 0.9) 100%);
             margin: 0;
             padding: 0;
-            min-height: 100vh;
+            height: 100vh;
             color: var(--text-main);
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         /* Scrollbar design */
@@ -77,8 +77,9 @@
         /* Main Workspace layout */
         .app-layout {
             display: flex;
-            min-height: 100vh;
+            height: 100vh;
             width: 100vw;
+            overflow: hidden;
         }
 
         /* Left Sidebar styling */
@@ -211,54 +212,56 @@
             display: flex;
             flex-direction: column;
             min-width: 0;
+            min-height: 0;
             background: #080c18;
             box-sizing: border-box;
+            overflow: hidden;
         }
 
         /* Top Bar styling */
         .top-bar {
-            min-height: 96px;
+            min-height: 44px;
             border-bottom: 1px solid rgba(0, 240, 255, 0.08);
-            padding: 14px 24px;
+            padding: 4px 12px;
             display: flex;
-            align-items: stretch;
+            align-items: center;
             justify-content: space-between;
-            gap: 14px;
+            gap: 8px;
             background: rgba(8, 12, 26, 0.6);
             backdrop-filter: blur(12px);
             box-sizing: border-box;
             flex-shrink: 0;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
         }
 
         .top-bar-left {
             display: flex;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            min-width: 190px;
+            gap: 8px;
+            flex-wrap: nowrap;
+            min-width: auto;
         }
 
         .live-badge {
             background: var(--danger);
             color: #ffffff;
-            padding: 6px 12px;
-            border-radius: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-family: var(--font-cyber);
             font-weight: 900;
-            font-size: 11px;
+            font-size: 10px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 0 10px rgba(255, 0, 85, 0.4);
+            gap: 4px;
+            box-shadow: 0 0 8px rgba(255, 0, 85, 0.3);
             letter-spacing: 0.5px;
         }
 
         .live-badge::before {
             content: "";
             display: block;
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
             background: #ffffff;
             border-radius: 50%;
             animation: pulse-live 1.2s infinite;
@@ -272,26 +275,26 @@
 
         .live-timer-top {
             font-family: var(--font-cyber);
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 700;
             color: #f1f5f9;
-            padding: 10px 12px;
-            min-width: 112px;
+            padding: 4px 8px;
+            min-width: 76px;
             text-align: center;
-            border-radius: 10px;
+            border-radius: 6px;
             background: rgba(255, 255, 255, 0.035);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .top-bar-stats {
             display: flex;
-            align-items: stretch;
+            align-items: center;
             justify-content: flex-end;
-            gap: 10px;
+            gap: 6px;
             color: #94a3b8;
-            font-size: 13px;
+            font-size: 11px;
             flex: 1;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             min-width: 0;
         }
 
@@ -300,12 +303,12 @@
             flex-direction: column;
             align-items: flex-start;
             justify-content: center;
-            gap: 5px;
-            min-width: 118px;
-            min-height: 54px;
-            padding: 9px 12px;
+            gap: 1px;
+            min-width: 76px;
+            min-height: 34px;
+            padding: 3px 8px;
             border: 1px solid rgba(148, 163, 184, 0.14);
-            border-radius: 10px;
+            border-radius: 6px;
             background: linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(8, 12, 26, 0.44));
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
             box-sizing: border-box;
@@ -313,10 +316,10 @@
 
         .stat-label {
             color: #64748b;
-            font-size: 10px;
+            font-size: 8.5px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.1px;
             line-height: 1.1;
             white-space: nowrap;
         }
@@ -324,7 +327,7 @@
         .stat-value {
             color: #cbd5e1;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 12px;
             line-height: 1.15;
             white-space: nowrap;
         }
@@ -342,8 +345,9 @@
         }
 
         .stat-group-divider {
-            margin-left: 6px;
-            border-left-color: rgba(0, 240, 255, 0.18);
+            margin-left: 2px;
+            border-left: 1px solid rgba(0, 240, 255, 0.15);
+            padding-left: 6px;
         }
 
         .stat-action {
@@ -355,63 +359,67 @@
         }
 
         .topbar-action-btn {
-            min-height: 54px;
-            padding: 0 14px;
-            border-radius: 10px;
-            font-size: 12px;
+            min-height: 32px;
+            padding: 0 10px;
+            border-radius: 6px;
+            font-size: 11px;
             white-space: nowrap;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 7px;
+            gap: 4px;
         }
 
         .voice-control {
-            min-width: 112px;
+            min-width: auto;
             align-items: center;
+            gap: 4px;
         }
 
         .server-status-card {
-            min-width: 106px;
+            min-width: auto;
             align-items: center;
+            gap: 4px;
         }
 
         #top-server-status {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             line-height: 1.15;
         }
 
         @media (max-width: 1300px) {
             .top-bar {
-                padding: 12px 18px;
+                padding: 4px 12px;
             }
 
             .top-bar-stats {
-                justify-content: flex-start;
+                justify-content: flex-end;
             }
 
             .stat-item {
-                min-width: 112px;
+                min-width: 76px;
             }
         }
 
         @media (max-width: 980px) {
             .top-bar {
                 min-height: 0;
+                flex-wrap: wrap;
             }
 
             .top-bar-left,
             .top-bar-stats {
-                width: 100%;
+                width: auto;
             }
 
             .stat-item {
-                flex: 1 1 140px;
+                flex: none;
+                min-width: 76px;
             }
         }
 
@@ -419,13 +427,14 @@
         .container {
             display: grid;
             grid-template-columns: repeat(12, 1fr);
-            gap: 24px;
-            padding: 30px;
+            grid-template-rows: auto 1fr;
+            gap: 12px;
+            padding: 12px 18px;
             box-sizing: border-box;
             width: 100%;
-            overflow-y: auto;
             flex: 1;
-            /* Visualizer container glow effect */
+            min-height: 0;
+            overflow: hidden;
             transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
         }
 
@@ -736,6 +745,28 @@
             color: var(--danger);
         }
 
+        .price-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .price-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .price-btn.active {
+            border-color: var(--primary) !important;
+            background: rgba(0, 240, 255, 0.1) !important;
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+        }
+
         .btn-gray {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -745,6 +776,19 @@
         .btn-gray:hover:not(:disabled) {
             background: rgba(255, 255, 255, 0.15);
             border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .history-tab-btn {
+            transition: all 0.2s ease;
+        }
+
+        .history-tab-btn:hover {
+            color: #fff !important;
+        }
+
+        .history-tab-btn.active {
+            color: var(--primary) !important;
+            border-bottom-color: var(--primary) !important;
         }
 
         label {
@@ -784,33 +828,39 @@
         /* Specific Panel layout adjustments */
         .panel-ai-read {
             grid-column: span 6;
-            height: 430px;
+            height: 100%;
         }
 
         .panel-comments {
             grid-column: span 6;
-            height: 430px;
+            height: 100%;
         }
 
         .panel-prompt {
             grid-column: span 8;
-            height: 380px;
+            height: 100%;
+            min-height: 0;
         }
 
         .panel-billing {
             grid-column: span 4;
-            height: 380px;
+            height: 100%;
+            min-height: 0;
         }
 
         /* Card Bodies with Scrolling */
         .panel-body {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
+            padding: 12px 15px;
             display: flex;
             flex-direction: column;
             box-sizing: border-box;
             min-height: 0;
+        }
+
+        .panel-billing .panel-body {
+            overflow: hidden !important;
         }
 
         /* Active sentence and sound visual style */
@@ -818,8 +868,8 @@
             background: rgba(0, 240, 255, 0.03);
             border: 1px dashed rgba(0, 240, 255, 0.2);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
             position: relative;
             flex-shrink: 0;
         }
@@ -949,14 +999,15 @@
         }
 
         .llm-item {
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-left: 3px solid rgba(255, 255, 255, 0.05);
             background: rgba(255, 255, 255, 0.02);
             border-radius: 0 8px 8px 0;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 13.5px;
+            line-height: 1.45;
             color: #94a3b8;
             transition: all 0.25s ease;
+            opacity: 0.85;
         }
 
         .llm-item.typing {
@@ -967,17 +1018,23 @@
         }
 
         .llm-item.active {
-            color: #ffffff;
-            font-weight: 500;
-            border-left: 3px solid var(--primary);
-            background: rgba(0, 240, 255, 0.05);
-            box-shadow: inset 0 0 8px rgba(0, 240, 255, 0.05);
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            border-left: 4px solid var(--primary) !important;
+            background: rgba(0, 240, 255, 0.1) !important;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15), inset 0 0 8px rgba(0, 240, 255, 0.1) !important;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5) !important;
+            transform: scale(1.01);
+            opacity: 1 !important;
         }
 
         .llm-item.read {
-            color: #475569;
-            border-left-color: #334155;
-            background: transparent;
+            color: #64748b !important;
+            opacity: 0.45 !important;
+            border-left: 3px solid rgba(255, 255, 255, 0.05) !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
         }
 
         .script-empty-state,
@@ -1082,6 +1139,7 @@
             gap: 16px;
             height: 100%;
             box-sizing: border-box;
+            min-height: 0;
         }
 
         .prompt-inputs-column {
@@ -1089,6 +1147,7 @@
             display: flex;
             flex-direction: column;
             gap: 12px;
+            min-height: 0;
         }
 
         .prompt-script-column {
@@ -1099,6 +1158,7 @@
             padding-left: 16px;
             box-sizing: border-box;
             min-height: 0;
+            height: 100%;
         }
 
         .system-prompt-selectors {
@@ -1336,26 +1396,26 @@
                 </div>
 
                 <div class="top-bar-stats">
-                    <div class="stat-item">
+                    <div class="stat-item" style="display: none;">
                         <span class="stat-label">👥 Người xem</span>
                         <span class="stat-value" id="top-viewer-count">--</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item tiktok-stat">
                         <span class="stat-label">💬 Bình luận/phút</span>
                         <span class="stat-value" id="top-comment-rate">--</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item tiktok-stat">
                         <span class="stat-label">❤️ Tim/phút</span>
                         <span class="stat-value" id="top-like-rate">--</span>
                     </div>
-                    <div class="stat-item">
+                    <div class="stat-item tiktok-stat">
                         <span class="stat-label">🛒 Đơn hàng</span>
                         <span class="stat-value" id="top-order-count">--</span>
                     </div>
                     
-                    <div class="stat-item stat-group-divider">
+                    <div class="stat-item stat-group-divider" onclick="openUserHistoryModal()" style="cursor: pointer;" title="Xem lịch sử tài khoản">
                         <span class="stat-label">👤 Khách</span>
-                        <span class="stat-value primary" id="top-username">-</span>
+                        <span class="stat-value primary" id="top-username" style="text-decoration: underline;">-</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-label">⏳ Số dư</span>
@@ -1366,7 +1426,7 @@
                         <span class="stat-value" id="top-hourly-rate">-</span>
                     </div>
                     <div class="stat-item stat-action">
-                        <button class="btn-green topbar-action-btn" onclick="openQrModal()">Nạp tiền</button>
+                        <button class="btn-green topbar-action-btn" onclick="openPriceModal()">Nạp tiền</button>
                     </div>
                     
                     <div class="stat-item voice-control stat-group-divider">
@@ -1601,6 +1661,65 @@
         </main>
     </div>
 
+    <!-- Price Selection Modal -->
+    <div id="price-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3>💰 Chọn gói nạp tiền</h3>
+                <button type="button" class="close-modal-btn" onclick="closePriceModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 15px 0;">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: center;">
+                    Đơn giá hiện tại của bạn: <span id="price-modal-rate" style="color: var(--primary); font-weight: bold;">- đ/giờ</span>
+                </p>
+                
+                <!-- Quick select grid -->
+                <div class="price-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                    <button type="button" class="price-btn" id="pbtn-10000" onclick="selectPrice(10000)">
+                        <strong>10.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-10k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-20000" onclick="selectPrice(20000)">
+                        <strong>20.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-20k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-50000" onclick="selectPrice(50000)">
+                        <strong>50.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-50k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-100000" onclick="selectPrice(100000)">
+                        <strong>100.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-100k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-200000" onclick="selectPrice(200000)">
+                        <strong>200.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-200k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-500000" onclick="selectPrice(500000)">
+                        <strong>500.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-500k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-1000000" onclick="selectPrice(1000000)" style="grid-column: span 2;">
+                        <div style="text-align: center;">
+                            <strong>1.000.000 đ</strong><br/>
+                            <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-1m">--</span>
+                        </div>
+                    </button>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 5px;">Hoặc nhập số tiền mong muốn (tối thiểu 10.000đ):</label>
+                    <input type="number" id="custom-price-input" placeholder="Ví dụ: 15000" oninput="calculateCustomHours()" style="width: 100%; height: 38px; padding: 0 10px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #fff; box-sizing: border-box;" />
+                    <span id="custom-price-hours-desc" style="font-size: 11px; color: var(--primary); display: block; margin-top: 5px; font-weight: 500;"></span>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn-gray" onclick="closePriceModal()" style="height: 38px; border-radius: 8px; padding: 0 15px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Hủy bỏ</button>
+                <button type="button" class="btn-green" onclick="confirmPriceSelection()" style="height: 38px; border-radius: 8px; padding: 0 20px; cursor: pointer;">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
     <!-- QR Top-up Modal -->
     <div id="qr-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
@@ -1612,16 +1731,195 @@
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
                     Chuyển khoản theo mã QR bên dưới, hệ thống sẽ tự quy đổi thành giờ chơi (đơn giá: <span id="modal-rate" style="color:var(--primary); font-weight:bold;">-</span>).
                 </p>
-                <img id="qr-image" src="" alt="VietQR" style="width: 250px; height: 250px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;" />
+                <div style="position: relative; width: 250px; height: 250px; margin: 0 auto 15px;">
+                    <img id="qr-image" src="" alt="VietQR" style="width: 250px; height: 250px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);" />
+                    <div id="qr-loading-spinner" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; color: #fff; font-size: 13px;">
+                        <span style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s ease-in-out infinite; margin-bottom: 10px;"></span>
+                        Đang kết nối hóa đơn...
+                    </div>
+                </div>
                 <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 8px; font-size: 13px; text-align: left; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="margin-bottom: 6px; color:#fff;">🏦 Ngân hàng: <strong id="modal-bank-name">-</strong></div>
                     <div style="margin-bottom: 6px; color:#fff;">💳 Số tài khoản: <strong id="modal-bank-acc" style="color: var(--primary);">-</strong></div>
                     <div style="margin-bottom: 6px; color:#fff;">👤 Chủ tài khoản: <strong id="modal-bank-owner">-</strong></div>
+                    <div style="margin-bottom: 6px; color:#fff;">💰 Số tiền: <strong id="modal-amount" style="color: var(--success); font-size:15px;">-</strong></div>
                     <div style="color:#fff;">📝 Nội dung CK: <strong id="modal-bank-memo" style="color: var(--danger); font-size:15px; font-family:var(--font-cyber);">-</strong></div>
+                </div>
+                <div id="polling-status-msg" style="margin-top: 15px; font-size: 13px; color: var(--primary); font-weight: 500;">
+                    🕒 Đang chờ bạn chuyển khoản...
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button type="button" class="btn-red" onclick="cancelPendingInvoice()" style="height: 38px; border-radius: 8px; padding: 0 15px; font-weight: bold; flex: 1;">Hủy hóa đơn</button>
+                <button type="button" class="btn-green" onclick="closeQrModal()" style="height: 38px; border-radius: 8px; padding: 0 15px; flex: 1;">Tôi đã chuyển tiền</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Confirm Modal -->
+    <div id="cancel-confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--danger); box-shadow: 0 0 40px rgba(239, 68, 68, 0.15);">
+            <div class="modal-header" style="border-bottom-color: rgba(239, 68, 68, 0.15);">
+                <h3 style="color: var(--danger); display: flex; align-items: center; gap: 8px; font-size: 15px;">⚠️ Xác nhận hủy hóa đơn</h3>
+                <button type="button" class="close-modal-btn" onclick="closeCancelConfirmModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 20px 0; text-align: center;">
+                <p style="font-size: 14px; color: #fff; line-height: 1.5; margin: 0;">
+                    Bạn có chắc chắn muốn hủy hóa đơn nạp tiền này không? Hành động này không thể hoàn tác.
+                </p>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button type="button" class="btn-gray" onclick="closeCancelConfirmModal()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Bỏ qua</button>
+                <button type="button" class="btn-red" onclick="executeCancelPendingInvoice()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold;">Hủy hóa đơn</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Alert Modal (Thay thế alert) -->
+    <div id="app-alert-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--primary); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15);">
+            <div class="modal-header" style="border-bottom-color: rgba(0, 240, 255, 0.15);">
+                <h3 id="app-alert-title" style="color: var(--primary); display: flex; align-items: center; gap: 8px; font-size: 15px;">📢 Thông báo</h3>
+                <button type="button" class="close-modal-btn" onclick="closeAppAlertModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 20px 0; text-align: center;">
+                <p id="app-alert-message" style="font-size: 14px; color: #fff; line-height: 1.5; margin: 0;"></p>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 10px;">
+                <button type="button" class="btn-gray" onclick="closeAppAlertModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Success Modal -->
+    <div id="payment-success-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--success); box-shadow: 0 0 50px rgba(16, 185, 129, 0.15);">
+            <div class="modal-header" style="border-bottom-color: rgba(16, 185, 129, 0.1);">
+                <h3 style="color: var(--success); display: flex; align-items: center; gap: 8px; font-size: 15px;">🎉 Thanh toán thành công</h3>
+                <button type="button" class="close-modal-btn" onclick="closePaymentSuccessModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 15px 0; text-align: center;">
+                <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px; border: 1px solid rgba(16, 185, 129, 0.2);">✓</div>
+                <p style="font-size: 13px; color: var(--text-main); margin-bottom: 15px;">
+                    Cảm ơn bạn! Hóa đơn của bạn đã được duyệt thanh toán thành công.
+                </p>
+                <div style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 8px; font-size: 13px; text-align: left; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Mã hóa đơn:</span>
+                        <strong id="success-det-code" style="color: #fff; font-family: var(--font-cyber);">-</strong>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Thời gian:</span>
+                        <span id="success-det-time" style="color: #fff;">-</span>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Số tiền nạp:</span>
+                        <strong id="success-det-amount" style="color: var(--success);">-</strong>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Thời gian nhận:</span>
+                        <strong id="success-det-hours" style="color: var(--primary);">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted);">Trạng thái:</span>
+                        <span style="color: var(--success); font-weight: bold;">Thanh toán thành công</span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
-                <button type="button" class="btn-green" onclick="closeQrModal()" style="width: 100%; height: 38px; border-radius: 8px;">Tôi đã chuyển khoản thành công</button>
+                <button type="button" class="btn-green" onclick="closePaymentSuccessModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer;">Đóng và Bắt đầu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Detail Modal -->
+    <div id="invoice-detail-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 20px;">
+            <div class="modal-header">
+                <h3>📄 Chi tiết hóa đơn</h3>
+                <button type="button" class="close-modal-btn" onclick="closeInvoiceDetailModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 15px 0;">
+                <div style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 8px; font-size: 13px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Mã hóa đơn:</span>
+                        <strong id="det-code" style="color: #fff; font-family: var(--font-cyber);">-</strong>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Thời gian:</span>
+                        <span id="det-time" style="color: #fff;">-</span>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Số tiền nạp:</span>
+                        <strong id="det-amount" style="color: var(--success);">-</strong>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Thời gian nhận:</span>
+                        <strong id="det-hours" style="color: var(--primary);">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted);">Trạng thái:</span>
+                        <span id="det-status" style="font-weight: bold;">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
+                <button type="button" class="btn-gray" onclick="closeInvoiceDetailModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User History Modal (Invoices & Sessions) -->
+    <div id="user-history-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 680px; width: 90%;">
+            <div class="modal-header">
+                <h3>👤 Lịch sử hoạt động tài khoản</h3>
+                <button type="button" class="close-modal-btn" onclick="closeUserHistoryModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 10px 0;">
+                <!-- Tab Headers -->
+                <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px;">
+                    <button type="button" id="tab-invoices-btn" class="history-tab-btn active" onclick="switchHistoryTab('invoices')" style="flex: 1; background: none; border: none; border-bottom: 2px solid var(--primary); padding: 10px 0; color: #fff; cursor: pointer; font-weight: bold; font-size: 13px;">💳 Lịch sử nạp tiền</button>
+                    <button type="button" id="tab-sessions-btn" class="history-tab-btn" onclick="switchHistoryTab('sessions')" style="flex: 1; background: none; border: none; border-bottom: 2px solid transparent; padding: 10px 0; color: var(--text-muted); cursor: pointer; font-weight: bold; font-size: 13px;">🎬 Lịch sử phiên live</button>
+                </div>
+                
+                <!-- Tab 1: Invoices List -->
+                <div id="tab-invoices-content" style="max-height: 350px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-muted);">
+                                <th style="padding: 8px; font-weight: bold;">Mã hóa đơn</th>
+                                <th style="padding: 8px; font-weight: bold;">Thời gian</th>
+                                <th style="padding: 8px; font-weight: bold;">Số tiền</th>
+                                <th style="padding: 8px; font-weight: bold;">Quy đổi</th>
+                                <th style="padding: 8px; font-weight: bold;">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-invoices-tbody">
+                            <!-- Invoices render here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tab 2: Sessions List -->
+                <div id="tab-sessions-content" style="display: none; max-height: 350px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-muted);">
+                                <th style="padding: 8px; font-weight: bold;">Bắt đầu</th>
+                                <th style="padding: 8px; font-weight: bold;">Kết thúc</th>
+                                <th style="padding: 8px; font-weight: bold;">Đã dùng</th>
+                                <th style="padding: 8px; font-weight: bold;">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-sessions-tbody">
+                            <!-- Sessions render here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                <button type="button" class="btn-gray" onclick="closeUserHistoryModal()" style="height: 38px; border-radius: 8px; padding: 0 20px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Đóng</button>
             </div>
         </div>
     </div>
@@ -1877,25 +2175,17 @@
 
         function scrollParentToSecondLine(parent, child) {
             if (!parent || !child) return;
-            const targetEl = child.classList.contains('llm-item') ? child : (child.closest('.comment-item') || child);
-
-            parent.style.paddingBottom = '16px';
-            const childTop = getCumulativeOffsetTop(targetEl, parent);
-            const offsetFromTop = 55;
-            const targetScrollTop = childTop - offsetFromTop;
-
-            const maxScrollTop = parent.scrollHeight - parent.clientHeight;
-            const neededPadding = targetScrollTop - maxScrollTop;
-
-            if (neededPadding > 0) {
-                parent.style.paddingBottom = (16 + neededPadding) + 'px';
+            
+            // Không tự động cuộn nếu người dùng đang tương tác/focus vào form nhập liệu
+            const activeEl = document.activeElement;
+            if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+                return;
             }
 
+            const targetEl = child.classList.contains('llm-item') ? child : (child.closest('.comment-item') || child);
+
             setTimeout(() => {
-                parent.scrollTo({
-                    top: Math.max(0, targetScrollTop),
-                    behavior: 'smooth'
-                });
+                targetEl.scrollIntoView({ block: "center", behavior: "smooth" });
             }, 50);
         }
 
@@ -2276,12 +2566,6 @@
 
                 scrollParentToSecondLine(scrollParent, item.containerEl);
 
-                // Glow reading colors
-                item.containerEl.style.color = '#ff0055';
-                item.containerEl.style.fontWeight = '700';
-                item.containerEl.style.textShadow = '0 0 8px rgba(255, 0, 85, 0.4)';
-                item.containerEl.style.transition = 'color 0.2s ease, text-shadow 0.2s ease';
-
                 // Animate progress bar in AI Sắp đọc panel
                 let start = null;
                 const progressFill = (timestamp) => {
@@ -2301,11 +2585,6 @@
             }
 
             highlightProgressDone(item) {
-                item.containerEl.style.color = '';
-                item.containerEl.style.fontWeight = '';
-                item.containerEl.style.textShadow = '';
-                item.containerEl.style.transition = '';
-
                 if (item.isLlmItem) {
                     item.containerEl.className = 'llm-item read';
                 } else {
@@ -2710,7 +2989,65 @@
             document.getElementById('locked-modal').style.display = 'flex';
         }
 
+        async function checkActivePendingInvoice() {
+            const activeId = localStorage.getItem('active_pending_invoice_id');
+            if (!activeId) return;
+
+            try {
+                const res = await fetch(`/api/invoice/status/${activeId}`);
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    if (data.status === 'completed') {
+                        localStorage.removeItem('active_pending_invoice_id');
+                        
+                        // Đóng modal QR nếu đang mở
+                        document.getElementById('qr-modal').style.display = 'none';
+                        
+                        // Hiển thị thông tin lên payment-success-modal
+                        const inv = data.invoice;
+                        document.getElementById('success-det-code').textContent = inv.code;
+                        document.getElementById('success-det-time').textContent = new Date().toLocaleString('vi-VN');
+                        document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+                        
+                        const mins = Math.floor(inv.secondsChanged / 60);
+                        document.getElementById('success-det-hours').textContent = `+${mins} phút`;
+                        
+                        // Mở modal success
+                        document.getElementById('payment-success-modal').style.display = 'flex';
+                        
+                        // Xóa các interval polling cục bộ
+                        if (invoicePollingInterval) {
+                            clearInterval(invoicePollingInterval);
+                            invoicePollingInterval = null;
+                        }
+                        activeInvoiceId = null;
+                        
+                        // Tải lại profile
+                        loadUserProfile();
+                    } else if (data.status === 'cancelled') {
+                        localStorage.removeItem('active_pending_invoice_id');
+                        document.getElementById('qr-modal').style.display = 'none';
+                        
+                        if (invoicePollingInterval) {
+                            clearInterval(invoicePollingInterval);
+                            invoicePollingInterval = null;
+                        }
+                        activeInvoiceId = null;
+                        
+                        showAppAlert('Thông báo', `Hóa đơn ${data.invoice ? data.invoice.code : ''} đã bị hủy.`);
+                        loadUserProfile();
+                    }
+                }
+            } catch (err) {
+                console.error('Error checking active pending invoice:', err);
+            }
+        }
+
         async function loadUserProfile() {
+            // Check hóa đơn pending trước
+            checkActivePendingInvoice();
+            
             try {
                 const res = await fetch('/api/user/profile');
                 const data = await res.json();
@@ -2788,40 +3125,433 @@
             profilePollingInterval = setInterval(loadUserProfile, 10000);
         }
 
-        function openQrModal() {
+        let currentSelectedAmount = null;
+        let activeInvoiceId = null;
+        let invoicePollingInterval = null;
+
+        function openPriceModal() {
+
+            const profile = userProfileData || {};
+            const rate = profile.hourlyRateVnd || 10000;
+            
+            document.getElementById('price-modal-rate').textContent = rate.toLocaleString('vi-VN') + ' đ/giờ';
+            
+            // Cập nhật số giờ quy đổi hiển thị trong các nút chọn nhanh
+            const amounts = [10000, 20000, 50000, 100000, 200000, 500000, 1000000];
+            const ids = ['10k', '20k', '50k', '100k', '200k', '500k', '1m'];
+            
+            amounts.forEach((amt, idx) => {
+                const hours = Math.floor(amt / rate);
+                const minutes = Math.floor(((amt / rate) % 1) * 60);
+                let desc = `~`;
+                if (hours > 0) desc += `${hours} giờ `;
+                if (minutes > 0) desc += `${minutes} phút`;
+                if (hours === 0 && minutes === 0) desc += '0 giờ';
+                
+                const elementId = `price-desc-${ids[idx]}`;
+                const el = document.getElementById(elementId);
+                if (el) el.textContent = desc;
+            });
+            
+            // Reset dữ liệu modal
+            currentSelectedAmount = null;
+            document.getElementById('custom-price-input').value = '';
+            document.getElementById('custom-price-hours-desc').textContent = '';
+            
+            const pbuttons = document.querySelectorAll('.price-btn');
+            pbuttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('price-modal').style.display = 'flex';
+        }
+
+        function closePriceModal() {
+            document.getElementById('price-modal').style.display = 'none';
+        }
+
+        function selectPrice(amount) {
+            currentSelectedAmount = amount;
+            document.getElementById('custom-price-input').value = '';
+            document.getElementById('custom-price-hours-desc').textContent = '';
+            
+            const pbuttons = document.querySelectorAll('.price-btn');
+            pbuttons.forEach(btn => btn.classList.remove('active'));
+            
+            const activeBtn = document.getElementById(`pbtn-${amount}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        function calculateCustomHours() {
+            const val = document.getElementById('custom-price-input').value;
+            const descEl = document.getElementById('custom-price-hours-desc');
+            
+            // Gỡ active của các nút chọn nhanh
+            const pbuttons = document.querySelectorAll('.price-btn');
+            pbuttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (!val || val <= 0) {
+                currentSelectedAmount = null;
+                descEl.textContent = '';
+                return;
+            }
+            
+            const amount = parseInt(val);
+            currentSelectedAmount = amount;
+            
+            const profile = userProfileData || {};
+            const rate = profile.hourlyRateVnd || 10000;
+            
+            const hours = Math.floor(amount / rate);
+            const minutes = Math.floor(((amount / rate) % 1) * 60);
+            
+            let desc = `Quy đổi: `;
+            if (hours > 0) desc += `${hours} giờ `;
+            if (minutes > 0) desc += `${minutes} phút`;
+            if (hours === 0 && minutes === 0) desc += '0 giờ';
+            
+            descEl.textContent = desc;
+        }
+
+        async function confirmPriceSelection() {
+            if (!currentSelectedAmount || currentSelectedAmount < 10000) {
+                showAppAlert('Cảnh báo', 'Vui lòng chọn hoặc nhập số tiền nạp tối thiểu 10.000 VNĐ.');
+                return;
+            }
+            
+            closePriceModal();
+            
+            // Mở qr-modal với trạng thái loading
+            document.getElementById('qr-modal').style.display = 'flex';
+            document.getElementById('qr-loading-spinner').style.display = 'flex';
+            document.getElementById('qr-image').style.display = 'none';
+            document.getElementById('polling-status-msg').textContent = '🕒 Đang tạo hóa đơn từ hệ thống...';
+            
+            try {
+                const res = await fetch('/api/invoice/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amountVnd: currentSelectedAmount })
+                });
+                
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    showAppAlert('Lỗi', data.error || 'Tạo hóa đơn thất bại.');
+                    closeQrModal();
+                    return;
+                }
+                
+                const invoice = data.invoice;
+                activeInvoiceId = invoice._id;
+                
+                // Hiển thị thông tin hóa đơn lên QR modal
+                const profile = userProfileData || {};
+                const bankDetails = profile.bankDetails || {};
+                
+                document.getElementById('modal-rate').textContent = profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '10.000 đ/giờ';
+                document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
+                document.getElementById('modal-bank-acc').textContent = bankDetails.accountNumber || '--';
+                document.getElementById('modal-bank-owner').textContent = bankDetails.accountName || '--';
+                document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+                document.getElementById('modal-bank-memo').textContent = invoice.transferContent;
+                
+                // Tải QR Code động
+                const qrImage = document.getElementById('qr-image');
+                if (bankDetails.accountNumber) {
+                    const qrUrl = `https://api.vietqr.io/image/970422-${bankDetails.accountNumber}-qr_only.jpg?accountName=${encodeURIComponent(bankDetails.accountName)}&amount=${invoice.amountVnd}&addInfo=${encodeURIComponent(invoice.transferContent)}`;
+                    qrImage.src = qrUrl;
+                    qrImage.style.display = 'block';
+                } else {
+                    qrImage.removeAttribute('src');
+                    qrImage.style.display = 'none';
+                }
+                
+                // Ẩn spinner, hiện QR
+                document.getElementById('qr-loading-spinner').style.display = 'none';
+                document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ bạn chuyển khoản...';
+                
+                // Khởi chạy Polling kiểm tra trạng thái
+                startInvoicePolling(invoice._id);
+                
+            } catch (err) {
+                console.error(err);
+                showAppAlert('Lỗi', 'Lỗi kết nối máy chủ.');
+                closeQrModal();
+            }
+        }
+
+        function startInvoicePolling(invoiceId) {
+            localStorage.setItem('active_pending_invoice_id', invoiceId);
+            if (invoicePollingInterval) clearInterval(invoicePollingInterval);
+            invoicePollingInterval = setInterval(checkActivePendingInvoice, 3000);
+        }
+
+        function closeQrModal() {
+            // Chỉ dừng polling và đóng modal (không hủy hóa đơn)
+            if (invoicePollingInterval) {
+                clearInterval(invoicePollingInterval);
+                invoicePollingInterval = null;
+            }
+            document.getElementById('qr-modal').style.display = 'none';
+            loadUserProfile(); // Sync profile
+        }
+
+        function closePaymentSuccessModal() {
+            document.getElementById('payment-success-modal').style.display = 'none';
+        }
+
+
+        function cancelPendingInvoice() {
+            if (!activeInvoiceId) return;
+            // Mở modal xác nhận hủy thay vì confirm của trình duyệt
+            document.getElementById('cancel-confirm-modal').style.display = 'flex';
+        }
+
+        function closeCancelConfirmModal() {
+            document.getElementById('cancel-confirm-modal').style.display = 'none';
+        }
+
+        async function executeCancelPendingInvoice() {
+            closeCancelConfirmModal();
+            
+            if (!activeInvoiceId) return;
+            
+            localStorage.removeItem('active_pending_invoice_id');
+            
+            if (invoicePollingInterval) {
+                clearInterval(invoicePollingInterval);
+                invoicePollingInterval = null;
+            }
+            
+            try {
+                const res = await fetch(`/api/invoice/cancel/${activeInvoiceId}`, { method: 'POST' });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showAppAlert('Thành công', 'Đã hủy hóa đơn nạp tiền thành công.');
+                } else {
+                    showAppAlert('Lỗi', data.error || 'Hủy hóa đơn thất bại.');
+                }
+            } catch (err) {
+                console.error('Cancel invoice error:', err);
+                showAppAlert('Lỗi', 'Không thể kết nối máy chủ để hủy hóa đơn.');
+            }
+            
+            activeInvoiceId = null;
+            document.getElementById('qr-modal').style.display = 'none';
+            loadUserProfile();
+        }
+
+        function showAppAlert(title, message) {
+            document.getElementById('app-alert-title').textContent = title || '📢 Thông báo';
+            document.getElementById('app-alert-message').textContent = message;
+            document.getElementById('app-alert-modal').style.display = 'flex';
+        }
+
+        function closeAppAlertModal() {
+            document.getElementById('app-alert-modal').style.display = 'none';
+        }
+
+        function switchHistoryTab(tab) {
+            const tabs = document.querySelectorAll('.history-tab-btn');
+            tabs.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('tab-invoices-content').style.display = 'none';
+            document.getElementById('tab-sessions-content').style.display = 'none';
+            
+            if (tab === 'invoices') {
+                document.getElementById('tab-invoices-btn').classList.add('active');
+                document.getElementById('tab-invoices-content').style.display = 'block';
+                loadUserInvoices();
+            } else {
+                document.getElementById('tab-sessions-btn').classList.add('active');
+                document.getElementById('tab-sessions-content').style.display = 'block';
+                loadUserSessions();
+            }
+        }
+
+        async function openUserHistoryModal() {
+            document.getElementById('user-history-modal').style.display = 'flex';
+            switchHistoryTab('invoices');
+        }
+
+        function closeUserHistoryModal() {
+            document.getElementById('user-history-modal').style.display = 'none';
+        }
+
+        window.loadedInvoices = [];
+
+        async function loadUserInvoices() {
+            const tbody = document.getElementById('user-invoices-tbody');
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">Đang tải lịch sử nạp...</td></tr>`;
+            
+            try {
+                const res = await fetch('/api/invoices');
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    const invoices = data.invoices || [];
+                    window.loadedInvoices = invoices;
+                    
+                    if (invoices.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">Chưa có lịch sử nạp tiền.</td></tr>`;
+                        return;
+                    }
+                    
+                    let html = '';
+                    invoices.forEach(inv => {
+                        let statusText = 'Chờ thanh toán';
+                        let statusColor = 'var(--purple)';
+                        if (inv.status === 'completed') {
+                            statusText = 'Thành công';
+                            statusColor = 'var(--success)';
+                        } else if (inv.status === 'cancelled') {
+                            statusText = 'Đã hủy';
+                            statusColor = 'var(--danger)';
+                        }
+                        
+                        const mins = Math.floor(inv.secondsChanged / 60);
+                        const dateStr = new Date(inv.createdAt).toLocaleString('vi-VN');
+                        
+                        html += `<tr onclick="handleInvoiceClick('${inv._id}')" style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='none'">
+                            <td style="padding: 8px; font-family: var(--font-cyber); font-weight: bold; color: #fff;">${inv.code}</td>
+                            <td style="padding: 8px; color: var(--text-muted);">${dateStr}</td>
+                            <td style="padding: 8px; font-weight: bold; color: var(--success);">${inv.amountVnd.toLocaleString('vi-VN')} đ</td>
+                            <td style="padding: 8px; color: var(--primary); font-weight: bold;">+${mins} phút</td>
+                            <td style="padding: 8px;"><span style="color: ${statusColor}; font-weight: bold;">${statusText}</span></td>
+                        </tr>`;
+                    });
+                    tbody.innerHTML = html;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--danger);">Không thể tải dữ liệu.</td></tr>`;
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--danger);">Lỗi kết nối.</td></tr>`;
+            }
+        }
+
+        function handleInvoiceClick(invoiceId) {
+            const invoice = window.loadedInvoices.find(inv => inv._id === invoiceId);
+            if (!invoice) return;
+
+            // Luôn đóng modal lịch sử trước để tránh bị đè z-index
+            closeUserHistoryModal();
+
+            if (invoice.status === 'pending') {
+                // Mở QR checkout
+                showInvoiceCheckout(invoice);
+            } else {
+                // Mở chi tiết hóa đơn (Thành công / Hủy)
+                showInvoiceDetail(invoice);
+            }
+        }
+
+        function showInvoiceCheckout(invoice) {
+            activeInvoiceId = invoice._id;
+            
             const profile = userProfileData || {};
             const bankDetails = profile.bankDetails || {};
-            const amount = 50000;
-            const username = profile.username || document.getElementById('top-username').textContent || '';
-            const addInfo = username ? `NAPTIEN ${username}` : 'NAPTIEN';
             
-            // Construct VietQR URL
+            document.getElementById('modal-rate').textContent = invoice.hourlyRateSnapshot ? invoice.hourlyRateSnapshot.toLocaleString('vi-VN') + ' đ/giờ' : (profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '10.000 đ/giờ');
+            document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
+            document.getElementById('modal-bank-acc').textContent = bankDetails.accountNumber || '--';
+            document.getElementById('modal-bank-owner').textContent = bankDetails.accountName || '--';
+            document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+            document.getElementById('modal-bank-memo').textContent = invoice.transferContent;
+            
             const qrImage = document.getElementById('qr-image');
             if (bankDetails.accountNumber) {
-                let qrUrl = bankDetails.qrTemplateUrl || 'https://api.vietqr.io/image/970422-{accountNumber}-qr_only.jpg?accountName={accountName}&amount={amount}&addInfo={addInfo}';
-                qrUrl = qrUrl.replace('{accountNumber}', bankDetails.accountNumber)
-                             .replace('{accountName}', encodeURIComponent(bankDetails.accountName || ''))
-                             .replace('{amount}', amount)
-                             .replace('{addInfo}', encodeURIComponent(addInfo));
+                const qrUrl = `https://api.vietqr.io/image/970422-${bankDetails.accountNumber}-qr_only.jpg?accountName=${encodeURIComponent(bankDetails.accountName)}&amount=${invoice.amountVnd}&addInfo=${encodeURIComponent(invoice.transferContent)}`;
                 qrImage.src = qrUrl;
-                qrImage.style.display = '';
+                qrImage.style.display = 'block';
             } else {
                 qrImage.removeAttribute('src');
                 qrImage.style.display = 'none';
             }
-
-            document.getElementById('modal-rate').textContent = profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '--';
-            document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
-            document.getElementById('modal-bank-acc').textContent = bankDetails.accountNumber || '--';
-            document.getElementById('modal-bank-owner').textContent = bankDetails.accountName || '--';
-            document.getElementById('modal-bank-memo').textContent = addInfo;
             
+            document.getElementById('qr-loading-spinner').style.display = 'none';
+            document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ bạn chuyển khoản...';
             document.getElementById('qr-modal').style.display = 'flex';
+            
+            startInvoicePolling(invoice._id);
         }
 
-        function closeQrModal() {
-            document.getElementById('qr-modal').style.display = 'none';
-            loadUserProfile(); // Sync profile immediately to fetch any approved top-up balance
+        function showInvoiceDetail(invoice) {
+            document.getElementById('det-code').textContent = invoice.code;
+            document.getElementById('det-time').textContent = new Date(invoice.createdAt).toLocaleString('vi-VN');
+            document.getElementById('det-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+            
+            const mins = Math.floor(invoice.secondsChanged / 60);
+            document.getElementById('det-hours').textContent = `+${mins} phút`;
+            
+            const statusEl = document.getElementById('det-status');
+            if (invoice.status === 'completed') {
+                statusEl.textContent = 'Thành công';
+                statusEl.style.color = 'var(--success)';
+            } else if (invoice.status === 'cancelled') {
+                statusEl.textContent = 'Đã hủy';
+                statusEl.style.color = 'var(--danger)';
+            } else {
+                statusEl.textContent = 'Chờ thanh toán';
+                statusEl.style.color = 'var(--purple)';
+            }
+            
+            document.getElementById('invoice-detail-modal').style.display = 'flex';
+        }
+
+        function closeInvoiceDetailModal() {
+            document.getElementById('invoice-detail-modal').style.display = 'none';
+            // Mở lại modal danh sách lịch sử để tiếp tục xem
+            openUserHistoryModal();
+        }
+
+        async function loadUserSessions() {
+            const tbody = document.getElementById('user-sessions-tbody');
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">Đang tải lịch sử live...</td></tr>`;
+            
+            try {
+                const res = await fetch('/api/sessions');
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    const sessions = data.sessions || [];
+                    if (sessions.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">Chưa có lịch sử livestream.</td></tr>`;
+                        return;
+                    }
+                    
+                    let html = '';
+                    sessions.forEach(sess => {
+                        const startStr = new Date(sess.startedAt).toLocaleString('vi-VN');
+                        const endStr = sess.endedAt ? new Date(sess.endedAt).toLocaleString('vi-VN') : 'Đang chạy';
+                        
+                        const mins = Math.floor(sess.totalUsedSeconds / 60);
+                        const secs = sess.totalUsedSeconds % 60;
+                        const durationStr = sess.status === 'active' ? 'Đang cập nhật' : `${mins} phút ${secs} giây`;
+                        
+                        let statusText = 'Đang chạy';
+                        let statusColor = 'var(--primary)';
+                        if (sess.status === 'ended') {
+                            statusText = 'Hoàn thành';
+                            statusColor = 'var(--text-muted)';
+                        } else if (sess.status === 'expired') {
+                            statusText = 'Hết hạn';
+                            statusColor = 'var(--danger)';
+                        }
+                        
+                        html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 8px; color: #fff;">${startStr}</td>
+                            <td style="padding: 8px; color: var(--text-muted);">${endStr}</td>
+                            <td style="padding: 8px; font-weight: bold; color: var(--primary);">${durationStr}</td>
+                            <td style="padding: 8px;"><span style="color: ${statusColor}; font-weight: bold;">${statusText}</span></td>
+                        </tr>`;
+                    });
+                    tbody.innerHTML = html;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--danger);">Không thể tải dữ liệu.</td></tr>`;
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--danger);">Lỗi kết nối.</td></tr>`;
+            }
         }
 
         function startBillingHeartbeat() {
