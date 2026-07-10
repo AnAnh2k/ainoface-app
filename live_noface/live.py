@@ -17,7 +17,28 @@ from openai import OpenAI
 
 # Configuration
 LIVE_APP_URL = os.getenv('LIVE_APP_URL', 'http://127.0.0.1:5000')
-OLLAMA_BASE_URL = os.getenv('LLM_API_BASE_URL') or os.getenv('OLLAMA_BASE_URL', 'https://luck-tvs-schedules-palace.trycloudflare.com')
+def _get_default_llm_url() -> str:
+    if os.path.exists('config.json'):
+        try:
+            with open('config.json', 'r', encoding='utf-8') as f:
+                cfg = json.load(f)
+                url = cfg.get("llm_api_base_url") or cfg.get("ollama_base_url")
+                if url:
+                    return url
+        except Exception:
+            pass
+    elif os.path.exists('../config.json'):
+        try:
+            with open('../config.json', 'r', encoding='utf-8') as f:
+                cfg = json.load(f)
+                url = cfg.get("llm_api_base_url") or cfg.get("ollama_base_url")
+                if url:
+                    return url
+        except Exception:
+            pass
+    return "https://luck-tvs-schedules-palace.trycloudflare.com"
+
+OLLAMA_BASE_URL = os.getenv('LLM_API_BASE_URL') or os.getenv('OLLAMA_BASE_URL', _get_default_llm_url())
 OLLAMA_MODEL = 'qwen2.5:3b'
 
 # Create the client

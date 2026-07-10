@@ -10,17 +10,16 @@ CONFIG_PATH = 'config.json'
 DEFAULT_CENTRAL_API_URL = "https://ainoface-backend.onrender.com"
 DEFAULT_LLM_URL = "https://luck-tvs-schedules-palace.trycloudflare.com"
 
-if not os.environ.get("LLM_API_BASE_URL") and not os.environ.get("OLLAMA_BASE_URL"):
-    llm_url = DEFAULT_LLM_URL
-    if os.path.exists(CONFIG_PATH):
-        try:
-            with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
-                cfg = json.load(f)
-                llm_url = cfg.get("llm_api_base_url") or cfg.get("ollama_base_url") or DEFAULT_LLM_URL
-        except Exception:
-            pass
-    os.environ["LLM_API_BASE_URL"] = llm_url
-    os.environ["OLLAMA_BASE_URL"] = llm_url
+llm_url = DEFAULT_LLM_URL
+if os.path.exists(CONFIG_PATH):
+    try:
+        with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
+            cfg = json.load(f)
+            llm_url = cfg.get("llm_api_base_url") or cfg.get("ollama_base_url") or DEFAULT_LLM_URL
+    except Exception:
+        pass
+os.environ["LLM_API_BASE_URL"] = llm_url
+os.environ["OLLAMA_BASE_URL"] = llm_url
 
 from queue import Queue, Empty
 from collections import deque
@@ -355,6 +354,52 @@ def user_profile():
         return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
     
     res_data, status_code = call_central_api('/api/user/profile', method='GET', token=auth_token)
+    return jsonify(res_data), status_code
+
+@app.route('/api/invoice/create', methods=['POST'])
+def invoice_create():
+    auth_token = session.get('auth_token')
+    if not auth_token:
+        return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
+    
+    data = request.get_json(silent=True) or {}
+    res_data, status_code = call_central_api('/api/billing/invoice/create', method='POST', data=data, token=auth_token)
+    return jsonify(res_data), status_code
+
+@app.route('/api/invoice/status/<invoice_id>', methods=['GET'])
+def invoice_status(invoice_id):
+    auth_token = session.get('auth_token')
+    if not auth_token:
+        return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
+    
+    res_data, status_code = call_central_api(f'/api/billing/invoice/status/{invoice_id}', method='GET', token=auth_token)
+    return jsonify(res_data), status_code
+
+@app.route('/api/invoice/cancel/<invoice_id>', methods=['POST'])
+def invoice_cancel(invoice_id):
+    auth_token = session.get('auth_token')
+    if not auth_token:
+        return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
+    
+    res_data, status_code = call_central_api(f'/api/billing/invoice/cancel/{invoice_id}', method='POST', token=auth_token)
+    return jsonify(res_data), status_code
+
+@app.route('/api/invoices', methods=['GET'])
+def user_invoices():
+    auth_token = session.get('auth_token')
+    if not auth_token:
+        return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
+    
+    res_data, status_code = call_central_api('/api/billing/invoices', method='GET', token=auth_token)
+    return jsonify(res_data), status_code
+
+@app.route('/api/sessions', methods=['GET'])
+def user_sessions():
+    auth_token = session.get('auth_token')
+    if not auth_token:
+        return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
+    
+    res_data, status_code = call_central_api('/api/billing/sessions', method='GET', token=auth_token)
     return jsonify(res_data), status_code
 
 

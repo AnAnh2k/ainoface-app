@@ -7,9 +7,34 @@ import requests
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
+import json
+
+def _get_default_llm_url() -> str:
+    # Thử đọc từ config.json ở thư mục làm việc hiện tại
+    if os.path.exists('config.json'):
+        try:
+            with open('config.json', 'r', encoding='utf-8') as f:
+                cfg = json.load(f)
+                url = cfg.get("llm_api_base_url") or cfg.get("ollama_base_url")
+                if url:
+                    return url
+        except Exception:
+            pass
+    # Thử đọc từ thư mục cha (trường hợp chạy từ bên trong live_noface)
+    elif os.path.exists('../config.json'):
+        try:
+            with open('../config.json', 'r', encoding='utf-8') as f:
+                cfg = json.load(f)
+                url = cfg.get("llm_api_base_url") or cfg.get("ollama_base_url")
+                if url:
+                    return url
+        except Exception:
+            pass
+    return "https://luck-tvs-schedules-palace.trycloudflare.com"
+
 LLM_API_BASE_URL = os.getenv(
     "LLM_API_BASE_URL",
-    os.getenv("OLLAMA_BASE_URL", "http://localhost:8080"),
+    os.getenv("OLLAMA_BASE_URL", _get_default_llm_url()),
 )
 
 
