@@ -1,0 +1,34 @@
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
+# Python virtual environment
+venv/
+test_vieneu/venv/
+.venv/
+env/
+ENV/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large TTS model weights cache
+tts_model_cache/
+live_noface/tts_model_cache/
+test_vieneu/tts_model_cache/
+
+# Local configuration and logs
+config.json
+credentials.txt
+*.log
+live_noface/logs/
+
+# IDE files
+.vscode/
+.idea/
+.project
+.pydevproject
+.settings/

@@ -1,0 +1,4366 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ thống Live AI - S Live</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00f0ff; /* Neon Cyan */
+            --primary-hover: #00c8ff;
+            --primary-light: rgba(0, 240, 255, 0.08);
+            
+            --danger: #ff0055; /* Neon Pink/Red */
+            --danger-hover: #e0004c;
+            --danger-light: rgba(255, 0, 85, 0.08);
+            
+            --success: #10b981; /* Neon Green */
+            --success-hover: #059669;
+            --success-light: rgba(16, 185, 129, 0.08);
+            
+            --purple: #a855f7;
+            --purple-hover: #9333ea;
+            
+            --bg-body: #060913;
+            --bg-container: rgba(13, 20, 38, 0.45);
+            --bg-input: rgba(10, 16, 32, 0.7);
+            
+            --text-dark: #f8fafc;
+            --text-main: #cbd5e1;
+            --text-muted: #64748b;
+            --text-dimmed: #475569;
+            
+            --border: rgba(0, 240, 255, 0.1);
+            --border-hover: rgba(0, 240, 255, 0.25);
+            
+            --font-main: 'Outfit', sans-serif;
+            --font-cyber: 'Orbitron', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            background-image: radial-gradient(circle at 10% 20%, rgba(4, 13, 31, 0.9) 0%, rgba(13, 20, 38, 0.9) 100%);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* Scrollbar design */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(10, 16, 32, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 240, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+        }
+
+        /* Main Workspace layout */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+        }
+
+        /* Left Sidebar styling */
+        .sidebar {
+            width: 260px;
+            background: rgba(8, 12, 26, 0.9);
+            border-right: 1px solid rgba(0, 240, 255, 0.1);
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            backdrop-filter: blur(16px);
+            z-index: 10;
+        }
+
+        .sidebar-logo {
+            font-family: var(--font-cyber);
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #00f0ff, #a855f7, #ff0055);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar-logo-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #00f0ff, #ff0055);
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #94a3b8;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14.5px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(0, 240, 255, 0.08);
+            color: var(--primary);
+            box-shadow: inset 0 0 8px rgba(0, 240, 255, 0.1);
+            border-left: 3px solid var(--primary);
+            padding-left: 13px;
+        }
+
+        .system-status-box {
+            background: rgba(13, 20, 38, 0.6);
+            border: 1px solid rgba(0, 240, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-sizing: border-box;
+        }
+
+        .system-status-box h4 {
+            margin: 0 0 4px 0;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 1px;
+            font-family: var(--font-cyber);
+        }
+
+        .status-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12.5px;
+            color: #94a3b8;
+        }
+
+        .status-badge {
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-badge.on {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-badge.off {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-chart-box {
+            margin-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 10px;
+        }
+
+        /* Main workspace styling */
+        .main-workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0;
+            background: #080c18;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* Top Bar styling */
+        .top-bar {
+            min-height: 44px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.08);
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: rgba(8, 12, 26, 0.6);
+            backdrop-filter: blur(12px);
+            box-sizing: border-box;
+            flex-shrink: 0;
+            flex-wrap: nowrap;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: nowrap;
+            min-width: auto;
+        }
+
+        .live-badge {
+            background: var(--danger);
+            color: #ffffff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: var(--font-cyber);
+            font-weight: 900;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 0 8px rgba(255, 0, 85, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .live-badge::before {
+            content: "";
+            display: block;
+            width: 5px;
+            height: 5px;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: pulse-live 1.2s infinite;
+        }
+
+        @keyframes pulse-live {
+            0% { transform: scale(0.9); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.5; }
+        }
+
+        .live-timer-top {
+            font-family: var(--font-cyber);
+            font-size: 13px;
+            font-weight: 700;
+            color: #f1f5f9;
+            padding: 4px 8px;
+            min-width: 76px;
+            text-align: center;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .top-bar-stats {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            color: #94a3b8;
+            font-size: 11px;
+            flex: 1;
+            flex-wrap: nowrap;
+            min-width: 0;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 1px;
+            min-width: 76px;
+            min-height: 34px;
+            padding: 3px 8px;
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-radius: 6px;
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(8, 12, 26, 0.44));
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+            box-sizing: border-box;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 8.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1px;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .stat-value {
+            color: #cbd5e1;
+            font-weight: 800;
+            font-size: 12px;
+            line-height: 1.15;
+            white-space: nowrap;
+        }
+
+        .stat-value.primary {
+            color: var(--primary);
+        }
+
+        .stat-value.success {
+            color: var(--success);
+        }
+
+        .stat-value.danger {
+            color: var(--danger);
+        }
+
+        .stat-group-divider {
+            margin-left: 2px;
+            border-left: 1px solid rgba(0, 240, 255, 0.15);
+            padding-left: 6px;
+        }
+
+        .stat-action {
+            min-width: auto;
+            padding: 0;
+            border: none;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .topbar-action-btn {
+            min-height: 32px;
+            padding: 0 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .voice-control {
+            min-width: auto;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .server-status-card {
+            min-width: auto;
+            align-items: center;
+            gap: 4px;
+        }
+
+        #top-server-status {
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            line-height: 1.15;
+        }
+
+        @media (max-width: 1300px) {
+            .top-bar {
+                padding: 4px 12px;
+            }
+
+            .top-bar-stats {
+                justify-content: flex-end;
+            }
+
+            .stat-item {
+                min-width: 76px;
+            }
+        }
+
+        @media (max-width: 980px) {
+            .top-bar {
+                min-height: 0;
+                flex-wrap: wrap;
+            }
+
+            .top-bar-left,
+            .top-bar-stats {
+                width: auto;
+            }
+
+            .stat-item {
+                flex: none;
+                min-width: 76px;
+            }
+        }
+
+        /* Grid container for content panels */
+        .container {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: 1fr 1fr;
+            gap: 12px;
+            padding: 12px 18px;
+            box-sizing: border-box;
+            width: 100%;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        /* Glassmorphic Cyber Panels */
+        .panel {
+            background: var(--bg-container);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 240, 255, 0.08);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.3), transparent);
+        }
+
+        .panel:hover {
+            border-color: rgba(0, 240, 255, 0.25);
+            box-shadow: 0 15px 35px rgba(0, 240, 255, 0.08);
+        }
+
+        .panel h3 {
+            margin: 0;
+            padding: 16px 20px;
+            font-family: var(--font-cyber);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #f8fafc;
+            flex-shrink: 0;
+        }
+
+        .panel-header-stack {
+            align-items: stretch;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .panel-header-title {
+            white-space: nowrap;
+        }
+
+        .comment-connect-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .comment-connect-row .text-input {
+            flex: 1;
+            min-width: 180px;
+            height: 30px;
+            padding: 3px 10px;
+            font-size: 12px;
+        }
+
+        .comment-connect-row button {
+            height: 30px;
+            padding: 0 12px;
+            font-size: 11px;
+            flex: 0 0 auto;
+        }
+
+        #mute-ai-comment {
+            display: none !important;
+        }
+
+        .panel-billing h3 {
+            justify-content: flex-start;
+        }
+
+        .panel-icon {
+            font-size: 14px;
+            margin-right: 6px;
+        }
+
+        /* Visualizer and top bar */
+        .visualizer-canvas {
+            background: rgba(10, 16, 32, 0.85);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 50px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Input styling */
+        textarea {
+            box-sizing: border-box;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 14px;
+            resize: none;
+            background: var(--bg-input);
+            outline: none;
+            font-family: var(--font-main);
+            transition: all 0.3s ease;
+            color: #ffffff;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+            background: rgba(10, 16, 32, 0.95);
+        }
+
+        .text-input {
+            box-sizing: border-box;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-input);
+            outline: none;
+            font-family: var(--font-main);
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: #ffffff;
+        }
+
+        .text-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+            background: rgba(10, 16, 32, 0.95);
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-input);
+            color: #ffffff;
+            outline: none;
+            cursor: pointer;
+            font-family: var(--font-main);
+            font-size: 13.5px;
+            transition: all 0.25s ease;
+        }
+
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.15);
+        }
+
+        select option {
+            background: #0f172a;
+            color: #ffffff;
+        }
+
+        /* Buttons with cyberpunk hover glows */
+        button {
+            padding: 12px 20px;
+            font-size: 13.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: var(--font-main);
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        button:disabled,
+        .btn-cyan:disabled,
+        .btn-pink:disabled,
+        .btn-green:disabled {
+            opacity: 0.35 !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        .btn-cyan {
+            background: linear-gradient(135deg, #00f0ff 0%, #00a8ff 100%);
+            box-shadow: 0 4px 15px rgba(0, 240, 255, 0.2);
+            color: #040914;
+        }
+
+        .btn-cyan:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(0, 240, 255, 0.4);
+        }
+
+        .btn-pink {
+            background: linear-gradient(135deg, #ff0055 0%, #ff007f 100%);
+            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.2);
+        }
+
+        .btn-pink:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(255, 0, 85, 0.4);
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-green:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-red {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);
+            color: #fff;
+        }
+
+        .btn-red:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.45);
+        }
+
+        /* Modal dialog styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(4, 7, 15, 0.85);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: rgba(13, 21, 39, 0.9);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            box-shadow: 0 0 50px rgba(0, 240, 255, 0.1);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 440px;
+            padding: 24px;
+            position: relative;
+            animation: slide-up 0.25s ease;
+            backdrop-filter: blur(12px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 10px;
+        }
+
+        .modal-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+        }
+
+        .close-modal-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--danger);
+        }
+
+        .price-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+        }
+
+        .price-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .price-btn.active {
+            border-color: var(--primary) !important;
+            background: rgba(0, 240, 255, 0.1) !important;
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+        }
+
+        .btn-gray {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+        }
+
+        .btn-gray:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .history-tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            padding: 10px 0;
+            color: var(--text-muted) !important;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .history-tab-btn:hover {
+            color: #fff !important;
+        }
+
+        .history-tab-btn.active {
+            color: #fff !important;
+            border-bottom: 2px solid var(--primary) !important;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 12.5px;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .error {
+            color: #fda4af;
+            font-size: 13.5px;
+            font-weight: 500;
+            padding: 12px 16px;
+            background: rgba(255, 0, 85, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 0, 85, 0.2);
+            display: none;
+            animation: slide-in 0.25s ease forwards;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            margin-bottom: 16px;
+        }
+
+        .error:not(:empty) {
+            display: block;
+        }
+
+        .status-info {
+            color: #00f0ff !important;
+            background: rgba(0, 240, 255, 0.05) !important;
+            border: 1px solid rgba(0, 240, 255, 0.15) !important;
+        }
+
+        /* Specific Panel layout adjustments */
+        .panel-ai-read {
+            grid-column: span 6;
+            height: 100%;
+        }
+
+        .panel-comments {
+            grid-column: span 6;
+            height: 100%;
+        }
+
+        .panel-prompt {
+            grid-column: span 8;
+            height: 100%;
+            min-height: 0;
+        }
+
+        .panel-billing {
+            grid-column: span 4;
+            height: 100%;
+            min-height: 0;
+        }
+
+        /* Card Bodies with Scrolling */
+        .panel-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            min-height: 0;
+        }
+
+        .panel-billing .panel-body {
+            overflow: hidden !important;
+        }
+
+        /* Active sentence and sound visual style */
+        .active-sentence-container {
+            background: rgba(0, 240, 255, 0.03);
+            border: 1px dashed rgba(0, 240, 255, 0.2);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .active-sentence-label {
+            font-family: var(--font-cyber);
+            font-size: 10px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .active-sentence-number {
+            font-size: 28px;
+            font-family: var(--font-cyber);
+            font-weight: 900;
+            color: rgba(0, 240, 255, 0.15);
+            position: absolute;
+            top: 8px;
+            right: 16px;
+            pointer-events: none;
+        }
+
+        .active-sentence-text {
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.5;
+            color: #ffffff;
+            min-height: 48px;
+        }
+
+        /* Progress bars */
+        .progress-container {
+            margin-bottom: 16px;
+            flex-shrink: 0;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--purple) 100%);
+            box-shadow: 0 0 8px var(--primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Sound control grid */
+        .sound-controls-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: auto;
+            flex-shrink: 0;
+            background: rgba(10, 16, 32, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .sound-control-item {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .sound-control-item label {
+            font-size: 10px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        /* Slider adjustments */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 6px var(--primary);
+            transition: all 0.1s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        /* Sentence lists and comments */
+        .llm-result, .comments-list {
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .llm-item {
+            padding: 8px 12px;
+            border-left: 3px solid rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 0 8px 8px 0;
+            font-size: 13.5px;
+            line-height: 1.45;
+            color: #94a3b8;
+            transition: all 0.25s ease;
+            opacity: 0.85;
+        }
+
+        .llm-item.typing {
+            color: #64748b;
+            font-style: italic;
+            border-left: 3px dashed var(--primary);
+            background: rgba(0, 240, 255, 0.02);
+        }
+
+        .llm-item.active {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            border-left: 4px solid var(--primary) !important;
+            background: rgba(0, 240, 255, 0.1) !important;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15), inset 0 0 8px rgba(0, 240, 255, 0.1) !important;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.5) !important;
+            transform: scale(1.01);
+            opacity: 1 !important;
+        }
+
+        .llm-item.read {
+            color: #64748b !important;
+            opacity: 0.45 !important;
+            border-left: 3px solid rgba(255, 255, 255, 0.05) !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+        }
+
+        .script-empty-state,
+        .script-loading-state,
+        .script-error-state {
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .script-empty-state {
+            color: var(--text-muted);
+            border: 1px dashed rgba(148, 163, 184, 0.18);
+            background: rgba(255, 255, 255, 0.018);
+        }
+
+        .script-loading-state {
+            color: var(--primary);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            background: rgba(0, 240, 255, 0.045);
+        }
+
+        .script-error-state {
+            color: #fecaca;
+            border: 1px solid rgba(255, 0, 85, 0.28);
+            background: rgba(255, 0, 85, 0.08);
+        }
+
+        /* Comment stream visual styles */
+        .comment-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .comment-item.active {
+            border-color: rgba(255, 0, 85, 0.2);
+            background: rgba(255, 0, 85, 0.02);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.05);
+        }
+
+        .comment-item.read {
+            opacity: 0.5;
+            border-color: transparent;
+            background: transparent;
+        }
+
+        .comment-viewer-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .viewer-name {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .viewer-action {
+            font-size: 10.5px;
+            opacity: 0.7;
+        }
+
+        .comment-content {
+            font-size: 13.5px;
+            color: #e2e8f0;
+            line-height: 1.45;
+        }
+
+        .comment-ai-reply {
+            margin-top: 4px;
+            background: rgba(255, 0, 85, 0.05);
+            border-left: 2px solid var(--danger);
+            border-radius: 0 6px 6px 0;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ai-badge {
+            font-family: var(--font-cyber);
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--danger);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Prompt inputs column styling */
+        .prompt-builder-grid {
+            display: flex;
+            gap: 16px;
+            height: 100%;
+            box-sizing: border-box;
+            min-height: 0;
+        }
+
+        .prompt-inputs-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .prompt-script-column {
+            flex: 1.2;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid rgba(255, 255, 255, 0.05);
+            padding-left: 16px;
+            box-sizing: border-box;
+            min-height: 0;
+            height: 100%;
+        }
+
+        .system-prompt-selectors {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .selector-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .selector-item label {
+            font-size: 10px;
+            color: #64748b;
+            margin: 0;
+        }
+
+        /* Billing panel design elements */
+        .billing-grid {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: space-between;
+        }
+
+        .billing-timer-glow {
+            font-family: var(--font-cyber);
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+            text-align: center;
+            padding: 15px 0;
+            letter-spacing: 2px;
+            background: rgba(0, 240, 255, 0.02);
+            border: 1px solid rgba(0, 240, 255, 0.08);
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .billing-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 12.5px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+
+        .billing-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .billing-amount-value {
+            font-family: var(--font-cyber);
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--danger);
+            text-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
+        }
+
+        .billing-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        /* System Indices SVG chart styles */
+        .stats-grid-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            height: 100%;
+            align-items: center;
+        }
+
+        .stat-card-glow {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-card-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card-value {
+            font-family: var(--font-cyber);
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .stat-card-value.green {
+            color: var(--success);
+            text-shadow: 0 0 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .stat-card-chart {
+            flex: 1.5;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Toggle switch style */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 32px;
+            height: 18px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #334155;
+            transition: .3s;
+            border-radius: 9px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+            box-shadow: 0 0 6px var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(14px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <span class="sidebar-logo-icon"></span>
+                 S-Live 
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li><a href="#" class="menu-item active">📺 Tổng quan</a></li>
+                <li><a href="#" class="menu-item">🎙️ AI Sắp đọc</a></li>
+                <li><a href="#" class="menu-item">💬 Bình luận & Trả lời</a></li>
+                <li><a href="#" class="menu-item">⌨️ Nội dung live</a></li>
+                <li><a href="#" class="menu-item">📝 Kịch bản</a></li>
+                <li><a href="#" class="menu-item">📊 Thống kê</a></li>
+                <li><a href="#" class="menu-item">⚙️ Cài đặt</a></li>
+                <li><a href="#" class="menu-item">🕒 Lịch sử Live</a></li>
+            </ul>
+
+            <div class="system-status-box">
+                <h4>Trạng thái hệ thống</h4>
+                <div class="status-indicator">
+                    <span>LLM (GPT-4o)</span>
+                    <span class="status-badge on">ON</span>
+                </div>
+                <div class="status-indicator">
+                    <span>TTS (Voice AI)</span>
+                    <span id="system-tts-badge" class="status-badge on">ON</span>
+                </div>
+                <div class="status-indicator">
+                    <span>TikTok Live</span>
+                    <span id="system-tiktok-badge" class="status-badge off">OFF</span>
+                </div>
+                <div class="status-indicator">
+                    <span>AI Reply Engine</span>
+                    <span class="status-badge on">ON</span>
+                </div>
+                
+                <div class="status-chart-box">
+                    <div style="font-size:10px; color:#64748b; margin-bottom:4px; display:flex; justify-content:space-between;">
+                        <span>Độ trễ trung bình</span>
+                        <span style="color:var(--primary); font-weight:700;">0.8s</span>
+                    </div>
+                    <!-- Minimal latency wave graph SVG -->
+                    <svg width="100%" height="24" viewBox="0 0 200 30" preserveAspectRatio="none">
+                        <defs>
+                            <linearGradient id="latency-grad" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.3"></stop>
+                                <stop offset="100%" stop-color="#00f0ff" stop-opacity="0"></stop>
+                            </linearGradient>
+                        </defs>
+                        <path d="M 0,25 Q 25,12 50,18 T 100,8 T 150,22 T 200,10 L 200,30 L 0,30 Z" fill="url(#latency-grad)"></path>
+                        <path d="M 0,25 Q 25,12 50,18 T 100,8 T 150,22 T 200,10" fill="none" stroke="#00f0ff" stroke-width="1.5"></path>
+                    </svg>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="main-workspace">
+            <!-- Top Status Bar -->
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <div class="live-badge">LIVE</div>
+                    <span class="live-timer-top" id="top-live-timer">00:00:00</span>
+                </div>
+
+                <div class="top-bar-stats">
+                    <div class="stat-item" style="display: none;">
+                        <span class="stat-label">👥 Người xem</span>
+                        <span class="stat-value" id="top-viewer-count">--</span>
+                    </div>
+                    <div class="stat-item tiktok-stat">
+                        <span class="stat-label">💬 Bình luận/phút</span>
+                        <span class="stat-value" id="top-comment-rate">--</span>
+                    </div>
+                    <div class="stat-item tiktok-stat">
+                        <span class="stat-label">❤️ Tim/phút</span>
+                        <span class="stat-value" id="top-like-rate">--</span>
+                    </div>
+                    <div class="stat-item tiktok-stat">
+                        <span class="stat-label">🛒 Đơn hàng</span>
+                        <span class="stat-value" id="top-order-count">--</span>
+                    </div>
+                    
+                    <div class="stat-item stat-group-divider" onclick="openUserHistoryModal()" style="cursor: pointer;" title="Xem lịch sử tài khoản">
+                        <span class="stat-label">👤 Khách</span>
+                        <span class="stat-value primary" id="top-username" style="text-decoration: underline;">-</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">⏳ Số dư</span>
+                        <span class="stat-value success" id="top-time-balance">00:00:00</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">💸 Đơn giá</span>
+                        <span class="stat-value" id="top-hourly-rate">-</span>
+                    </div>
+                    <div class="stat-item stat-action">
+                        <button class="btn-green topbar-action-btn" onclick="openPriceModal()">Nạp tiền</button>
+                    </div>
+                    
+                    <div class="stat-item voice-control stat-group-divider">
+                        <span class="stat-label">🎙️ AI Voice</span>
+                        <label class="switch">
+                            <input type="checkbox" id="web-audio-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="stat-item server-status-card">
+                        <span class="stat-label">Server</span>
+                        <span id="top-server-status" style="color:var(--success);">
+                            <span style="display:inline-block; width:5px; height:5px; background:var(--success); border-radius:50%; box-shadow:0 0 6px var(--success)"></span>
+                            Online
+                        </span>
+                    </div>
+
+                    <a href="/logout" onclick="confirmLogout(event)" class="btn-gray topbar-action-btn">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Đăng xuất
+                    </a>
+                </div>
+            </header>
+
+            <!-- Grid container for dashboard panels -->
+            <div class="container">
+                <!-- Panel 1: AI Sắp đọc -->
+                <section class="panel panel-ai-read">
+                    <h3>
+                        <span>🎙️ AI Sắp đọc</span>
+                        <span style="font-size: 11px; text-transform: none; color: var(--primary);">Bảng điều khiển giọng đọc MC</span>
+                    </h3>
+                    <div class="panel-body">
+                        <!-- Active sentence widget -->
+                        <div class="active-sentence-container">
+                            <div class="active-sentence-label">
+                                <span>🔊 ĐANG ĐỌC PHÁT ÂM THANH</span>
+                                <span style="font-size: 10px; color:#64748b;">VieNeu TTS Engine</span>
+                            </div>
+                            <span class="active-sentence-number" id="reading-num">01</span>
+                            <div class="active-sentence-text" id="reading-text">Xin chào mọi người! Hôm nay mình sẽ giới thiệu đến các bạn một sản phẩm cực kỳ hữu ích...</div>
+                        </div>
+
+                        <!-- Pulse wave visualizer canvas -->
+                        <div style="margin-bottom:12px;">
+                            <canvas id="visualizer" class="visualizer-canvas"></canvas>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="progress-container">
+                            <div class="progress-label">
+                                <span>Tiến độ đọc câu hiện tại</span>
+                                <span id="reading-progress-percent">0%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="reading-progress-bar"></div>
+                            </div>
+                        </div>
+
+                        <!-- Start/Stop and Sound Controls grid -->
+                        <div style="display:flex; gap:10px; margin-bottom:16px;">
+                            <button type="button" id="start-btn" class="btn-cyan" style="flex:1; height:42px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>Bắt đầu</button>
+                            <button type="button" id="stop-btn" class="btn-pink" disabled style="flex:1; height:42px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect></svg>Ngừng</button>
+                        </div>
+
+                        <!-- Control settings bar -->
+                        <div class="sound-controls-bar">
+                            <div class="sound-control-item">
+                                <label>🔊 Âm lượng</label>
+                                <input type="range" id="web-audio-volume" min="0" max="1" step="0.1" value="0.8">
+                            </div>
+                            <div class="sound-control-item">
+                                <label>⚡ Tốc độ (<span id="speed-val" style="color:var(--primary); font-weight:700;">0.80x</span>)</label>
+                                <input type="range" id="web-audio-speed" min="0.8" max="1.4" step="0.05" value="0.8">
+                            </div>
+                            <div class="sound-control-item">
+                                <label>🎙️ Giọng đọc</label>
+                                <select id="voice-select" style="padding: 2px 6px; font-size:11.5px; height:24px;">
+                                    <option value="Trúc Ly" selected>Trúc Ly (Nữ)</option>
+                                    <option value="Phạm Tuyên">Phạm Tuyên (Nam)</option>
+                                    <option value="Thái Sơn">Thái Sơn (Nam)</option>
+                                    <option value="Xuân Vĩnh">Xuân Vĩnh (Nam)</option>
+                                    <option value="Thanh Bình">Thanh Bình (Nam)</option>
+                                    <option value="Minh Đức">Minh Đức (Nam)</option>
+                                    <option value="Ngọc Linh">Ngọc Linh (Nữ)</option>
+                                    <option value="Đoan Trang">Đoan Trang (Nữ)</option>
+                                    <option value="Mai Anh">Mai Anh (Nữ)</option>
+                                    <option value="Thục Đoan">Thục Đoan (Nữ)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Panel 2: Comments & AI Trả lời -->
+                <section class="panel panel-comments">
+                    <h3 class="panel-header-stack">
+                        <span class="panel-header-title">💬 COMMENT & AI TRẢ LỜI</span>
+                        <div class="comment-connect-row">
+                            <input id="tiktok-user" class="text-input" placeholder="Nhập username hoặc link TikTok Live" />
+                            <button id="connect-live" class="btn-cyan" type="button">KẾT NỐI</button>
+                            <button id="disconnect-live" class="btn-gray" type="button" disabled>NGẮT</button>
+                            <button id="mute-ai-comment" class="btn-pink" type="button" style="min-width:120px;">NGẮT GIỌNG AI</button>
+                        </div>
+                    </h3>
+                    <div class="panel-body">
+                        <!-- Error/Status Box -->
+                        <div id="status" class="error"></div>
+
+                        <!-- Feed scrolling area -->
+                        <div id="comments" class="comments-list">
+                            <div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ bình luận TikTok...</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Panel 3: Noi dung live -->
+                <section class="panel panel-prompt">
+                    <h3>
+                        <span>NỘI DUNG LIVE</span>
+                    </h3>
+                    <div class="panel-body">
+                        <div class="prompt-builder-grid">
+                            <!-- Left inputs column -->
+                            <div class="prompt-inputs-column">
+                                <form id="prompt-form" style="display:flex; flex-direction:column; gap:10px; height:100%;">
+                                    <div class="system-prompt-selectors">
+                                        <div class="selector-item">
+                                            <label>Vai trò AI</label>
+                                            <select style="height:26px; padding:2px 6px; font-size:12px;">
+                                                <option selected>MC bán hàng</option>
+                                                <option>MC review công nghệ</option>
+                                                <option>MC tư vấn mỹ phẩm</option>
+                                            </select>
+                                        </div>
+                                        <div class="selector-item">
+                                            <label>Phong cách</label>
+                                            <select style="height:26px; padding:2px 6px; font-size:12px;">
+                                                <option selected>Nhiệt tình, gần gũi</option>
+                                                <option>Hài hước, dí dỏm</option>
+                                                <option>Chuyên nghiệp, sâu sắc</option>
+                                            </select>
+                                        </div>
+                                        <div class="selector-item">
+                                            <label>Mục tiêu</label>
+                                            <select style="height:26px; padding:2px 6px; font-size:12px;">
+                                                <option selected>Chốt đơn hàng</option>
+                                                <option>Tăng tương tác</option>
+                                                <option>Giải thích sản phẩm</option>
+                                            </select>
+                                        </div>
+                                        <div class="selector-item">
+                                            <label>Ngành hàng</label>
+                                            <select style="height:26px; padding:2px 6px; font-size:12px;">
+                                                <option selected>Gia dụng</option>
+                                                <option>Thời trang</option>
+                                                <option>Mỹ phẩm & Làm đẹp</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div style="display:flex; flex-direction:column; flex:1;">
+                                        <label for="prompt">Nhập chủ đề Livestream:</label>
+                                        <textarea id="prompt" name="prompt" placeholder="Nhập kịch bản hoặc yêu cầu prompt tại đây..." required style="flex:1; min-height:80px;"></textarea>
+                                    </div>
+                                    
+                                    <button type="button" id="send-btn" class="btn-green" style="height:36px; padding:0 16px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>Gửi kịch bản</button>
+                                </form>
+                            </div>
+
+                            <!-- Right stream output column -->
+                            <div class="prompt-script-column">
+                                <label style="margin-bottom:8px; font-size:11px; font-family:var(--font-cyber);">Nội dung live sinh ra (Live Script)</label>
+                                <div id="llm-result" class="llm-result">
+                                    <div class="script-empty-state">Chưa có nội dung live. Hãy nhập chủ đề và tạo kịch bản.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Panel 4: Tinh gio su dung -->
+                <section class="panel panel-billing">
+                    <h3>
+                        <span>💳 TÍNH GIỜ SỬ DỤNG</span>
+                    </h3>
+                    <div class="panel-body">
+                        <div class="billing-grid">
+                            <div class="selector-item" style="margin-bottom: 8px;">
+                                <label>Đơn giá (VND/Giờ)</label>
+                                <input type="number" id="billing-rate-input" class="text-input" value="20000" readonly style="height:32px; font-weight:700; color:var(--primary); font-size:14px;" />
+                            </div>
+
+                            <!-- Orbitron Glowing timer -->
+                            <div class="billing-timer-glow" id="billing-timer">00:00:00</div>
+
+                            <div class="billing-stats">
+                                <div class="billing-stat-row">
+                                    <span>Trạng thái phiên:</span>
+                                    <span id="billing-session-status" style="color:#ffffff; font-weight:700;">Chưa bắt đầu</span>
+                                </div>
+                                <div class="billing-stat-row">
+                                    <span>Số dư còn lại:</span>
+                                    <span id="billing-balance-left" style="color:var(--success); font-weight:700;">00:00:00</span>
+                                </div>
+                                <div class="billing-stat-row">
+                                    <span>Bắt đầu lúc:</span>
+                                    <span id="billing-start-time" style="color:#ffffff; font-weight:600;">--:--:--</span>
+                                </div>
+                                <div class="billing-stat-row" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top:8px; margin-top:4px;">
+                                    <span>Tạm tính theo phiên:</span>
+                                    <span class="billing-amount-value" id="billing-amount">0 đ</span>
+                                </div>
+                            </div>
+
+                            <div class="billing-controls" style="display: none;">
+                                <button type="button" id="btn-billing-start" class="btn-green" style="height:36px; font-size:11px;">Bắt đầu</button>
+                                <button type="button" id="btn-billing-pause" class="btn-gray" disabled style="height:36px; font-size:11px;">Tạm dừng</button>
+                                <button type="button" id="btn-billing-end" class="btn-pink" disabled style="height:36px; font-size:11px; grid-column: span 2; margin-top:4px;">Kết thúc phiên</button>
+                                <button type="button" id="btn-billing-reset" class="btn-gray" style="height:30px; font-size:10px; grid-column: span 2; margin-top:4px;">Reset bộ đếm</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Price Selection Modal -->
+    <div id="price-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3>💰 Chọn gói nạp tiền</h3>
+                <button type="button" class="close-modal-btn" onclick="closePriceModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 15px 0;">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: center;">
+                    Đơn giá hiện tại của bạn: <span id="price-modal-rate" style="color: var(--primary); font-weight: bold;">- đ/giờ</span>
+                </p>
+                
+                <!-- Quick select grid -->
+                <div class="price-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
+                    <button type="button" class="price-btn" id="pbtn-10000" onclick="selectPrice(10000)">
+                        <strong>10.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-10k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-20000" onclick="selectPrice(20000)">
+                        <strong>20.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-20k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-50000" onclick="selectPrice(50000)">
+                        <strong>50.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-50k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-100000" onclick="selectPrice(100000)">
+                        <strong>100.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-100k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-200000" onclick="selectPrice(200000)">
+                        <strong>200.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-200k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-500000" onclick="selectPrice(500000)">
+                        <strong>500.000 đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-500k">--</span>
+                    </button>
+                    <button type="button" class="price-btn" id="pbtn-1000000" onclick="selectPrice(1000000)" style="grid-column: span 2;">
+                        <div style="text-align: center;">
+                            <strong>1.000.000 đ</strong><br/>
+                            <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-1m">--</span>
+                        </div>
+                    </button>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 5px;">Hoặc nhập số tiền mong muốn (tối thiểu 10.000đ):</label>
+                    <input type="number" id="custom-price-input" placeholder="Ví dụ: 15000" oninput="calculateCustomHours()" style="width: 100%; height: 38px; padding: 0 10px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #fff; box-sizing: border-box;" />
+                    <span id="custom-price-hours-desc" style="font-size: 11px; color: var(--primary); display: block; margin-top: 5px; font-weight: 500;"></span>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn-gray" onclick="closePriceModal()" style="height: 38px; border-radius: 8px; padding: 0 15px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Hủy bỏ</button>
+                <button type="button" class="btn-green" onclick="confirmPriceSelection()" style="height: 38px; border-radius: 8px; padding: 0 20px; cursor: pointer;">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Top-up Modal -->
+    <div id="qr-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🏦 Quét mã QR để nạp thêm thời gian</h3>
+                <button type="button" class="close-modal-btn" onclick="closeQrModal()">✕</button>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 15px 0;">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+                    Chuyển khoản theo mã QR bên dưới, hệ thống sẽ tự quy đổi thành giờ chơi (đơn giá: <span id="modal-rate" style="color:var(--primary); font-weight:bold;">-</span>).
+                </p>
+                <div style="position: relative; width: 250px; height: 250px; margin: 0 auto 15px;">
+                    <img id="qr-image" src="" alt="VietQR" style="width: 250px; height: 250px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);" />
+                    <div id="qr-loading-spinner" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; color: #fff; font-size: 13px;">
+                        <span style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s ease-in-out infinite; margin-bottom: 10px;"></span>
+                        Đang kết nối hóa đơn...
+                    </div>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 8px; font-size: 13px; text-align: left; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="margin-bottom: 6px; color:#fff;">🏦 Ngân hàng: <strong id="modal-bank-name">-</strong></div>
+                    <div style="margin-bottom: 6px; color:#fff;">💳 Số tài khoản: <strong id="modal-bank-acc" style="color: var(--primary);">-</strong></div>
+                    <div style="margin-bottom: 6px; color:#fff;">👤 Chủ tài khoản: <strong id="modal-bank-owner">-</strong></div>
+                    <div style="margin-bottom: 6px; color:#fff;">💰 Số tiền: <strong id="modal-amount" style="color: var(--success); font-size:15px;">-</strong></div>
+                    <div style="color:#fff;">📝 Nội dung CK: <strong id="modal-bank-memo" style="color: var(--danger); font-size:15px; font-family:var(--font-cyber);">-</strong></div>
+                </div>
+                <div id="polling-status-msg" style="margin-top: 15px; font-size: 13px; color: var(--primary); font-weight: 500;">
+                    🕒 Đang chờ bạn chuyển khoản...
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button type="button" class="btn-red" id="btn-cancel-invoice" onclick="cancelPendingInvoice()" style="height: 38px; border-radius: 8px; padding: 0 15px; font-weight: bold; flex: 1;">Hủy hóa đơn</button>
+                <button type="button" class="btn-green" onclick="closeQrModal()" style="height: 38px; border-radius: 8px; padding: 0 15px; flex: 1;">Tôi đã chuyển tiền</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Confirm Modal -->
+    <div id="cancel-confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--danger); box-shadow: 0 0 40px rgba(239, 68, 68, 0.15);">
+            <div class="modal-header" style="border-bottom-color: rgba(239, 68, 68, 0.15);">
+                <h3 style="color: var(--danger); display: flex; align-items: center; gap: 8px; font-size: 15px;">⚠️ Xác nhận hủy hóa đơn</h3>
+                <button type="button" class="close-modal-btn" onclick="closeCancelConfirmModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 20px 0; text-align: center;">
+                <p style="font-size: 14px; color: #fff; line-height: 1.5; margin: 0;">
+                    Bạn có chắc chắn muốn hủy hóa đơn nạp tiền này không? Hành động này không thể hoàn tác.
+                </p>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
+                <button type="button" class="btn-gray" onclick="closeCancelConfirmModal()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Bỏ qua</button>
+                <button type="button" class="btn-red" id="btn-execute-cancel-invoice" onclick="executeCancelPendingInvoice()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold;">Hủy hóa đơn</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Alert Modal (Thay thế alert) -->
+    <div id="app-alert-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--primary); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15);">
+            <div class="modal-header" style="border-bottom-color: rgba(0, 240, 255, 0.15);">
+                <h3 id="app-alert-title" style="color: var(--primary); display: flex; align-items: center; gap: 8px; font-size: 15px;">📢 Thông báo</h3>
+                <button type="button" class="close-modal-btn" onclick="closeAppAlertModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 20px 0; text-align: center;">
+                <p id="app-alert-message" style="font-size: 14px; color: #fff; line-height: 1.5; margin: 0;"></p>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 10px;">
+                <button type="button" class="btn-gray" onclick="closeAppAlertModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Success Modal -->
+    <div id="payment-success-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--success); box-shadow: 0 0 50px rgba(16, 185, 129, 0.15);">
+            <div class="modal-header" style="border-bottom-color: rgba(16, 185, 129, 0.1);">
+                <h3 style="color: var(--success); display: flex; align-items: center; gap: 8px; font-size: 15px;">🎉 Thanh toán thành công</h3>
+                <button type="button" class="close-modal-btn" onclick="closePaymentSuccessModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 15px 0; text-align: center;">
+                <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px; border: 1px solid rgba(16, 185, 129, 0.2);">✓</div>
+                <p style="font-size: 13px; color: var(--text-main); margin-bottom: 15px;">
+                    Cảm ơn bạn! Hóa đơn của bạn đã được duyệt thanh toán thành công.
+                </p>
+                <div style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 8px; font-size: 13px; text-align: left; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Mã hóa đơn:</span>
+                        <strong id="success-det-code" style="color: #fff; font-family: var(--font-cyber);">-</strong>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Thời gian:</span>
+                        <span id="success-det-time" style="color: #fff;">-</span>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Số tiền nạp:</span>
+                        <strong id="success-det-amount" style="color: var(--success);">-</strong>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Thời gian nhận:</span>
+                        <strong id="success-det-hours" style="color: var(--primary);">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted);">Trạng thái:</span>
+                        <span style="color: var(--success); font-weight: bold;">Thanh toán thành công</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
+                <button type="button" class="btn-green" onclick="closePaymentSuccessModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer;">Đóng và Bắt đầu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Detail Modal -->
+    <div id="invoice-detail-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 400px; padding: 20px;">
+            <div class="modal-header">
+                <h3>📄 Chi tiết hóa đơn</h3>
+                <button type="button" class="close-modal-btn" onclick="closeInvoiceDetailModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 15px 0;">
+                <div style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 8px; font-size: 13px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Mã hóa đơn:</span>
+                        <strong id="det-code" style="color: #fff; font-family: var(--font-cyber);">-</strong>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Thời gian:</span>
+                        <span id="det-time" style="color: #fff;">-</span>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Số tiền nạp:</span>
+                        <strong id="det-amount" style="color: var(--success);">-</strong>
+                    </div>
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Thời gian nhận:</span>
+                        <strong id="det-hours" style="color: var(--primary);">-</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: var(--text-muted);">Trạng thái:</span>
+                        <span id="det-status" style="font-weight: bold;">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
+                <button type="button" class="btn-gray" onclick="closeInvoiceDetailModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User History Modal (Invoices & Sessions) -->
+    <div id="user-history-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 680px; width: 90%;">
+            <div class="modal-header">
+                <h3>👤 Lịch sử hoạt động tài khoản</h3>
+                <button type="button" class="close-modal-btn" onclick="closeUserHistoryModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 10px 0;">
+                <!-- Tab Headers -->
+                <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px;">
+                    <button type="button" id="tab-invoices-btn" class="history-tab-btn active" onclick="switchHistoryTab('invoices')">💳 Lịch sử nạp tiền</button>
+                    <button type="button" id="tab-sessions-btn" class="history-tab-btn" onclick="switchHistoryTab('sessions')">🎬 Lịch sử phiên live</button>
+                </div>
+                
+                <!-- Tab 1: Invoices List -->
+                <div id="tab-invoices-content" style="max-height: 350px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-muted);">
+                                <th style="padding: 8px; font-weight: bold;">Mã hóa đơn</th>
+                                <th style="padding: 8px; font-weight: bold;">Thời gian</th>
+                                <th style="padding: 8px; font-weight: bold;">Số tiền</th>
+                                <th style="padding: 8px; font-weight: bold;">Quy đổi</th>
+                                <th style="padding: 8px; font-weight: bold;">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-invoices-tbody">
+                            <!-- Invoices render here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tab 2: Sessions List -->
+                <div id="tab-sessions-content" style="display: none; max-height: 350px; overflow-y: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-muted);">
+                                <th style="padding: 8px; font-weight: bold;">Bắt đầu</th>
+                                <th style="padding: 8px; font-weight: bold;">Kết thúc</th>
+                                <th style="padding: 8px; font-weight: bold;">Đã dùng</th>
+                                <th style="padding: 8px; font-weight: bold;">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-sessions-tbody">
+                            <!-- Sessions render here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                <button type="button" class="btn-gray" onclick="closeUserHistoryModal()" style="height: 38px; border-radius: 8px; padding: 0 20px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Đóng</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="locked-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Tài khoản bị khóa</h3>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 18px 0;">
+                <p style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
+                    Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.
+                </p>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
+                <button type="button" class="btn-red" onclick="logoutLockedAccount()" style="width: 100%; height: 38px; border-radius: 8px;">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="expired-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Hết thời gian sử dụng</h3>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 18px 0;">
+                <p style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
+                    Tài khoản đã hết thời gian sử dụng. Phiên live đã được dừng tự động.
+                </p>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
+                <button type="button" class="btn-cyan" onclick="acknowledgeExpiredModal()" style="width: 100%; height: 38px; border-radius: 8px;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width: 380px;">
+            <div class="modal-header">
+                <h3>Xác nhận đăng xuất</h3>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 18px 0;">
+                <p style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
+                    Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng không?
+                </p>
+            </div>
+            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button type="button" class="btn-gray" onclick="closeLogoutModal()" style="flex: 1; height: 38px; border-radius: 8px;">Hủy bỏ</button>
+                <button type="button" class="btn-red" onclick="executeLogout()" style="flex: 1; height: 38px; border-radius: 8px;">Đăng xuất</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const sendBtn = document.getElementById('send-btn');
+        const status = document.getElementById('status');
+        const llmResult = document.getElementById('llm-result');
+        const commentsDiv = document.getElementById('comments');
+        const connectBtn = document.getElementById('connect-live');
+        const disconnectBtn = document.getElementById('disconnect-live');
+        const muteAiCommentBtn = document.getElementById('mute-ai-comment');
+        const tiktokUserInput = document.getElementById('tiktok-user');
+        const voiceSelect = document.getElementById('voice-select');
+        const volumeInput = document.getElementById('web-audio-volume');
+        const audioToggle = document.getElementById('web-audio-toggle');
+        const speedInput = document.getElementById('web-audio-speed');
+        const speedValLabel = document.getElementById('speed-val');
+
+        // Top bar indicators
+        const topLiveTimer = document.getElementById('top-live-timer');
+        const topViewerCount = document.getElementById('top-viewer-count');
+        const topCommentRate = document.getElementById('top-comment-rate');
+        const topLikeRate = document.getElementById('top-like-rate');
+        const topOrderCount = document.getElementById('top-order-count');
+        const systemTiktokBadge = document.getElementById('system-tiktok-badge');
+
+        // Reading panel state elements
+        const readingNum = document.getElementById('reading-num');
+        const readingText = document.getElementById('reading-text');
+        const readingProgressBar = document.getElementById('reading-progress-bar');
+        const readingProgressPercent = document.getElementById('reading-progress-percent');
+
+        // Global state variables
+        let source = null;
+        let commentsSource = null;
+        let isRunning = false;
+        let audioQueue = Promise.resolve();
+
+        // SpeechQueue buffering & refill state
+        window.originalPrompt = '';
+        window.generatedSentences = [];
+        window.isFetchingMore = false;
+
+        let audioCtx = null;
+        let analyser = null;
+
+        // Top-bar Live Counter
+        let topTimerSeconds = 0;
+        let topTimerInterval = null;
+        let liveStatsInterval = null;
+        let tiktokStatusInterval = null;
+        let tiktokUiState = 'idle';
+        let tiktokControlsLocked = false;
+
+        function applyTikTokUiState(state, username) {
+            tiktokUiState = state;
+            if (tiktokControlsLocked) {
+                return;
+            }
+
+            const isConnecting = state === 'connecting';
+            const isActive = state === 'connected' || state === 'running';
+
+            connectBtn.disabled = isConnecting || isActive;
+            disconnectBtn.disabled = !isActive;
+            tiktokUserInput.disabled = isConnecting || isActive;
+            systemTiktokBadge.textContent = isActive ? 'ON' : 'OFF';
+            systemTiktokBadge.className = isActive ? 'status-badge on' : 'status-badge off';
+
+            if (!isActive) {
+                resetLiveTopbarStats();
+            }
+        }
+
+        async function syncTikTokStatus() {
+            try {
+                const res = await fetch('/api/tiktok/status');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (!data || data.success === false) return;
+                const active = !!(data.connected || data.running);
+                applyTikTokUiState(active ? (data.connected ? 'connected' : 'running') : 'idle', data.username);
+            } catch (err) {
+                console.error('Error fetching TikTok status:', err);
+            }
+        }
+
+        function startTikTokStatusPolling() {
+            if (tiktokStatusInterval) clearInterval(tiktokStatusInterval);
+            syncTikTokStatus();
+            tiktokStatusInterval = setInterval(syncTikTokStatus, 2000);
+        }
+
+        function confirmLogout(event) {
+            event.preventDefault();
+            document.getElementById('logout-confirm-modal').style.display = 'flex';
+        }
+
+        function closeLogoutModal() {
+            document.getElementById('logout-confirm-modal').style.display = 'none';
+        }
+
+        function executeLogout() {
+            window.location.href = '/logout';
+        }
+
+        function startTopTimer() {
+            if (topTimerInterval) clearInterval(topTimerInterval);
+            topTimerSeconds = 0;
+            topTimerInterval = setInterval(() => {
+                topTimerSeconds++;
+                const hrs = Math.floor(topTimerSeconds / 3600).toString().padStart(2, '0');
+                const mins = Math.floor((topTimerSeconds % 3600) / 60).toString().padStart(2, '0');
+                const secs = (topTimerSeconds % 60).toString().padStart(2, '0');
+                topLiveTimer.textContent = `${hrs}:${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopTopTimer() {
+            clearInterval(topTimerInterval);
+            topTimerInterval = null;
+        }
+
+        function resetLiveTopbarStats() {
+            topViewerCount.textContent = '--';
+            topCommentRate.textContent = '--';
+            topLikeRate.textContent = '--';
+            topOrderCount.textContent = '--';
+        }
+
+        function formatLiveStat(value) {
+            return Number.isInteger(value) && value >= 0 ? value.toLocaleString('vi-VN') : '--';
+        }
+
+        function applyLiveStats(data) {
+            if (!data || !data.success || !data.connected) {
+                resetLiveTopbarStats();
+                return;
+            }
+            topViewerCount.textContent = formatLiveStat(data.currentViewers);
+            topCommentRate.textContent = formatLiveStat(data.commentsPerMinute);
+            topLikeRate.textContent = formatLiveStat(data.heartsPerMinute);
+            topOrderCount.textContent = formatLiveStat(data.ordersCount);
+        }
+
+        async function loadLiveStats() {
+            try {
+                const res = await fetch('/api/live/stats');
+                if (!res.ok) return;
+                const data = await res.json();
+                applyLiveStats(data);
+            } catch (err) {
+                console.error('Error fetching live stats:', err);
+            }
+        }
+
+        function startLiveStatsPolling() {
+            if (liveStatsInterval) clearInterval(liveStatsInterval);
+            loadLiveStats();
+            liveStatsInterval = setInterval(loadLiveStats, 2000);
+        }
+
+        // Sentence Splitting logic
+        function splitTextIntoSentences(text) {
+            if (!text) return [];
+            const rawSentences = text.split(/(?<=[.!?\n])\s+/);
+            const sentences = [];
+
+            rawSentences.forEach(s => {
+                const trimmed = s.trim();
+                if (trimmed) {
+                    if (trimmed.length > 65) {
+                        const subParts = trimmed.split(/(?<=[,;])\s+/);
+                        let tempSentence = "";
+                        subParts.forEach(part => {
+                            if ((tempSentence + part).length > 65) {
+                                if (tempSentence.trim()) {
+                                    sentences.push(tempSentence.trim());
+                                }
+                                tempSentence = part;
+                            } else {
+                                tempSentence += (tempSentence ? " " : "") + part;
+                            }
+                        });
+                        if (tempSentence.trim()) {
+                            sentences.push(tempSentence.trim());
+                        }
+                    } else {
+                        sentences.push(trimmed);
+                    }
+                }
+            });
+            return sentences;
+        }
+
+        function getCumulativeOffsetTop(element, parent) {
+            let offsetTop = 0;
+            while (element && element !== parent) {
+                offsetTop += element.offsetTop;
+                element = element.offsetParent;
+            }
+            return offsetTop;
+        }
+
+        function scrollParentToSecondLine(parent, child) {
+            if (!parent || !child) return;
+            
+            // Không tự động cuộn nếu người dùng đang tương tác/focus vào form nhập liệu
+            const activeEl = document.activeElement;
+            if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
+                return;
+            }
+
+            const targetEl = child.classList.contains('llm-item') ? child : (child.closest('.comment-item') || child);
+
+            setTimeout(() => {
+                const topPos = getCumulativeOffsetTop(targetEl, parent);
+                const targetScrollTop = topPos - (parent.clientHeight / 2) + (targetEl.clientHeight / 2);
+                parent.scrollTo({
+                    top: Math.max(0, targetScrollTop),
+                    behavior: "smooth"
+                });
+            }, 50);
+        }
+
+        function showLiveContentMessage(message, type = 'empty') {
+            const className = type === 'error'
+                ? 'script-error-state'
+                : type === 'loading'
+                    ? 'script-loading-state'
+                    : 'script-empty-state';
+            llmResult.innerHTML = `<div class="${className}">${message}</div>`;
+        }
+
+        function clearLiveContentMessage() {
+            llmResult.innerHTML = '';
+        }
+
+        // ----------------------------------------------------
+        // CLIENT-SIDE AUDIO PLAYBACK & PRE-FETCH ENGINE
+        // ----------------------------------------------------
+        class SpeechQueue {
+            constructor() {
+                this.queue = [];
+                this.isPlaying = false;
+                this.isHighlighting = false;
+                this.lastSentCount = -1;
+                this.unreadCountTimeout = null;
+                this.playResolver = null;
+                this.currentItem = null;
+                this.readingIndex = 0;
+                this.buffering = true;
+
+                this.audioA = new Audio();
+                this.audioB = new Audio();
+                this.audioA.crossOrigin = "anonymous";
+                this.audioB.crossOrigin = "anonymous";
+
+                this.activePlayer = this.audioA;
+                this.inactivePlayer = this.audioB;
+                this.currentAudio = null;
+
+                this.audioCtx = null;
+                this.analyser = null;
+                this.simulateTimeout = null;
+
+                this.audioA.onended = () => this.onEnded();
+                this.audioB.onended = () => this.onEnded();
+                this.audioA.onerror = (e) => this.onError(e);
+                this.audioB.onerror = (e) => this.onError(e);
+            }
+
+            async updateUnreadCount() {
+                const count = this.queue.length;
+                if (this.lastSentCount === count) return;
+                this.lastSentCount = count;
+
+                clearTimeout(this.unreadCountTimeout);
+                this.unreadCountTimeout = setTimeout(async () => {
+                    try {
+                        await fetch('/set-unread-count', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ count })
+                        });
+                    } catch (e) {
+                        console.error("Failed to update unread count:", e);
+                    }
+                }, 100);
+            }
+
+            stop() {
+                this.queue = [];
+                this.isPlaying = false;
+                this.isHighlighting = false;
+                this.playResolver = null;
+                this.currentItem = null;
+                this.readingIndex = 0;
+                this.buffering = true;
+                this.updateUnreadCount();
+
+                if (this.simulateTimeout) {
+                    clearTimeout(this.simulateTimeout);
+                    this.simulateTimeout = null;
+                }
+
+                try {
+                    this.audioA.pause();
+                    this.audioA.src = '';
+                } catch (e) { }
+                try {
+                    this.audioB.pause();
+                    this.audioB.src = '';
+                } catch (e) { }
+
+                this.currentAudio = null;
+                
+                // Clear active reading states
+                readingNum.textContent = '00';
+                readingText.textContent = 'Đã dừng phát âm thanh.';
+                readingProgressBar.style.width = '0%';
+                readingProgressPercent.textContent = '0%';
+            }
+
+            stopComments() {
+                // Filter out all comment items from queue
+                this.queue = this.queue.filter(item => item.isLlmItem === true);
+                this.updateUnreadCount();
+
+                // If currently playing item is a comment, stop it
+                if (this.currentItem && !this.currentItem.isLlmItem) {
+                    try {
+                        this.audioA.pause();
+                        this.audioA.src = '';
+                    } catch(e) {}
+                    try {
+                        this.audioB.pause();
+                        this.audioB.src = '';
+                    } catch(e) {}
+                    this.currentAudio = null;
+                    this.isPlaying = false;
+                    this.playNext();
+                }
+
+                // Clear comments list
+                commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ bình luận TikTok...</div>';
+            }
+
+            interruptCurrent() {
+                if (!this.currentItem || !this.currentItem.isLlmItem) return;
+
+                console.log("[SpeechQueue] Interrupting script item to read TikTok event:", this.currentItem.text);
+
+                const interruptedItem = this.currentItem;
+                this.currentItem = null;
+
+                // Reset element highlight/styling of the interrupted item
+                if (interruptedItem.containerEl) {
+                    interruptedItem.containerEl.className = 'llm-item';
+                }
+
+                // Insert it back as the first LLM item in the queue
+                const firstLlmIndex = this.queue.findIndex(qItem => qItem.isLlmItem);
+                if (firstLlmIndex === -1) {
+                    this.queue.push(interruptedItem);
+                } else {
+                    this.queue.splice(firstLlmIndex, 0, interruptedItem);
+                }
+
+                // Stop audio/simulation
+                this.isPlaying = false;
+                this.isHighlighting = false;
+
+                if (this.simulateTimeout) {
+                    clearTimeout(this.simulateTimeout);
+                    this.simulateTimeout = null;
+                }
+
+                try {
+                    this.audioA.pause();
+                    this.audioA.src = '';
+                } catch(e) {}
+                try {
+                    this.audioB.pause();
+                    this.audioB.src = '';
+                } catch(e) {}
+
+                this.currentAudio = null;
+                this.updateUnreadCount();
+
+                const resolve = this.playResolver;
+                this.playResolver = null;
+                if (resolve) {
+                    resolve(this.playNext());
+                } else {
+                    this.playNext();
+                }
+            }
+
+            initAudio() {
+                if (this.audioCtx) return;
+                try {
+                    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                    this.audioCtx = new AudioContextClass();
+                    this.analyser = this.audioCtx.createAnalyser();
+                    this.analyser.fftSize = 64;
+
+                    this.sourceA = this.audioCtx.createMediaElementSource(this.audioA);
+                    this.sourceB = this.audioCtx.createMediaElementSource(this.audioB);
+
+                    this.sourceA.connect(this.analyser);
+                    this.sourceB.connect(this.analyser);
+                    this.analyser.connect(this.audioCtx.destination);
+                } catch (e) {
+                    console.error("Failed to init audio context for visualizer", e);
+                }
+            }
+
+            setVolume(volume) {
+                this.audioA.volume = volume;
+                this.audioB.volume = volume;
+            }
+
+            setMuted(muted) {
+                this.audioA.muted = muted;
+                this.audioB.muted = muted;
+            }
+
+            add(text, containerEl, isLlmItem = true) {
+                const item = {
+                    text,
+                    containerEl,
+                    isLlmItem,
+                    audioBlobUrl: null,
+                    isFetched: false,
+                    isFetching: false
+                };
+
+                if (!isLlmItem) {
+                    // Set buffering to false to ensure immediate play for TikTok events
+                    this.buffering = false;
+
+                    // Insert TikTok event before any LLM items in the queue
+                    const firstLlmIndex = this.queue.findIndex(qItem => qItem.isLlmItem);
+                    if (firstLlmIndex === -1) {
+                        this.queue.push(item);
+                    } else {
+                        this.queue.splice(firstLlmIndex, 0, item);
+                    }
+                } else {
+                    this.queue.push(item);
+                }
+
+                this.updateUnreadCount();
+
+                containerEl.textContent = text;
+                this.triggerNextPreFetch();
+
+                // Buffer/Play policy
+                if (this.buffering) {
+                    if (this.queue.length >= 10) {
+                        this.buffering = false;
+                        if (!this.isPlaying) {
+                            this.playNext();
+                        }
+                    }
+                } else {
+                    if (!this.isPlaying) {
+                        this.playNext();
+                    } else if (!isLlmItem) {
+                        // Interrupt current script item to play TikTok event immediately
+                        this.interruptCurrent();
+                    }
+                }
+            }
+
+            async preFetchItem(item) {
+                if (item.isFetched || item.isFetching) return;
+
+                const playWebAudio = audioToggle.checked;
+                if (!playWebAudio) {
+                    item.isFetched = true;
+                    this.triggerNextPreFetch();
+                    return;
+                }
+
+                item.isFetching = true;
+                const voiceSelectVal = voiceSelect.value || 'Trúc Ly';
+
+                try {
+                    const response = await fetch('/tts', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: item.text, voice: voiceSelectVal })
+                    });
+
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        item.audioBlobUrl = URL.createObjectURL(blob);
+                        item.isFetched = true;
+                        this.preloadNextIfInactive();
+                    } else {
+                        console.error("Failed to pre-fetch TTS", response.statusText);
+                        item.isFetched = true;
+                    }
+                } catch (err) {
+                    console.error("Error pre-fetching TTS", err);
+                    item.isFetched = true;
+                } finally {
+                    item.isFetching = false;
+                    this.triggerNextPreFetch();
+                }
+            }
+
+            triggerNextPreFetch() {
+                const isQueueFetching = this.queue.some(item => item.isFetching);
+                const isCurrentFetching = this.currentItem && this.currentItem.isFetching;
+
+                if (isQueueFetching || isCurrentFetching) {
+                    return;
+                }
+
+                const nextToFetch = this.queue.find(item => !item.isFetched && !item.isFetching);
+                if (nextToFetch) {
+                    this.preFetchItem(nextToFetch);
+                }
+            }
+
+            preloadNextIfInactive() {
+                if (this.queue.length > 0) {
+                    const nextItem = this.queue[0];
+                    if (nextItem.isFetched && nextItem.audioBlobUrl) {
+                        if (this.inactivePlayer.src !== nextItem.audioBlobUrl) {
+                            this.inactivePlayer.src = nextItem.audioBlobUrl;
+                            this.inactivePlayer.load();
+                        }
+                    }
+                }
+            }
+
+            async playNext() {
+                if (this.queue.length === 0) {
+                    this.isPlaying = false;
+                    this.currentAudio = null;
+                    this.currentItem = null;
+                    this.updateUnreadCount();
+                    this.buffering = true;
+                    return;
+                }
+
+                this.isPlaying = true;
+                const item = this.queue.shift();
+                this.currentItem = item;
+                this.readingIndex++;
+                this.updateUnreadCount();
+
+                this.triggerNextPreFetch();
+
+                // Refill policy: trigger request when queue falls below 7
+                if (this.queue.length < 7 && !window.isFetchingMore) {
+                    if (typeof window.requestMoreSentences === 'function') {
+                        window.requestMoreSentences();
+                    }
+                }
+
+                const playWebAudio = audioToggle.checked;
+                const volume = parseFloat(volumeInput.value);
+
+                if (playWebAudio && !item.isFetched) {
+                    if (!item.isFetching) {
+                        await this.preFetchItem(item);
+                    } else {
+                        await new Promise(resolve => {
+                            const checkInterval = setInterval(() => {
+                                if (item.isFetched) {
+                                    clearInterval(checkInterval);
+                                    resolve();
+                                }
+                            }, 30);
+                        });
+                    }
+                }
+
+                // Update Active reading panel layout
+                readingNum.textContent = this.readingIndex.toString().padStart(2, '0');
+                readingText.textContent = item.text;
+
+                if (playWebAudio && item.audioBlobUrl) {
+                    const prevPlayer = this.activePlayer;
+                    this.activePlayer = this.inactivePlayer;
+                    this.inactivePlayer = prevPlayer;
+
+                    this.currentAudio = this.activePlayer;
+                    this.initAudio();
+
+                    if (this.audioCtx && this.audioCtx.state === 'suspended') {
+                        await this.audioCtx.resume().catch(e => console.error(e));
+                    }
+
+                    if (this.activePlayer.src !== item.audioBlobUrl) {
+                        this.activePlayer.src = item.audioBlobUrl;
+                    }
+
+                    this.activePlayer.volume = volume;
+                    const speed = parseFloat(speedInput.value) || 0.8;
+                    this.activePlayer.playbackRate = speed;
+
+                    this.playResolver = null;
+                    this.preloadNextIfInactive();
+
+                    queueAudio(item.text);
+
+                    return new Promise((resolve) => {
+                        this.playResolver = resolve;
+
+                        this.activePlayer.onplay = () => {
+                            this.activePlayer.playbackRate = speed;
+                            this.isHighlighting = true;
+
+                            const duration = this.activePlayer.duration || (item.text.length * 0.08 + 0.5);
+                            this.highlightProgress(item, duration / speed);
+                        };
+
+                        this.activePlayer.play().catch(e => {
+                            console.warn("Playback failed, fallback to simulation:", e);
+                            this.playResolver = null;
+                            this.simulateHighlight(item, resolve);
+                        });
+                    });
+                } else {
+                    return new Promise((resolve) => {
+                        this.playResolver = resolve;
+                        this.simulateHighlight(item, resolve);
+                    });
+                }
+            }
+
+            onEnded() {
+                if (this.currentItem) {
+                    this.highlightProgressDone(this.currentItem);
+                    if (this.currentItem.audioBlobUrl) {
+                        URL.revokeObjectURL(this.currentItem.audioBlobUrl);
+                        this.currentItem.audioBlobUrl = null;
+                    }
+                }
+
+                if (this.playResolver) {
+                    this.isHighlighting = false;
+                    const resolve = this.playResolver;
+                    this.playResolver = null;
+
+                    setTimeout(() => {
+                        resolve(this.playNext());
+                    }, 10);
+                }
+            }
+
+            onError(e) {
+                console.error("Audio player error:", e);
+                if (this.playResolver) {
+                    this.isHighlighting = false;
+                    const resolve = this.playResolver;
+                    this.playResolver = null;
+                    resolve(this.playNext());
+                }
+            }
+
+            simulateHighlight(item, resolve) {
+                this.isHighlighting = true;
+                this.currentItem = item;
+                const durationMs = Math.max(1000, (item.text.length / 15) * 1000);
+
+                this.highlightProgress(item, durationMs / 1000);
+                queueAudio(item.text);
+
+                this.simulateTimeout = setTimeout(() => {
+                    this.simulateTimeout = null;
+                    if (this.playResolver === resolve) {
+                        this.playResolver = null;
+                    }
+                    this.isHighlighting = false;
+                    this.highlightProgressDone(item);
+                    resolve(this.playNext());
+                }, durationMs);
+            }
+
+            highlightProgress(item, duration) {
+                const scrollParent = item.isLlmItem ? llmResult : commentsDiv;
+
+                if (item.isLlmItem) {
+                    item.containerEl.className = 'llm-item active';
+                } else {
+                    const commentItem = item.containerEl.closest('.comment-item');
+                    if (commentItem) {
+                        commentItem.className = 'comment-item active';
+                    }
+                }
+
+                const items = Array.from(scrollParent.children);
+                items.forEach((child) => {
+                    child.style.display = '';
+                });
+
+                scrollParentToSecondLine(scrollParent, item.containerEl);
+
+                // Animate progress bar in AI Sắp đọc panel
+                let start = null;
+                const progressFill = (timestamp) => {
+                    if (!this.isHighlighting || this.currentItem !== item) return;
+                    if (!start) start = timestamp;
+                    const elapsed = (timestamp - start) / 1000;
+                    const percent = Math.min(100, Math.round((elapsed / duration) * 100));
+                    
+                    readingProgressBar.style.width = percent + '%';
+                    readingProgressPercent.textContent = percent + '%';
+
+                    if (percent < 100) {
+                        requestAnimationFrame(progressFill);
+                    }
+                };
+                requestAnimationFrame(progressFill);
+            }
+
+            highlightProgressDone(item) {
+                if (item.isLlmItem) {
+                    item.containerEl.className = 'llm-item read';
+                } else {
+                    const commentItem = item.containerEl.closest('.comment-item');
+                    if (commentItem) {
+                        commentItem.className = 'comment-item read';
+
+                        // Find all sentence-block elements inside commentItem
+                        const sentences = Array.from(commentItem.querySelectorAll('.sentence-block'));
+                        const currentIndex = sentences.indexOf(item.containerEl);
+
+                        // If it is the last sentence of the comment, delete it after a short delay
+                        if (currentIndex === sentences.length - 1) {
+                            setTimeout(() => {
+                                commentItem.remove();
+                                if (commentsDiv.children.length === 0) {
+                                    commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ bình luận TikTok...</div>';
+                                }
+                            }, 1000);
+                        }
+                    }
+                }
+                
+                readingProgressBar.style.width = '100%';
+                readingProgressPercent.textContent = '100%';
+            }
+        }
+
+        const speechQueue = new SpeechQueue();
+
+        function stopStream() {
+            speechQueue.stop();
+            stopTopTimer();
+            stopBillingHeartbeat();
+            stopSessionElapsedTimer();
+            
+            // Send end session call to proxy
+            fetch('/api/session/end', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.success) {
+                        applyBillingSnapshot(data);
+                        setBillingSessionStatus('Đã dừng', 'var(--text-muted)');
+                    } else if (isLockedResponse(data)) {
+                        handleLockedAccount(data);
+                    }
+                })
+                .catch(err => console.error(err));
+
+            if (source) {
+                source.close();
+                source = null;
+            }
+            if (commentsSource) {
+                commentsSource.close();
+                commentsSource = null;
+            }
+            isRunning = false;
+            stopBtn.disabled = true;
+            sendBtn.disabled = true;
+            
+            if (isAccountLocked) {
+                startBtn.disabled = true;
+                status.className = 'error';
+                status.textContent = 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.';
+            } else if (timeBalanceSeconds <= 0) {
+                startBtn.disabled = true;
+                status.className = 'error';
+                status.textContent = 'Tài khoản đã hết thời gian sử dụng. Vui lòng quét mã QR nạp tiền.';
+            } else {
+                startBtn.disabled = false;
+                status.textContent = 'Đã dừng.';
+            }
+        }
+
+        function queueAudio(text) {
+            const voice = voiceSelect ? voiceSelect.value : 'Trúc Ly';
+            audioQueue = audioQueue.then(() =>
+                fetch('/add-tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, voice }),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                try {
+                                    const data = JSON.parse(text);
+                                    throw new Error(data.error || data.detail || text || 'Lỗi TTS');
+                                } catch {
+                                    throw new Error(text || response.statusText || 'Lỗi TTS');
+                                }
+                            });
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.error('TTS error:', error);
+                        status.textContent = 'Lỗi TTS: ' + error.message;
+                    })
+            );
+        }
+
+        // Visualizer Drawing Function
+        const canvas = document.getElementById('visualizer');
+        const canvasCtx = canvas.getContext('2d');
+        const mainContainer = document.querySelector('.container');
+
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+
+            if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+                canvas.width = canvas.clientWidth;
+                canvas.height = canvas.clientHeight;
+            }
+
+            const width = canvas.width;
+            const height = canvas.height;
+
+            // Fill canvas with deep navy/black matching the theme
+            canvasCtx.fillStyle = '#0a1020';
+            canvasCtx.fillRect(0, 0, width, height);
+
+            const hasActiveAudio = speechQueue.analyser &&
+                audioToggle && audioToggle.checked &&
+                speechQueue.currentAudio &&
+                !speechQueue.currentAudio.paused;
+
+            let volume = 0;
+
+            if (hasActiveAudio) {
+                const bufferLength = speechQueue.analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                speechQueue.analyser.getByteTimeDomainData(dataArray);
+
+                let maxVal = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    const val = Math.abs(dataArray[i] - 128);
+                    if (val > maxVal) maxVal = val;
+                }
+                volume = maxVal / 64;
+            }
+
+            if (volume > 0) {
+                if (mainContainer) {
+                    mainContainer.style.transition = 'none';
+                    const borderWidth = 1 + volume * 2;
+                    mainContainer.style.borderColor = `rgba(0, 240, 255, ${0.1 + volume * 0.4})`;
+
+                    const glow = 15 + volume * 35;
+                    mainContainer.style.boxShadow = `0 10px 30px rgba(0, 0, 0, 0.4), 0 0 ${glow}px rgba(0, 240, 255, ${volume * 0.25})`;
+                }
+
+                // Draw neon visualizer lines
+                canvasCtx.lineWidth = 2.5;
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = '#00f0ff'; // Neon Cyan
+                canvasCtx.shadowBlur = 10;
+                canvasCtx.shadowColor = '#00f0ff';
+
+                const time = performance.now() * 0.008;
+                for (let i = 0; i < width; i++) {
+                    const progress = i / width;
+                    const freqScale = 0.04 + volume * 0.12;
+                    const ampScale = (height / 2.2) * volume;
+                    const y = height / 2 + Math.sin(i * freqScale - time) * ampScale * Math.sin(progress * Math.PI);
+
+                    if (i === 0) canvasCtx.moveTo(i, y);
+                    else canvasCtx.lineTo(i, y);
+                }
+                canvasCtx.stroke();
+
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = '#ff0055'; // Neon Pink
+                canvasCtx.shadowColor = '#ff0055';
+                canvasCtx.lineWidth = 1.8;
+                for (let i = 0; i < width; i++) {
+                    const progress = i / width;
+                    const freqScale = 0.07 + volume * 0.1;
+                    const ampScale = (height / 2.5) * volume * 0.8;
+                    const y = height / 2 + Math.sin(i * freqScale + time * 1.3 + Math.PI) * ampScale * Math.sin(progress * Math.PI);
+
+                    if (i === 0) canvasCtx.moveTo(i, y);
+                    else canvasCtx.lineTo(i, y);
+                }
+                canvasCtx.stroke();
+                
+                // Reset shadow blur
+                canvasCtx.shadowBlur = 0;
+            } else {
+                if (mainContainer) {
+                    mainContainer.style.transition = '';
+                    mainContainer.style.transform = '';
+                    mainContainer.style.boxShadow = '';
+                    mainContainer.style.borderColor = '';
+                }
+
+                canvasCtx.shadowBlur = 0;
+                if (!isRunning) {
+                    // Straight pink line when stopped
+                    canvasCtx.lineWidth = 2.5;
+                    canvasCtx.strokeStyle = 'rgba(255, 0, 85, 0.4)';
+                    canvasCtx.beginPath();
+                    canvasCtx.moveTo(0, height / 2);
+                    canvasCtx.lineTo(width, height / 2);
+                    canvasCtx.stroke();
+                } else {
+                    // Cyan/pink lines standing still when running but quiet
+                    canvasCtx.lineWidth = 2.5;
+                    canvasCtx.strokeStyle = 'rgba(0, 240, 255, 0.3)';
+                    canvasCtx.beginPath();
+                    canvasCtx.moveTo(0, height / 2);
+                    canvasCtx.lineTo(width, height / 2);
+                    canvasCtx.stroke();
+                }
+            }
+        }
+        drawVisualizer();
+
+        // Global Billing state variables (Net Cafe Style)
+        let userProfileData = null;
+        let timeBalanceSeconds = 0;
+        let billingHeartbeatInterval = null;
+        let localCountdownInterval = null;
+        let profilePollingInterval = null;
+        let isAccountLocked = false;
+        let lastKnownBalanceSeconds = 0;
+        let currentBillingSessionId = null;
+        let currentSessionElapsedSeconds = 0;
+        let sessionElapsedInterval = null;
+        let noBalanceMode = false;
+        let expiredModalVisible = false;
+
+        function formatSecondsToHHMMSS(totalSeconds) {
+            if (totalSeconds <= 0) return '00:00:00';
+            const hrs = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+            const mins = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const secs = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${hrs}:${mins}:${secs}`;
+        }
+
+        function updateTimeBalanceUI() {
+            const timeStr = formatSecondsToHHMMSS(timeBalanceSeconds);
+            document.getElementById('top-time-balance').textContent = timeStr;
+            const balanceEl = document.getElementById('billing-balance-left');
+            if (balanceEl) balanceEl.textContent = timeStr;
+        }
+
+        function setBillingSessionStatus(label, color = '#ffffff') {
+            const statusEl = document.getElementById('billing-session-status');
+            if (statusEl) {
+                statusEl.textContent = label;
+                statusEl.style.color = color;
+            }
+        }
+
+        function updateCurrentSessionUI() {
+            const timerEl = document.getElementById('billing-timer');
+            const amountEl = document.getElementById('billing-amount');
+            const rateInput = document.getElementById('billing-rate-input');
+            if (timerEl) timerEl.textContent = formatSecondsToHHMMSS(currentSessionElapsedSeconds);
+
+            const rate = parseFloat(rateInput ? rateInput.value : 0) || (userProfileData && userProfileData.hourlyRateVnd) || 20000;
+            const amount = Math.round((currentSessionElapsedSeconds / 3600) * rate);
+            if (amountEl) amountEl.textContent = amount.toLocaleString('vi-VN') + ' đ';
+        }
+
+        function startSessionElapsedTimer(initialSeconds = 0) {
+            currentSessionElapsedSeconds = Math.max(0, initialSeconds || 0);
+            updateCurrentSessionUI();
+            if (sessionElapsedInterval) clearInterval(sessionElapsedInterval);
+            sessionElapsedInterval = setInterval(() => {
+                currentSessionElapsedSeconds++;
+                updateCurrentSessionUI();
+            }, 1000);
+        }
+
+        function stopSessionElapsedTimer() {
+            if (sessionElapsedInterval) {
+                clearInterval(sessionElapsedInterval);
+                sessionElapsedInterval = null;
+            }
+        }
+
+        function applyBillingSnapshot(data) {
+            if (!data) return;
+            if (typeof data.remainingSeconds === 'number') {
+                timeBalanceSeconds = data.remainingSeconds;
+            } else if (typeof data.timeBalanceSeconds === 'number') {
+                timeBalanceSeconds = data.timeBalanceSeconds;
+            }
+            if (typeof data.sessionElapsedSeconds === 'number') {
+                currentSessionElapsedSeconds = data.sessionElapsedSeconds;
+            } else if (data.activeSession && typeof data.activeSession.sessionElapsedSeconds === 'number') {
+                currentSessionElapsedSeconds = data.activeSession.sessionElapsedSeconds;
+            } else if (data.session && typeof data.session.sessionElapsedSeconds === 'number') {
+                currentSessionElapsedSeconds = data.session.sessionElapsedSeconds;
+            }
+            updateTimeBalanceUI();
+            updateCurrentSessionUI();
+        }
+
+        function showExpiredModal() {
+            expiredModalVisible = true;
+            document.getElementById('qr-modal').style.display = 'none';
+            document.getElementById('expired-modal').style.display = 'flex';
+        }
+
+        function acknowledgeExpiredModal() {
+            expiredModalVisible = false;
+            document.getElementById('expired-modal').style.display = 'none';
+            status.className = 'status-info';
+            status.textContent = 'Tài khoản chưa có thời gian sử dụng. Vui lòng nạp thêm để tiếp tục.';
+        }
+
+        function showPaymentQr(message = 'Tài khoản chưa có thời gian sử dụng. Vui lòng nạp thêm để tiếp tục.') {
+            document.getElementById('expired-modal').style.display = 'none';
+            expiredModalVisible = false;
+            status.className = 'error';
+            status.textContent = message;
+            openQrModal();
+        }
+
+        function requireActiveBalance() {
+            if (isAccountLocked) {
+                handleLockedAccount({ message: 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.' });
+                return false;
+            }
+            if (timeBalanceSeconds <= 0 || noBalanceMode) {
+                showPaymentQr();
+                return false;
+            }
+            return true;
+        }
+
+        function stopRuntimeForNoBalance() {
+            speechQueue.stop();
+            stopBillingHeartbeat();
+            stopSessionElapsedTimer();
+            stopTopTimer();
+
+            if (source) {
+                source.close();
+                source = null;
+            }
+            if (commentsSource) {
+                commentsSource.close();
+                commentsSource = null;
+            }
+
+            fetch('/stop-live', { method: 'POST' }).catch(err => console.error(err));
+
+            isRunning = false;
+            currentBillingSessionId = null;
+            timeBalanceSeconds = 0;
+            lastKnownBalanceSeconds = 0;
+            updateTimeBalanceUI();
+            setBillingSessionStatus('Hết thời gian', 'var(--danger)');
+            stopBtn.disabled = true;
+            startBtn.disabled = false;
+            sendBtn.disabled = false;
+            applyTikTokUiState('idle');
+        }
+
+        function handleExpiredBalance(data) {
+            if (data) applyBillingSnapshot(data);
+            noBalanceMode = true;
+            stopRuntimeForNoBalance();
+            status.className = 'error';
+            status.textContent = 'Tài khoản đã hết thời gian sử dụng. Phiên live đã được dừng tự động.';
+            showExpiredModal();
+        }
+
+        function isLockedResponse(data) {
+            return data && (data.status === 'locked' || data.action === 'force_logout');
+        }
+
+        function logoutLockedAccount() {
+            window.location.href = '/logout';
+        }
+
+        function handleLockedAccount(data) {
+            if (isAccountLocked) return;
+            isAccountLocked = true;
+            speechQueue.stop();
+            stopBillingHeartbeat();
+            stopTopTimer();
+            stopSessionElapsedTimer();
+
+            if (source) {
+                source.close();
+                source = null;
+            }
+            if (commentsSource) {
+                commentsSource.close();
+                commentsSource = null;
+            }
+
+            fetch('/stop-live', { method: 'POST' }).catch(err => console.error(err));
+            fetch('/api/session/end', { method: 'POST' }).catch(err => console.error(err));
+
+            isRunning = false;
+            startBtn.disabled = true;
+            stopBtn.disabled = true;
+            sendBtn.disabled = true;
+            tiktokControlsLocked = true;
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = true;
+            tiktokUserInput.disabled = true;
+            systemTiktokBadge.textContent = 'OFF';
+            systemTiktokBadge.className = 'status-badge off';
+            status.className = 'error';
+            status.textContent = (data && (data.message || data.error)) || 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.';
+            setBillingSessionStatus('Tài khoản bị khóa', 'var(--danger)');
+            document.getElementById('qr-modal').style.display = 'none';
+            document.getElementById('locked-modal').style.display = 'flex';
+        }
+
+        async function checkActivePendingInvoice() {
+            const activeId = localStorage.getItem('active_pending_invoice_id');
+            if (!activeId) return;
+
+            try {
+                const res = await fetch(`/api/invoice/status/${activeId}`);
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    if (data.status === 'completed') {
+                        localStorage.removeItem('active_pending_invoice_id');
+                        
+                        // Đóng các modal nạp tiền và xác nhận nếu đang mở
+                        document.getElementById('qr-modal').style.display = 'none';
+                        document.getElementById('cancel-confirm-modal').style.display = 'none';
+                        
+                        // Hiển thị thông tin lên payment-success-modal
+                        const inv = data.invoice;
+                        document.getElementById('success-det-code').textContent = inv.code;
+                        document.getElementById('success-det-time').textContent = new Date().toLocaleString('vi-VN');
+                        document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+                        
+                        const mins = Math.floor(inv.secondsChanged / 60);
+                        document.getElementById('success-det-hours').textContent = `+${mins} phút`;
+                        
+                        // Mở modal success
+                        document.getElementById('payment-success-modal').style.display = 'flex';
+                        
+                        // Xóa các interval polling cục bộ
+                        if (invoicePollingInterval) {
+                            clearInterval(invoicePollingInterval);
+                            invoicePollingInterval = null;
+                        }
+                        activeInvoiceId = null;
+                        
+                        // Tải lại profile
+                        loadUserProfile();
+                    } else if (data.status === 'cancelled') {
+                        localStorage.removeItem('active_pending_invoice_id');
+                        document.getElementById('qr-modal').style.display = 'none';
+                        document.getElementById('cancel-confirm-modal').style.display = 'none';
+                        
+                        if (invoicePollingInterval) {
+                            clearInterval(invoicePollingInterval);
+                            invoicePollingInterval = null;
+                        }
+                        activeInvoiceId = null;
+                        
+                        showAppAlert('Thông báo', `Hóa đơn ${data.invoice ? data.invoice.code : ''} đã bị hủy.`);
+                        loadUserProfile();
+                    }
+                }
+            } catch (err) {
+                console.error('Error checking active pending invoice:', err);
+            }
+        }
+
+        async function loadUserProfile() {
+            // Check hóa đơn pending trước
+            checkActivePendingInvoice();
+            
+            try {
+                const res = await fetch('/api/user/profile');
+                const data = await res.json();
+                if (isLockedResponse(data)) {
+                    handleLockedAccount(data);
+                    return;
+                }
+                if (data && data.success) {
+                    const hadProfileData = !!userProfileData;
+                    userProfileData = data;
+                    const previousBalance = timeBalanceSeconds;
+                    timeBalanceSeconds = typeof data.remainingSeconds === 'number' ? data.remainingSeconds : data.timeBalanceSeconds;
+                    lastKnownBalanceSeconds = timeBalanceSeconds;
+                    document.getElementById('top-username').textContent = data.username;
+                    document.getElementById('top-hourly-rate').textContent = data.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/h';
+                    const billingRateEl = document.getElementById('billing-rate-input');
+                    if (billingRateEl) billingRateEl.value = data.hourlyRateVnd;
+                    if (data.activeSession && data.activeSession.status === 'active') {
+                        currentBillingSessionId = data.activeSession.sessionId || data.activeSession._id;
+                        currentSessionElapsedSeconds = data.activeSession.sessionElapsedSeconds || data.activeSession.totalUsedSeconds || 0;
+                        const startedAt = data.activeSession.startedAt ? new Date(data.activeSession.startedAt) : null;
+                        const startTimeEl = document.getElementById('billing-start-time');
+                        if (startTimeEl && startedAt) {
+                            startTimeEl.textContent = startedAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        }
+                        setBillingSessionStatus('Đang sử dụng', 'var(--success)');
+                        updateCurrentSessionUI();
+                    } else if (!isRunning) {
+                        currentBillingSessionId = null;
+                        if (timeBalanceSeconds <= 0) {
+                            setBillingSessionStatus('Hết giờ', 'var(--danger)');
+                        } else {
+                            setBillingSessionStatus('Chưa bắt đầu', '#ffffff');
+                        }
+                    }
+                    updateTimeBalanceUI();
+                    
+                    document.getElementById('top-server-status').style.color = 'var(--success)';
+                    document.getElementById('top-server-status').innerHTML = '<span style="display:inline-block; width:5px; height:5px; background:var(--success); border-radius:50%; box-shadow:0 0 6px var(--success)"></span> Online';
+                    
+                    if (timeBalanceSeconds > 0) {
+                        noBalanceMode = false;
+                        expiredModalVisible = false;
+                        document.getElementById('expired-modal').style.display = 'none';
+                        if (!isRunning && !isAccountLocked) {
+                            startBtn.disabled = false;
+                        }
+                        if (hadProfileData && previousBalance <= 0) {
+                            if (document.getElementById('qr-modal').style.display === 'flex') {
+                                document.getElementById('qr-modal').style.display = 'none';
+                            }
+                            status.className = 'status-info';
+                            status.textContent = 'Tài khoản đã được nạp thời gian. Bạn có thể tiếp tục sử dụng.';
+                            setBillingSessionStatus('Sẵn sàng', 'var(--success)');
+                        }
+                    } else {
+                        noBalanceMode = true;
+                        if (!isRunning && !isAccountLocked) {
+                            startBtn.disabled = false;
+                        }
+                    }
+                } else {
+                    document.getElementById('top-server-status').style.color = 'var(--danger)';
+                    document.getElementById('top-server-status').innerHTML = '<span style="display:inline-block; width:5px; height:5px; background:var(--danger); border-radius:50%; box-shadow:0 0 6px var(--danger)"></span> Offline';
+                }
+            } catch (err) {
+                console.error('Error fetching user profile:', err);
+                document.getElementById('top-server-status').style.color = 'var(--danger)';
+                document.getElementById('top-server-status').innerHTML = '<span style="display:inline-block; width:5px; height:5px; background:var(--danger); border-radius:50%; box-shadow:0 0 6px var(--danger)"></span> Offline';
+            }
+        }
+
+        function startProfilePolling() {
+            if (profilePollingInterval) clearInterval(profilePollingInterval);
+            profilePollingInterval = setInterval(loadUserProfile, 10000);
+        }
+
+        let currentSelectedAmount = null;
+        let activeInvoiceId = null;
+        let invoicePollingInterval = null;
+
+        function openPriceModal() {
+
+            const profile = userProfileData || {};
+            const rate = profile.hourlyRateVnd || 10000;
+            
+            document.getElementById('price-modal-rate').textContent = rate.toLocaleString('vi-VN') + ' đ/giờ';
+            
+            // Cập nhật số giờ quy đổi hiển thị trong các nút chọn nhanh
+            const amounts = [10000, 20000, 50000, 100000, 200000, 500000, 1000000];
+            const ids = ['10k', '20k', '50k', '100k', '200k', '500k', '1m'];
+            
+            amounts.forEach((amt, idx) => {
+                const hours = Math.floor(amt / rate);
+                const minutes = Math.floor(((amt / rate) % 1) * 60);
+                let desc = `~`;
+                if (hours > 0) desc += `${hours} giờ `;
+                if (minutes > 0) desc += `${minutes} phút`;
+                if (hours === 0 && minutes === 0) desc += '0 giờ';
+                
+                const elementId = `price-desc-${ids[idx]}`;
+                const el = document.getElementById(elementId);
+                if (el) el.textContent = desc;
+            });
+            
+            // Reset dữ liệu modal
+            currentSelectedAmount = null;
+            document.getElementById('custom-price-input').value = '';
+            document.getElementById('custom-price-hours-desc').textContent = '';
+            
+            const pbuttons = document.querySelectorAll('.price-btn');
+            pbuttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('price-modal').style.display = 'flex';
+        }
+
+        function closePriceModal() {
+            document.getElementById('price-modal').style.display = 'none';
+        }
+
+        function selectPrice(amount) {
+            currentSelectedAmount = amount;
+            document.getElementById('custom-price-input').value = '';
+            document.getElementById('custom-price-hours-desc').textContent = '';
+            
+            const pbuttons = document.querySelectorAll('.price-btn');
+            pbuttons.forEach(btn => btn.classList.remove('active'));
+            
+            const activeBtn = document.getElementById(`pbtn-${amount}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        function calculateCustomHours() {
+            const val = document.getElementById('custom-price-input').value;
+            const descEl = document.getElementById('custom-price-hours-desc');
+            
+            // Gỡ active của các nút chọn nhanh
+            const pbuttons = document.querySelectorAll('.price-btn');
+            pbuttons.forEach(btn => btn.classList.remove('active'));
+            
+            if (!val || val <= 0) {
+                currentSelectedAmount = null;
+                descEl.textContent = '';
+                return;
+            }
+            
+            const amount = parseInt(val);
+            currentSelectedAmount = amount;
+            
+            const profile = userProfileData || {};
+            const rate = profile.hourlyRateVnd || 10000;
+            
+            const hours = Math.floor(amount / rate);
+            const minutes = Math.floor(((amount / rate) % 1) * 60);
+            
+            let desc = `Quy đổi: `;
+            if (hours > 0) desc += `${hours} giờ `;
+            if (minutes > 0) desc += `${minutes} phút`;
+            if (hours === 0 && minutes === 0) desc += '0 giờ';
+            
+            descEl.textContent = desc;
+        }
+
+        async function confirmPriceSelection() {
+            if (!currentSelectedAmount || currentSelectedAmount < 10000) {
+                showAppAlert('Cảnh báo', 'Vui lòng chọn hoặc nhập số tiền nạp tối thiểu 10.000 VNĐ.');
+                return;
+            }
+            
+            closePriceModal();
+            
+            // Mở qr-modal với trạng thái loading
+            document.getElementById('qr-modal').style.display = 'flex';
+            document.getElementById('qr-loading-spinner').style.display = 'flex';
+            document.getElementById('qr-image').style.display = 'none';
+            document.getElementById('polling-status-msg').textContent = '🕒 Đang tạo hóa đơn từ hệ thống...';
+            
+            try {
+                const res = await fetch('/api/invoice/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amountVnd: currentSelectedAmount })
+                });
+                
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    showAppAlert('Lỗi', data.error || 'Tạo hóa đơn thất bại.');
+                    closeQrModal();
+                    return;
+                }
+                
+                const invoice = data.invoice;
+                activeInvoiceId = invoice._id;
+                
+                // Hiển thị thông tin hóa đơn lên QR modal
+                const profile = userProfileData || {};
+                const bankDetails = profile.bankDetails || {};
+                
+                document.getElementById('modal-rate').textContent = profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '10.000 đ/giờ';
+                document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
+                document.getElementById('modal-bank-acc').textContent = bankDetails.accountNumber || '--';
+                document.getElementById('modal-bank-owner').textContent = bankDetails.accountName || '--';
+                document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+                document.getElementById('modal-bank-memo').textContent = invoice.transferContent;
+                
+                // Tải QR Code động
+                const qrImage = document.getElementById('qr-image');
+                if (bankDetails.accountNumber) {
+                    const qrUrl = `https://api.vietqr.io/image/970422-${bankDetails.accountNumber}-qr_only.jpg?accountName=${encodeURIComponent(bankDetails.accountName)}&amount=${invoice.amountVnd}&addInfo=${encodeURIComponent(invoice.transferContent)}`;
+                    qrImage.src = qrUrl;
+                    qrImage.style.display = 'block';
+                } else {
+                    qrImage.removeAttribute('src');
+                    qrImage.style.display = 'none';
+                }
+                
+                // Ẩn spinner, hiện QR
+                document.getElementById('qr-loading-spinner').style.display = 'none';
+                document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ bạn chuyển khoản...';
+                
+                // Khởi chạy Polling kiểm tra trạng thái
+                startInvoicePolling(invoice._id);
+                
+            } catch (err) {
+                console.error(err);
+                showAppAlert('Lỗi', 'Lỗi kết nối máy chủ.');
+                closeQrModal();
+            }
+        }
+
+        function startInvoicePolling(invoiceId) {
+            localStorage.setItem('active_pending_invoice_id', invoiceId);
+            if (invoicePollingInterval) clearInterval(invoicePollingInterval);
+            invoicePollingInterval = setInterval(checkActivePendingInvoice, 3000);
+        }
+
+        function closeQrModal() {
+            // Chỉ dừng polling và đóng modal (không hủy hóa đơn)
+            if (invoicePollingInterval) {
+                clearInterval(invoicePollingInterval);
+                invoicePollingInterval = null;
+            }
+            document.getElementById('qr-modal').style.display = 'none';
+            loadUserProfile(); // Sync profile
+        }
+
+        function closePaymentSuccessModal() {
+            document.getElementById('payment-success-modal').style.display = 'none';
+        }
+
+
+        function cancelPendingInvoice() {
+            if (!activeInvoiceId) return;
+            // Mở modal xác nhận hủy thay vì confirm của trình duyệt
+            document.getElementById('cancel-confirm-modal').style.display = 'flex';
+        }
+
+        function closeCancelConfirmModal() {
+            document.getElementById('cancel-confirm-modal').style.display = 'none';
+        }
+
+        async function executeCancelPendingInvoice() {
+            if (!activeInvoiceId) {
+                closeCancelConfirmModal();
+                return;
+            }
+
+            const btnCancel = document.getElementById('btn-cancel-invoice');
+            const btnExecute = document.getElementById('btn-execute-cancel-invoice');
+            if (btnCancel) btnCancel.disabled = true;
+            if (btnExecute) btnExecute.disabled = true;
+            
+            try {
+                const res = await fetch(`/api/invoice/cancel/${activeInvoiceId}`, { method: 'POST' });
+                const data = await res.json();
+                
+                // Đóng modal xác nhận hủy
+                closeCancelConfirmModal();
+                
+                if (res.ok && data.success) {
+                    localStorage.removeItem('active_pending_invoice_id');
+                    if (invoicePollingInterval) {
+                        clearInterval(invoicePollingInterval);
+                        invoicePollingInterval = null;
+                    }
+                    showAppAlert('Thành công', 'Đã hủy hóa đơn nạp tiền thành công.');
+                    document.getElementById('qr-modal').style.display = 'none';
+                    activeInvoiceId = null;
+                    loadUserProfile();
+                } else {
+                    // Nếu backend báo hóa đơn đã được thanh toán thành công (completed) do admin vừa duyệt
+                    if (data.isCompleted || (data.invoice && data.invoice.status === 'completed')) {
+                        localStorage.removeItem('active_pending_invoice_id');
+                        if (invoicePollingInterval) {
+                            clearInterval(invoicePollingInterval);
+                            invoicePollingInterval = null;
+                        }
+                        
+                        document.getElementById('qr-modal').style.display = 'none';
+                        
+                        // Hiển thị thông tin lên payment-success-modal
+                        const inv = data.invoice;
+                        document.getElementById('success-det-code').textContent = inv.code;
+                        document.getElementById('success-det-time').textContent = new Date().toLocaleString('vi-VN');
+                        document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+                        
+                        const mins = Math.floor(inv.secondsChanged / 60);
+                        document.getElementById('success-det-hours').textContent = `+${mins} phút`;
+                        
+                        document.getElementById('payment-success-modal').style.display = 'flex';
+                        activeInvoiceId = null;
+                        loadUserProfile();
+                    } else {
+                        showAppAlert('Lỗi', data.error || 'Hủy hóa đơn thất bại.');
+                        if (btnCancel) btnCancel.disabled = false;
+                        if (btnExecute) btnExecute.disabled = false;
+                    }
+                }
+            } catch (err) {
+                console.error('Cancel invoice error:', err);
+                closeCancelConfirmModal();
+                showAppAlert('Lỗi', 'Không thể kết nối máy chủ để hủy hóa đơn.');
+                if (btnCancel) btnCancel.disabled = false;
+                if (btnExecute) btnExecute.disabled = false;
+            }
+        }
+
+        function showAppAlert(title, message) {
+            document.getElementById('app-alert-title').textContent = title || '📢 Thông báo';
+            document.getElementById('app-alert-message').textContent = message;
+            document.getElementById('app-alert-modal').style.display = 'flex';
+        }
+
+        function closeAppAlertModal() {
+            document.getElementById('app-alert-modal').style.display = 'none';
+        }
+
+        function switchHistoryTab(tab) {
+            const tabs = document.querySelectorAll('.history-tab-btn');
+            tabs.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('tab-invoices-content').style.display = 'none';
+            document.getElementById('tab-sessions-content').style.display = 'none';
+            
+            if (tab === 'invoices') {
+                document.getElementById('tab-invoices-btn').classList.add('active');
+                document.getElementById('tab-invoices-content').style.display = 'block';
+                loadUserInvoices();
+            } else {
+                document.getElementById('tab-sessions-btn').classList.add('active');
+                document.getElementById('tab-sessions-content').style.display = 'block';
+                loadUserSessions();
+            }
+        }
+
+        async function openUserHistoryModal() {
+            document.getElementById('user-history-modal').style.display = 'flex';
+            switchHistoryTab('invoices');
+        }
+
+        function closeUserHistoryModal() {
+            document.getElementById('user-history-modal').style.display = 'none';
+        }
+
+        window.loadedInvoices = [];
+
+        async function loadUserInvoices() {
+            const tbody = document.getElementById('user-invoices-tbody');
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">Đang tải lịch sử nạp...</td></tr>`;
+            
+            try {
+                const res = await fetch('/api/invoices');
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    const invoices = data.invoices || [];
+                    window.loadedInvoices = invoices;
+                    
+                    if (invoices.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">Chưa có lịch sử nạp tiền.</td></tr>`;
+                        return;
+                    }
+                    
+                    let html = '';
+                    invoices.forEach(inv => {
+                        let statusText = 'Chờ thanh toán';
+                        let statusColor = 'var(--purple)';
+                        if (inv.status === 'completed') {
+                            statusText = 'Thành công';
+                            statusColor = 'var(--success)';
+                        } else if (inv.status === 'cancelled') {
+                            statusText = 'Đã hủy';
+                            statusColor = 'var(--danger)';
+                        }
+                        
+                        const mins = Math.floor(inv.secondsChanged / 60);
+                        const dateStr = new Date(inv.createdAt).toLocaleString('vi-VN');
+                        
+                        html += `<tr onclick="handleInvoiceClick('${inv._id}')" style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='none'">
+                            <td style="padding: 8px; font-family: var(--font-cyber); font-weight: bold; color: #fff;">${inv.code}</td>
+                            <td style="padding: 8px; color: var(--text-muted);">${dateStr}</td>
+                            <td style="padding: 8px; font-weight: bold; color: var(--success);">${inv.amountVnd.toLocaleString('vi-VN')} đ</td>
+                            <td style="padding: 8px; color: var(--primary); font-weight: bold;">+${mins} phút</td>
+                            <td style="padding: 8px;"><span style="color: ${statusColor}; font-weight: bold;">${statusText}</span></td>
+                        </tr>`;
+                    });
+                    tbody.innerHTML = html;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--danger);">Không thể tải dữ liệu.</td></tr>`;
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--danger);">Lỗi kết nối.</td></tr>`;
+            }
+        }
+
+        function handleInvoiceClick(invoiceId) {
+            const invoice = window.loadedInvoices.find(inv => inv._id === invoiceId);
+            if (!invoice) return;
+
+            // Luôn đóng modal lịch sử trước để tránh bị đè z-index
+            closeUserHistoryModal();
+
+            if (invoice.status === 'pending') {
+                // Mở QR checkout
+                showInvoiceCheckout(invoice);
+            } else {
+                // Mở chi tiết hóa đơn (Thành công / Hủy)
+                showInvoiceDetail(invoice);
+            }
+        }
+
+        function showInvoiceCheckout(invoice) {
+            activeInvoiceId = invoice._id;
+            
+            const btnCancel = document.getElementById('btn-cancel-invoice');
+            const btnExecute = document.getElementById('btn-execute-cancel-invoice');
+            if (btnCancel) btnCancel.disabled = false;
+            if (btnExecute) btnExecute.disabled = false;
+
+            const profile = userProfileData || {};
+            const bankDetails = profile.bankDetails || {};
+            
+            document.getElementById('modal-rate').textContent = invoice.hourlyRateSnapshot ? invoice.hourlyRateSnapshot.toLocaleString('vi-VN') + ' đ/giờ' : (profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '10.000 đ/giờ');
+            document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
+            document.getElementById('modal-bank-acc').textContent = bankDetails.accountNumber || '--';
+            document.getElementById('modal-bank-owner').textContent = bankDetails.accountName || '--';
+            document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+            document.getElementById('modal-bank-memo').textContent = invoice.transferContent;
+            
+            const qrImage = document.getElementById('qr-image');
+            if (bankDetails.accountNumber) {
+                const qrUrl = `https://api.vietqr.io/image/970422-${bankDetails.accountNumber}-qr_only.jpg?accountName=${encodeURIComponent(bankDetails.accountName)}&amount=${invoice.amountVnd}&addInfo=${encodeURIComponent(invoice.transferContent)}`;
+                qrImage.src = qrUrl;
+                qrImage.style.display = 'block';
+            } else {
+                qrImage.removeAttribute('src');
+                qrImage.style.display = 'none';
+            }
+            
+            document.getElementById('qr-loading-spinner').style.display = 'none';
+            document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ bạn chuyển khoản...';
+            document.getElementById('qr-modal').style.display = 'flex';
+            
+            startInvoicePolling(invoice._id);
+        }
+
+        function showInvoiceDetail(invoice) {
+            document.getElementById('det-code').textContent = invoice.code;
+            document.getElementById('det-time').textContent = new Date(invoice.createdAt).toLocaleString('vi-VN');
+            document.getElementById('det-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+            
+            const mins = Math.floor(invoice.secondsChanged / 60);
+            document.getElementById('det-hours').textContent = `+${mins} phút`;
+            
+            const statusEl = document.getElementById('det-status');
+            if (invoice.status === 'completed') {
+                statusEl.textContent = 'Thành công';
+                statusEl.style.color = 'var(--success)';
+            } else if (invoice.status === 'cancelled') {
+                statusEl.textContent = 'Đã hủy';
+                statusEl.style.color = 'var(--danger)';
+            } else {
+                statusEl.textContent = 'Chờ thanh toán';
+                statusEl.style.color = 'var(--purple)';
+            }
+            
+            document.getElementById('invoice-detail-modal').style.display = 'flex';
+        }
+
+        function closeInvoiceDetailModal() {
+            document.getElementById('invoice-detail-modal').style.display = 'none';
+            // Mở lại modal danh sách lịch sử để tiếp tục xem
+            openUserHistoryModal();
+        }
+
+        async function loadUserSessions() {
+            const tbody = document.getElementById('user-sessions-tbody');
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">Đang tải lịch sử live...</td></tr>`;
+            
+            try {
+                const res = await fetch('/api/sessions');
+                const data = await res.json();
+                
+                if (res.ok && data.success) {
+                    const sessions = data.sessions || [];
+                    if (sessions.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">Chưa có lịch sử livestream.</td></tr>`;
+                        return;
+                    }
+                    
+                    let html = '';
+                    sessions.forEach(sess => {
+                        const startStr = new Date(sess.startedAt).toLocaleString('vi-VN');
+                        const endStr = sess.endedAt ? new Date(sess.endedAt).toLocaleString('vi-VN') : 'Đang chạy';
+                        
+                        const mins = Math.floor(sess.totalUsedSeconds / 60);
+                        const secs = sess.totalUsedSeconds % 60;
+                        const durationStr = sess.status === 'active' ? 'Đang cập nhật' : `${mins} phút ${secs} giây`;
+                        
+                        let statusText = 'Đang chạy';
+                        let statusColor = 'var(--primary)';
+                        if (sess.status === 'ended') {
+                            statusText = 'Hoàn thành';
+                            statusColor = 'var(--text-muted)';
+                        } else if (sess.status === 'expired') {
+                            statusText = 'Hết hạn';
+                            statusColor = 'var(--danger)';
+                        }
+                        
+                        html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 8px; color: #fff;">${startStr}</td>
+                            <td style="padding: 8px; color: var(--text-muted);">${endStr}</td>
+                            <td style="padding: 8px; font-weight: bold; color: var(--primary);">${durationStr}</td>
+                            <td style="padding: 8px;"><span style="color: ${statusColor}; font-weight: bold;">${statusText}</span></td>
+                        </tr>`;
+                    });
+                    tbody.innerHTML = html;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--danger);">Không thể tải dữ liệu.</td></tr>`;
+                }
+            } catch (err) {
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--danger);">Lỗi kết nối.</td></tr>`;
+            }
+        }
+
+        function startBillingHeartbeat() {
+            if (billingHeartbeatInterval) clearInterval(billingHeartbeatInterval);
+            billingHeartbeatInterval = setInterval(async () => {
+                try {
+                     const res = await fetch('/api/session/heartbeat', { method: 'POST' });
+                     const data = await res.json();
+                     if (isLockedResponse(data)) {
+                         handleLockedAccount(data);
+                         return;
+                     }
+                     if (data && data.success) {
+                         applyBillingSnapshot(data);
+                         if (data.status === 'expired' || data.action === 'stop_live') {
+                             handleExpiredBalance(data);
+                         } else {
+                             timeBalanceSeconds = typeof data.remainingSeconds === 'number' ? data.remainingSeconds : data.timeBalanceSeconds;
+                             lastKnownBalanceSeconds = timeBalanceSeconds;
+                             updateTimeBalanceUI();
+                             if (typeof data.sessionElapsedSeconds === 'number') {
+                                 currentSessionElapsedSeconds = data.sessionElapsedSeconds;
+                                 updateCurrentSessionUI();
+                             }
+                         }
+                     } else {
+                         stopBtn.click();
+                         status.className = 'error';
+                         status.textContent = data.error || 'Lỗi kiểm tra phiên sử dụng từ máy chủ.';
+                         setBillingSessionStatus('Đã dừng', 'var(--text-muted)');
+                     }
+                } catch (err) {
+                     console.error('Heartbeat error:', err);
+                     document.getElementById('top-server-status').style.color = 'var(--danger)';
+                     document.getElementById('top-server-status').innerHTML = '<span style="display:inline-block; width:5px; height:5px; background:var(--danger); border-radius:50%; box-shadow:0 0 6px var(--danger)"></span> Offline';
+                }
+            }, 10000); // 10s heartbeat
+            
+            if (localCountdownInterval) clearInterval(localCountdownInterval);
+            localCountdownInterval = setInterval(() => {
+                if (timeBalanceSeconds > 0) {
+                    timeBalanceSeconds--;
+                    updateTimeBalanceUI();
+                } else {
+                    clearInterval(localCountdownInterval);
+                }
+            }, 1000);
+        }
+
+        function stopBillingHeartbeat() {
+            if (billingHeartbeatInterval) {
+                clearInterval(billingHeartbeatInterval);
+                billingHeartbeatInterval = null;
+            }
+            if (localCountdownInterval) {
+                clearInterval(localCountdownInterval);
+                localCountdownInterval = null;
+            }
+            stopSessionElapsedTimer();
+        }
+
+        // Check TTS service model loading health status on page load
+        const systemTtsBadge = document.getElementById('system-tts-badge');
+        let ttsModelHealthy = true;
+
+        async function checkTtsHealth() {
+            try {
+                const response = await fetch('/tts-health');
+                const data = await response.json();
+                if (data && data.success && data.status === 'ready') {
+                    systemTtsBadge.textContent = 'ON';
+                    systemTtsBadge.className = 'status-badge on';
+                    ttsModelHealthy = true;
+                } else {
+                    systemTtsBadge.textContent = 'ERR';
+                    systemTtsBadge.className = 'status-badge off';
+                    ttsModelHealthy = false;
+                    status.textContent = 'Cảnh báo: Không thể kết nối hoặc tải mô hình giọng nói AI. Vui lòng kết nối Internet ổn định và khởi động lại ứng dụng.';
+                }
+            } catch (err) {
+                systemTtsBadge.textContent = 'OFF';
+                systemTtsBadge.className = 'status-badge off';
+                ttsModelHealthy = false;
+            }
+        }
+        checkTtsHealth();
+        loadUserProfile(); // Load user profile details on startup!
+        startProfilePolling();
+        startLiveStatsPolling();
+        startTikTokStatusPolling();
+
+        // Control buttons listeners
+        startBtn.addEventListener('click', async () => {
+            status.textContent = '';
+            if (!requireActiveBalance()) {
+                return;
+            }
+            if (!ttsModelHealthy) {
+                status.textContent = 'Cảnh báo: Mô hình giọng nói AI chưa được tải thành công. Vui lòng kết nối Internet ổn định và khởi động lại ứng dụng.';
+            }
+
+            // Start session in central server
+            try {
+                const res = await fetch('/api/session/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ deviceId: 'desktop-webview', appVersion: '1.0.0' })
+                });
+                const data = await res.json();
+                if (isLockedResponse(data)) {
+                    handleLockedAccount(data);
+                    return;
+                }
+                if (!res.ok || !data.success) {
+                    status.className = 'error';
+                    status.textContent = data.error || 'Không thể khởi động phiên làm việc. Vui lòng đăng nhập lại.';
+                    return;
+                }
+                currentBillingSessionId = data.sessionId;
+                applyBillingSnapshot(data);
+                const startTimeEl = document.getElementById('billing-start-time');
+                if (startTimeEl) {
+                    startTimeEl.textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                }
+                setBillingSessionStatus('Đang sử dụng', 'var(--success)');
+                startSessionElapsedTimer(data.sessionElapsedSeconds || 0);
+            } catch (err) {
+                status.className = 'error';
+                status.textContent = 'Không thể kết nối đến máy chủ xác thực.';
+                return;
+            }
+
+            isRunning = true;
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+            sendBtn.disabled = false;
+            showLiveContentMessage('Chưa có nội dung live. Hãy nhập chủ đề và tạo kịch bản.', 'empty');
+            
+            startTopTimer();
+            startBillingHeartbeat();
+
+            if (!commentsSource) {
+                commentsSource = new EventSource('/comments-stream');
+                commentsSource.onmessage = ev => {
+                    if (ev.data) {
+                        applyTikTokUiState('connected');
+                        const placeholder = commentsDiv.querySelector('div');
+                        if (placeholder && placeholder.style.color) {
+                            placeholder.remove();
+                        }
+
+                        let userName = 'Người xem';
+                        const match = ev.data.match(/^Chào\s+([^.]+)\./);
+                        if (match) {
+                            userName = match[1].trim();
+                        }
+
+                        const item = document.createElement('div');
+                        item.className = 'comment-item';
+
+                        const viewerInfo = document.createElement('div');
+                        viewerInfo.className = 'comment-viewer-info';
+                        viewerInfo.innerHTML = `<span class="viewer-name">👤 @${userName}</span> <span class="viewer-action">gửi bình luận</span>`;
+
+                        const aiReply = document.createElement('div');
+                        aiReply.className = 'comment-ai-reply';
+                        aiReply.innerHTML = `<span class="ai-badge">🤖 AI Trả Lời:</span>`;
+
+                        const content = document.createElement('div');
+                        content.className = 'comment-content';
+                        aiReply.appendChild(content);
+
+                        item.appendChild(viewerInfo);
+                        item.appendChild(aiReply);
+                        commentsDiv.appendChild(item);
+
+                        const sentences = splitTextIntoSentences(ev.data);
+                        sentences.forEach((sentence, idx) => {
+                            const sentenceEl = document.createElement('span');
+                            sentenceEl.className = 'sentence-block';
+                            sentenceEl.style.display = 'block';
+                            sentenceEl.style.margin = '4px 0';
+                            content.appendChild(sentenceEl);
+
+                            if (window.aiCommentReplyEnabled !== false) {
+                                speechQueue.add(sentence, sentenceEl, false);
+                            } else {
+                                sentenceEl.textContent = sentence;
+                                sentenceEl.style.color = 'var(--text-muted)';
+                            }
+                        });
+                    }
+                };
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            stopStream();
+        });
+
+        window.aiCommentReplyEnabled = true;
+        if (muteAiCommentBtn) {
+            muteAiCommentBtn.addEventListener('click', () => {
+                window.aiCommentReplyEnabled = !window.aiCommentReplyEnabled;
+                if (!window.aiCommentReplyEnabled) {
+                    speechQueue.stopComments();
+                    muteAiCommentBtn.textContent = 'BẬT GIỌNG AI';
+                    muteAiCommentBtn.className = 'btn-green';
+                    status.className = 'status-info';
+                    status.textContent = 'Đã ngắt giọng đọc AI trả lời bình luận.';
+                } else {
+                    muteAiCommentBtn.textContent = 'NGẮT GIỌNG AI';
+                    muteAiCommentBtn.className = 'btn-pink';
+                    status.className = 'status-info';
+                    status.textContent = 'Đã bật lại giọng đọc AI trả lời bình luận.';
+                }
+            });
+        }
+
+        // TikTok connection handling
+        function parseResponse(res) {
+            return res.text().then(text => {
+                let body = null;
+                try {
+                    body = JSON.parse(text);
+                } catch (e) {
+                    body = null;
+                }
+                return { ok: res.ok, body, text };
+            });
+        }
+
+        function parseTikTokUsername(value) {
+            const raw = (value || '').trim();
+            if (!raw) return '';
+            const atMatch = raw.match(/@([A-Za-z0-9_.]+)/);
+            if (atMatch && atMatch[1]) {
+                return atMatch[1].replace(/^[._]+|[._]+$/g, '');
+            }
+            let cleaned = raw.split('?')[0].split('#')[0].replace(/\/+$/g, '');
+            if (cleaned.includes('/')) {
+                cleaned = cleaned.split('/').pop();
+            }
+            cleaned = cleaned.replace(/^@+/, '').trim();
+            if (!/^[A-Za-z0-9_.]{2,24}$/.test(cleaned)) return '';
+            return cleaned.replace(/^[._]+|[._]+$/g, '');
+        }
+
+        function friendlyTikTokError(message) {
+            const raw = String(message || '');
+            if (/WinError|Traceback|FileNotFoundError|No such file|system cannot find|Errno/i.test(raw)) {
+                return 'Không thể khởi động bộ kết nối TikTok Live. Vui lòng kiểm tra cài đặt hoặc thử lại.';
+            }
+            return raw || 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.';
+        }
+
+        connectBtn.addEventListener('click', () => {
+            if (!requireActiveBalance()) {
+                return;
+            }
+            const user = parseTikTokUsername(tiktokUserInput.value);
+            if (!user) {
+                status.className = 'error';
+                status.textContent = 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.';
+                return;
+            }
+            status.textContent = '';
+            applyTikTokUiState('connecting');
+            fetch('/start-live', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ room: user })
+            })
+                .then(parseResponse)
+                .then(({ ok, body, text }) => {
+                    if (body && body.success) {
+                        status.textContent = '';
+                        applyTikTokUiState('connected', user);
+                        status.className = 'status-info';
+                        status.textContent = `Đã kết nối TikTok Live: @${user}`;
+                        loadLiveStats();
+                        syncTikTokStatus();
+                    } else {
+                        const msg = (body && (body.error || body.message)) || text || 'Không rõ';
+                        applyTikTokUiState('idle');
+                        syncTikTokStatus();
+                        status.className = 'error';
+                        status.textContent = friendlyTikTokError(msg);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    applyTikTokUiState('idle');
+                    syncTikTokStatus();
+                    status.className = 'error';
+                    status.textContent = 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.';
+                });
+        });
+
+        disconnectBtn.addEventListener('click', () => {
+            if (disconnectBtn.disabled) {
+                return;
+            }
+            disconnectBtn.disabled = true;
+            fetch('/stop-live', { method: 'POST' })
+                .then(parseResponse)
+                .then(({ ok, body, text }) => {
+                    if (body && body.success) {
+                        status.className = 'status-info';
+                        status.textContent = 'Đã ngắt kết nối TikTok Live.';
+                        applyTikTokUiState('idle');
+                        resetLiveTopbarStats();
+                        syncTikTokStatus();
+                    } else {
+                        const msg = (body && (body.error || body.message)) || text || 'Không rõ';
+                        status.className = 'error';
+                        status.textContent = 'Ngắt kết nối thất bại: ' + msg;
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    status.className = 'error';
+                    status.textContent = 'Lỗi khi ngắt kết nối: ' + (err.message || err);
+                })
+                .finally(() => syncTikTokStatus());
+        });
+
+        // Prompt submitting handling
+        const originalBtnHtml = sendBtn.innerHTML;
+
+        sendBtn.addEventListener('click', () => {
+            if (!requireActiveBalance()) {
+                return;
+            }
+            if (!ttsModelHealthy) {
+                showLiveContentMessage('Không tạo được nội dung live. Vui lòng kiểm tra kết nối máy chủ AI hoặc thử lại.', 'error');
+                return;
+            }
+
+            if (!isRunning) {
+                startBtn.click();
+            }
+
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) {
+                showLiveContentMessage('Chưa có nội dung live. Hãy nhập chủ đề và tạo kịch bản.', 'error');
+                return;
+            }
+
+            showLiveContentMessage('Đang kết nối máy chủ AI để tạo nội dung live...', 'loading');
+
+            // Show loading state and disable button to prevent duplicate submissions
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = `<span class="spinner">⏳</span> Đang kết nối AI...`;
+
+            const selectEls = document.querySelectorAll('.system-prompt-selectors select');
+            let fullPrompt = prompt;
+            if (selectEls.length >= 4) {
+                const vaiTro = selectEls[0].value;
+                const phongCach = selectEls[1].value;
+                const mucTieu = selectEls[2].value;
+                const nganhHang = selectEls[3].value;
+                fullPrompt = `Viết kịch bản livestream.\n- Chủ đề: ${prompt}\n- Vai trò: ${vaiTro}\n- Phong cách: ${phongCach}\n- Mục tiêu: ${mucTieu}\n- Ngành hàng: ${nganhHang}`;
+            }
+
+            window.originalPrompt = fullPrompt;
+            window.generatedSentences = [];
+            window.isFetchingMore = false;
+            speechQueue.stop();
+
+            if (source) {
+                source.close();
+            }
+            source = new EventSource(`/stream?prompt=${encodeURIComponent(fullPrompt)}`);
+
+            let currentTypingEl = null;
+            let startTime = performance.now();
+            let firstChunkTime = null;
+            let totalTokens = 0;
+
+            // Listen for Business/AI process errors sent from backend
+            source.addEventListener('ai_error', event => {
+                showLiveContentMessage(event.data, 'error');
+                if (source) {
+                    source.close();
+                    source = null;
+                }
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = originalBtnHtml;
+            });
+
+            source.addEventListener('sentence', event => {
+                if (!isRunning) return;
+                const sentence = event.data;
+
+                // Clear loading status message on the first received content
+                if (llmResult.children.length === 0) {
+                    clearLiveContentMessage();
+                }
+
+                let targetEl = currentTypingEl;
+                if (!targetEl) {
+                    targetEl = document.createElement('div');
+                    llmResult.appendChild(targetEl);
+                }
+
+                targetEl.className = 'llm-item';
+                targetEl.innerHTML = '';
+                currentTypingEl = null;
+
+                const subSentences = splitTextIntoSentences(sentence);
+                subSentences.forEach(sub => {
+                    const subEl = document.createElement('span');
+                    subEl.className = 'sentence-block';
+                    subEl.style.display = 'inline-block';
+                    subEl.style.marginRight = '8px';
+                    targetEl.appendChild(subEl);
+
+                    speechQueue.add(sub, subEl, true);
+                    window.generatedSentences.push(sub);
+                });
+            });
+
+            source.onerror = () => {
+                if (source) {
+                    source.close();
+                    source = null;
+                }
+                // Restore button state and icon text
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = originalBtnHtml;
+
+                // If connection drops before rendering any script, show connection error
+                if (llmResult.children.length === 0) {
+                    showLiveContentMessage('Không kết nối được máy chủ AI. Vui lòng kiểm tra server hoặc cấu hình.', 'error');
+                }
+            };
+        });
+
+        // Live volume and speed handlers
+        if (volumeInput) {
+            volumeInput.addEventListener('input', () => {
+                speechQueue.setVolume(parseFloat(volumeInput.value));
+            });
+        }
+
+        if (audioToggle) {
+            audioToggle.addEventListener('change', () => {
+                if (!requireActiveBalance()) {
+                    audioToggle.checked = false;
+                    speechQueue.setMuted(true);
+                    return;
+                }
+                speechQueue.setMuted(!audioToggle.checked);
+            });
+        }
+
+        if (speedInput) {
+            speedInput.addEventListener('input', () => {
+                const speed = parseFloat(speedInput.value);
+                speedValLabel.textContent = speed.toFixed(2) + 'x';
+                if (speechQueue.currentAudio && !speechQueue.currentAudio.paused) {
+                    speechQueue.currentAudio.playbackRate = speed;
+                }
+            });
+        }
+
+        // ----------------------------------------------------
+        // BILLING TIMER CONTROLS (TÍNH TIỀN THEO TIẾNG)
+        // ----------------------------------------------------
+        let billingInterval = null;
+        let billingSeconds = 0;
+        let isBillingRunning = false;
+        let billingStartTime = null;
+
+        const billingRateInput = document.getElementById('billing-rate-input');
+        const billingTimerEl = document.getElementById('billing-timer');
+        const billingAmountEl = document.getElementById('billing-amount');
+        const billingStartTimeEl = document.getElementById('billing-start-time');
+        const btnBillingStart = document.getElementById('btn-billing-start');
+        const btnBillingPause = document.getElementById('btn-billing-pause');
+        const btnBillingEnd = document.getElementById('btn-billing-end');
+        const btnBillingReset = document.getElementById('btn-billing-reset');
+
+        function formatBillingTime(totalSeconds) {
+            const hrs = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+            const mins = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+            const secs = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${hrs}:${mins}:${secs}`;
+        }
+
+        function updateBillingUI() {
+            billingTimerEl.textContent = formatBillingTime(billingSeconds);
+            const rate = parseFloat(billingRateInput.value) || 20000;
+            const amount = Math.round((billingSeconds / 3600) * rate);
+            billingAmountEl.textContent = amount.toLocaleString('vi-VN') + ' đ';
+        }
+
+        btnBillingStart.addEventListener('click', () => {
+            if (isBillingRunning) return;
+            isBillingRunning = true;
+            btnBillingStart.disabled = true;
+            btnBillingPause.disabled = false;
+            btnBillingEnd.disabled = false;
+            btnBillingReset.disabled = true;
+            
+            if (!billingStartTime) {
+                const now = new Date();
+                billingStartTime = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                billingStartTimeEl.textContent = billingStartTime;
+            }
+
+            billingInterval = setInterval(() => {
+                billingSeconds++;
+                updateBillingUI();
+            }, 1000);
+        });
+
+        btnBillingPause.addEventListener('click', () => {
+            if (!isBillingRunning) return;
+            isBillingRunning = false;
+            btnBillingStart.disabled = false;
+            btnBillingPause.disabled = true;
+            btnBillingReset.disabled = false;
+            clearInterval(billingInterval);
+        });
+
+        btnBillingEnd.addEventListener('click', () => {
+            isBillingRunning = false;
+            btnBillingStart.disabled = false;
+            btnBillingPause.disabled = true;
+            btnBillingEnd.disabled = true;
+            btnBillingReset.disabled = false;
+            clearInterval(billingInterval);
+            
+            const rate = parseFloat(billingRateInput.value) || 20000;
+            const amount = Math.round((billingSeconds / 3600) * rate);
+            
+            // Appending a summary item in the logs list
+            const billingSummary = document.createElement('div');
+            billingSummary.className = 'comment-item active';
+            billingSummary.innerHTML = `
+                <div class="comment-viewer-info">
+                    <span class="viewer-name">💳 THÔNG BÁO THANH TOÁN</span>
+                    <span class="viewer-action">${billingStartTime}</span>
+                </div>
+                <div class="comment-content" style="color:var(--primary); font-weight:700;">
+                    Phiên live kết thúc thành công.<br>
+                    Thời gian chạy: ${formatBillingTime(billingSeconds)}<br>
+                    Tổng chi phí (Đơn giá ${rate.toLocaleString('vi-VN')}đ/h): ${amount.toLocaleString('vi-VN')} đ
+                </div>
+            `;
+            status.className = 'status-info';
+            status.textContent = `Phiên Live kết thúc. Thời gian: ${formatBillingTime(billingSeconds)}. Tạm tính: ${amount.toLocaleString('vi-VN')} đ.`;
+        });
+
+        btnBillingReset.addEventListener('click', () => {
+            if (isBillingRunning) return;
+            billingSeconds = 0;
+            billingStartTime = null;
+            billingStartTimeEl.textContent = '--:--:--';
+            updateBillingUI();
+            btnBillingEnd.disabled = true;
+            btnBillingPause.disabled = true;
+        });
+
+        billingRateInput.addEventListener('input', updateBillingUI);
+
+        // SpeechQueue Refill logic when queue size falls below 7
+        window.requestMoreSentences = function() {
+            if (window.isFetchingMore || !isRunning || !window.originalPrompt) {
+                return;
+            }
+            window.isFetchingMore = true;
+            console.log("[SpeechQueue] Queue size is low (< 7). Requesting more sentences...");
+
+            const historySlice = window.generatedSentences.slice(-5);
+            let historyParams = historySlice.map(s => `history=${encodeURIComponent(s)}`).join('&');
+            if (historyParams) {
+                historyParams = '&' + historyParams;
+            }
+
+            const url = `/stream?prompt=${encodeURIComponent(window.originalPrompt)}${historyParams}`;
+            const contSource = new EventSource(url);
+
+            let currentTypingEl = null;
+
+            contSource.addEventListener('sentence', event => {
+                if (!isRunning) {
+                    contSource.close();
+                    window.isFetchingMore = false;
+                    return;
+                }
+                const sentence = event.data;
+
+                let targetEl = currentTypingEl;
+                if (!targetEl) {
+                    targetEl = document.createElement('div');
+                    llmResult.appendChild(targetEl);
+                }
+
+                targetEl.className = 'llm-item';
+                targetEl.innerHTML = '';
+                currentTypingEl = null;
+
+                const subSentences = splitTextIntoSentences(sentence);
+                subSentences.forEach(sub => {
+                    const subEl = document.createElement('span');
+                    subEl.className = 'sentence-block';
+                    subEl.style.display = 'inline-block';
+                    subEl.style.marginRight = '8px';
+                    targetEl.appendChild(subEl);
+
+                    speechQueue.add(sub, subEl, true);
+                    window.generatedSentences.push(sub);
+                });
+            });
+
+            contSource.onerror = () => {
+                contSource.close();
+                window.isFetchingMore = false;
+            };
+
+            contSource.addEventListener('ai_error', event => {
+                console.error("[SpeechQueue refill error]", event.data);
+                contSource.close();
+                window.isFetchingMore = false;
+            });
+        };
+    </script>
+</body>
+
+</html>
