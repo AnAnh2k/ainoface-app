@@ -446,11 +446,7 @@
 
                     const data = await readJsonResponse(response);
                     if (response.ok && data.success) {
-                        if (data.token || data.user) {
-                            window.location.href = '/';
-                            return;
-                        }
-                        // Registration success! Switch to login mode
+                        // Registration success: require an explicit login before entering the app.
                         isRegisterMode = false;
                         tabLogin.classList.add('active');
                         tabRegister.classList.remove('active');

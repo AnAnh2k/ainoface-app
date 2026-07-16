@@ -1674,7 +1674,7 @@
     <div id="price-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 440px;">
             <div class="modal-header">
-                <h3>💰 Chọn gói nạp tiền</h3>
+                <h3 id="price-modal-title">💰 Chọn gói nạp tiền</h3>
                 <button type="button" class="close-modal-btn" onclick="closePriceModal()">✕</button>
             </div>
             <div class="modal-body" style="padding: 15px 0;">
@@ -1949,6 +1949,22 @@
         </div>
     </div>
 
+    <div id="session-replaced-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Đăng nhập ở thiết bị khác</h3>
+            </div>
+            <div class="modal-body" style="text-align: center; padding: 18px 0;">
+                <p style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
+                    Tài khoản này đã đăng nhập ở thiết bị khác. Phiên hiện tại đã bị đăng xuất.
+                </p>
+            </div>
+            <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
+                <button type="button" class="btn-red" onclick="logoutSessionReplacedAccount()" style="width: 100%; height: 38px; border-radius: 8px;">Đăng nhập lại</button>
+            </div>
+        </div>
+    </div>
+
     <div id="expired-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -2215,6 +2231,25 @@
                     ? 'script-loading-state'
                     : 'script-empty-state';
             llmResult.innerHTML = `<div class="${className}">${message}</div>`;
+        }
+
+        function keepReadingSentenceInView(parent, child) {
+            if (!parent || !child) return;
+            requestAnimationFrame(() => {
+                const parentRect = parent.getBoundingClientRect();
+                const childRect = child.getBoundingClientRect();
+                const safeTop = parentRect.top + Math.min(parent.clientHeight * 0.25, 56);
+                const safeBottom = parentRect.bottom - Math.min(parent.clientHeight * 0.25, 56);
+                if (childRect.top >= safeTop && childRect.bottom <= safeBottom) {
+                    return;
+                }
+                const childTop = parent.scrollTop + (childRect.top - parentRect.top);
+                const targetTop = childTop - Math.min(parent.clientHeight * 0.35, 72);
+                parent.scrollTo({
+                    top: Math.max(0, targetTop),
+                    behavior: 'smooth'
+                });
+            });
         }
 
         function clearLiveContentMessage() {
@@ -2686,15 +2721,24 @@
                     child.style.display = '';
                 });
 
-                scrollParentToSecondLine(scrollParent, item.containerEl);
+                if (item.isLlmItem) {
+                    keepReadingSentenceInView(scrollParent, item.containerEl);
+                } else {
+                    scrollParentToSecondLine(scrollParent, item.containerEl);
+                }
 
                 // Animate progress bar in AI Sắp đọc panel
                 let start = null;
+                let lastScrollAt = 0;
                 const progressFill = (timestamp) => {
                     if (!this.isHighlighting || this.currentItem !== item) return;
                     if (!start) start = timestamp;
                     const elapsed = (timestamp - start) / 1000;
                     const percent = Math.min(100, Math.round((elapsed / duration) * 100));
+                    if (item.isLlmItem && timestamp - lastScrollAt > 1800) {
+                        lastScrollAt = timestamp;
+                        keepReadingSentenceInView(scrollParent, item.containerEl);
+                    }
                     
                     readingProgressBar.style.width = percent + '%';
                     readingProgressPercent.textContent = percent + '%';
@@ -2742,6 +2786,7 @@
             stopTopTimer();
             stopBillingHeartbeat();
             stopSessionElapsedTimer();
+            isRunning = false;
             
             // Send end session call to proxy
             fetch('/api/session/end', { method: 'POST' })
@@ -2764,7 +2809,6 @@
                 commentsSource.close();
                 commentsSource = null;
             }
-            isRunning = false;
             stopBtn.disabled = true;
             sendBtn.disabled = true;
             
@@ -2998,12 +3042,18 @@
             } else if (typeof data.timeBalanceSeconds === 'number') {
                 timeBalanceSeconds = data.timeBalanceSeconds;
             }
+            let snapshotElapsedSeconds = null;
             if (typeof data.sessionElapsedSeconds === 'number') {
-                currentSessionElapsedSeconds = data.sessionElapsedSeconds;
+                snapshotElapsedSeconds = data.sessionElapsedSeconds;
             } else if (data.activeSession && typeof data.activeSession.sessionElapsedSeconds === 'number') {
-                currentSessionElapsedSeconds = data.activeSession.sessionElapsedSeconds;
+                snapshotElapsedSeconds = data.activeSession.sessionElapsedSeconds;
             } else if (data.session && typeof data.session.sessionElapsedSeconds === 'number') {
-                currentSessionElapsedSeconds = data.session.sessionElapsedSeconds;
+                snapshotElapsedSeconds = data.session.sessionElapsedSeconds;
+            }
+            if (typeof snapshotElapsedSeconds === 'number') {
+                if (!isRunning || snapshotElapsedSeconds > currentSessionElapsedSeconds) {
+                    currentSessionElapsedSeconds = snapshotElapsedSeconds;
+                }
             }
             updateTimeBalanceUI();
             updateCurrentSessionUI();
@@ -3036,7 +3086,9 @@
                 return false;
             }
             if (timeBalanceSeconds <= 0 || noBalanceMode) {
-                showPaymentQr();
+                status.className = 'error';
+                status.textContent = 'Chưa có thời gian sử dụng hãy nạp tiền';
+                openPriceModal({ title: 'Chưa có thời gian sử dụng hãy nạp tiền' });
                 return false;
             }
             return true;
@@ -3080,12 +3132,56 @@
             showExpiredModal();
         }
 
+        function isSessionReplacedResponse(data) {
+            return data && (data.status === 'session_replaced' || data.reason === 'session_replaced');
+        }
+
         function isLockedResponse(data) {
-            return data && (data.status === 'locked' || data.action === 'force_logout');
+            return data && (data.status === 'locked' || (data.action === 'force_logout' && !isSessionReplacedResponse(data)));
         }
 
         function logoutLockedAccount() {
             window.location.href = '/logout';
+        }
+
+        function logoutSessionReplacedAccount() {
+            window.location.href = '/logout';
+        }
+
+        function handleSessionReplacedAccount(data) {
+            speechQueue.stop();
+            stopBillingHeartbeat();
+            stopTopTimer();
+            stopSessionElapsedTimer();
+
+            if (source) {
+                source.close();
+                source = null;
+            }
+            if (commentsSource) {
+                commentsSource.close();
+                commentsSource = null;
+            }
+
+            fetch('/stop-live', { method: 'POST' }).catch(err => console.error(err));
+
+            isRunning = false;
+            currentBillingSessionId = null;
+            startBtn.disabled = true;
+            stopBtn.disabled = true;
+            sendBtn.disabled = true;
+            tiktokControlsLocked = true;
+            connectBtn.disabled = true;
+            disconnectBtn.disabled = true;
+            tiktokUserInput.disabled = true;
+            systemTiktokBadge.textContent = 'OFF';
+            systemTiktokBadge.className = 'status-badge off';
+            status.className = 'error';
+            status.textContent = (data && (data.message || data.error)) || 'T\u00E0i kho\u1EA3n n\u00E0y \u0111\u00E3 \u0111\u0103ng nh\u1EADp \u1EDF thi\u1EBFt b\u1ECB kh\u00E1c. Phi\u00EAn hi\u1EC7n t\u1EA1i \u0111\u00E3 b\u1ECB \u0111\u0103ng xu\u1EA5t.';
+            setBillingSessionStatus('\u0110\u00E3 \u0111\u0103ng xu\u1EA5t', 'var(--danger)');
+            document.getElementById('qr-modal').style.display = 'none';
+            document.getElementById('locked-modal').style.display = 'none';
+            document.getElementById('session-replaced-modal').style.display = 'flex';
         }
 
         function handleLockedAccount(data) {
@@ -3189,7 +3285,11 @@
             try {
                 const res = await fetch('/api/user/profile');
                 const data = await res.json();
-                if (isLockedResponse(data)) {
+                if (isSessionReplacedResponse(data)) {
+                    handleSessionReplacedAccount(data);
+                    return;
+                }
+if (isLockedResponse(data)) {
                     handleLockedAccount(data);
                     return;
                 }
@@ -3204,14 +3304,26 @@
                     const billingRateEl = document.getElementById('billing-rate-input');
                     if (billingRateEl) billingRateEl.value = data.hourlyRateVnd;
                     if (data.activeSession && data.activeSession.status === 'active') {
-                        currentBillingSessionId = data.activeSession.sessionId || data.activeSession._id;
-                        currentSessionElapsedSeconds = data.activeSession.sessionElapsedSeconds || data.activeSession.totalUsedSeconds || 0;
-                        const startedAt = data.activeSession.startedAt ? new Date(data.activeSession.startedAt) : null;
-                        const startTimeEl = document.getElementById('billing-start-time');
-                        if (startTimeEl && startedAt) {
-                            startTimeEl.textContent = startedAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        if (isRunning) {
+                            currentBillingSessionId = data.activeSession.sessionId || data.activeSession._id;
+                            const profileElapsedSeconds = data.activeSession.sessionElapsedSeconds || data.activeSession.totalUsedSeconds || 0;
+                            if (profileElapsedSeconds > currentSessionElapsedSeconds) {
+                                currentSessionElapsedSeconds = profileElapsedSeconds;
+                            }
+                            const startedAt = data.activeSession.startedAt ? new Date(data.activeSession.startedAt) : null;
+                            const startTimeEl = document.getElementById('billing-start-time');
+                            if (startTimeEl && startedAt) {
+                                startTimeEl.textContent = startedAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                            }
+                            setBillingSessionStatus('Đang sử dụng', 'var(--success)');
+                        } else {
+                            currentBillingSessionId = null;
+                            stopSessionElapsedTimer();
+                            currentSessionElapsedSeconds = 0;
+                            const startTimeEl = document.getElementById('billing-start-time');
+                            if (startTimeEl) startTimeEl.textContent = '--:--:--';
+                            setBillingSessionStatus('Chưa bắt đầu', '#ffffff');
                         }
-                        setBillingSessionStatus('Đang sử dụng', 'var(--success)');
                         updateCurrentSessionUI();
                     } else if (!isRunning) {
                         currentBillingSessionId = null;
@@ -3267,7 +3379,9 @@
         let activeInvoiceId = null;
         let invoicePollingInterval = null;
 
-        function openPriceModal() {
+        function openPriceModal(options = {}) {
+            const titleEl = document.getElementById('price-modal-title');
+            if (titleEl) titleEl.textContent = options.title || '💰 Chọn gói nạp tiền';
 
             const profile = userProfileData || {};
             const rate = profile.hourlyRateVnd || 10000;
@@ -3303,6 +3417,8 @@
         }
 
         function closePriceModal() {
+            const titleEl = document.getElementById('price-modal-title');
+            if (titleEl) titleEl.textContent = '💰 Chọn gói nạp tiền';
             document.getElementById('price-modal').style.display = 'none';
         }
 
@@ -3739,7 +3855,11 @@
                 try {
                      const res = await fetch('/api/session/heartbeat', { method: 'POST' });
                      const data = await res.json();
-                     if (isLockedResponse(data)) {
+                     if (isSessionReplacedResponse(data)) {
+                         handleSessionReplacedAccount(data);
+                         return;
+                     }
+if (isLockedResponse(data)) {
                          handleLockedAccount(data);
                          return;
                      }
@@ -3751,7 +3871,7 @@
                              timeBalanceSeconds = typeof data.remainingSeconds === 'number' ? data.remainingSeconds : data.timeBalanceSeconds;
                              lastKnownBalanceSeconds = timeBalanceSeconds;
                              updateTimeBalanceUI();
-                             if (typeof data.sessionElapsedSeconds === 'number') {
+                             if (typeof data.sessionElapsedSeconds === 'number' && data.sessionElapsedSeconds > currentSessionElapsedSeconds) {
                                  currentSessionElapsedSeconds = data.sessionElapsedSeconds;
                                  updateCurrentSessionUI();
                              }
@@ -3840,7 +3960,11 @@
                     body: JSON.stringify({ deviceId: 'desktop-webview', appVersion: '1.0.0' })
                 });
                 const data = await res.json();
-                if (isLockedResponse(data)) {
+                if (isSessionReplacedResponse(data)) {
+                    handleSessionReplacedAccount(data);
+                    return;
+                }
+if (isLockedResponse(data)) {
                     handleLockedAccount(data);
                     return;
                 }
