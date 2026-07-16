@@ -4,6 +4,7 @@ import json
 import threading
 import subprocess
 import sys
+import uuid
 
 # Load configuration and initialize LLM API base URLs in environment variables
 CONFIG_PATH = 'config.json'
@@ -117,8 +118,17 @@ def load_or_create_config():
     with open(CONFIG_PATH, 'r', encoding='utf-8') as f:
         config_data = json.load(f)
         
+    config_changed = False
+
     if "central_api_url" not in config_data:
         config_data["central_api_url"] = "https://ainoface-backend.onrender.com"
+        config_changed = True
+
+    if "desktop_device_id" not in config_data:
+        config_data["desktop_device_id"] = str(uuid.uuid4())
+        config_changed = True
+
+    if config_changed:
         with open(CONFIG_PATH, 'w', encoding='utf-8') as f:
             json.dump(config_data, f, indent=4)
             
@@ -135,6 +145,13 @@ app.config.update(
 )
 
 CENTRAL_API_URL = os.getenv("AINOFACE_CENTRAL_API_URL", config.get("central_api_url", "http://127.0.0.1:5050")).rstrip("/")
+
+def is_force_logout_response(data):
+    return isinstance(data, dict) and data.get('action') == 'force_logout'
+
+def clear_local_login_for_force_logout(data):
+    if is_force_logout_response(data):
+        session.clear()
 
 def call_central_api(endpoint, method='GET', data=None, token=None):
     url = f"{CENTRAL_API_URL}{endpoint}"
@@ -278,12 +295,12 @@ def set_unread_count():
 def register():
     data = request.get_json(silent=True) or {}
     res_data, status_code = call_central_api('/api/auth/register', method='POST', data=data)
-    if status_code == 201 and res_data.get('success') and res_data.get('token'):
-        session['logged_in'] = True
-        session['auth_token'] = res_data.get('token')
-        user_data = res_data.get('user') or {}
-        session['username'] = user_data.get('username') or data.get('username', '').strip()
-        session.permanent = True
+    if status_code == 201 and res_data.get('success'):
+        # Registration must not log the user into the desktop app automatically.
+        # The central API may return a token, but this client requires an
+        # explicit login step so the next screen is always /login.
+        session.clear()
+        res_data.pop('token', None)
     return jsonify(res_data), status_code
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -294,7 +311,12 @@ def login():
         password = data.get('password', '')
         
         # Authenticate via central API
-        res_data, status_code = call_central_api('/api/auth/login', method='POST', data={'username': username, 'password': password})
+        res_data, status_code = call_central_api('/api/auth/login', method='POST', data={
+            'username': username,
+            'password': password,
+            'deviceId': config.get('desktop_device_id'),
+            'appVersion': '1.0.0'
+        })
         
         if status_code == 200 and res_data.get('success'):
             session['logged_in'] = True
@@ -326,9 +348,12 @@ def session_start():
         return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
     
     data = request.get_json(silent=True) or {}
+    data['deviceId'] = config.get('desktop_device_id')
+    data['appVersion'] = data.get('appVersion') or '1.0.0'
     res_data, status_code = call_central_api('/api/billing/session/start', method='POST', data=data, token=auth_token)
     if status_code == 200 and res_data.get('success'):
         session['session_id'] = res_data.get('sessionId')
+    clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
 @app.route('/api/session/heartbeat', methods=['POST'])
@@ -343,8 +368,9 @@ def session_heartbeat():
         
     res_data, status_code = call_central_api('/api/billing/session/heartbeat', method='POST', data={'sessionId': session_id}, token=auth_token)
     # If expired, clear session_id
-    if res_data.get('status') in ('expired', 'ended', 'stopped', 'locked') or res_data.get('action') in ('stop_live', 'force_logout'):
+    if res_data.get('status') in ('expired', 'ended', 'stopped', 'locked', 'session_replaced') or res_data.get('action') in ('stop_live', 'force_logout'):
         session.pop('session_id', None)
+    clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
 @app.route('/api/session/end', methods=['POST'])
@@ -359,6 +385,7 @@ def session_end():
         
     res_data, status_code = call_central_api('/api/billing/session/end', method='POST', data={'sessionId': session_id}, token=auth_token)
     session.pop('session_id', None)
+    clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
 @app.route('/api/user/profile', methods=['GET'])
@@ -368,6 +395,7 @@ def user_profile():
         return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
     
     res_data, status_code = call_central_api('/api/user/profile', method='GET', token=auth_token)
+    clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
 @app.route('/api/invoice/create', methods=['POST'])
@@ -378,6 +406,7 @@ def invoice_create():
     
     data = request.get_json(silent=True) or {}
     res_data, status_code = call_central_api('/api/billing/invoice/create', method='POST', data=data, token=auth_token)
+    clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
 @app.route('/api/invoice/status/<invoice_id>', methods=['GET'])
@@ -387,6 +416,7 @@ def invoice_status(invoice_id):
         return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
     
     res_data, status_code = call_central_api(f'/api/billing/invoice/status/{invoice_id}', method='GET', token=auth_token)
+    clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
 @app.route('/api/invoice/cancel/<invoice_id>', methods=['POST'])
@@ -396,6 +426,7 @@ def invoice_cancel(invoice_id):
         return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
     
     res_data, status_code = call_central_api(f'/api/billing/invoice/cancel/{invoice_id}', method='POST', token=auth_token)
+    clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
 @app.route('/api/invoices', methods=['GET'])
@@ -405,6 +436,7 @@ def user_invoices():
         return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
     
     res_data, status_code = call_central_api('/api/billing/invoices', method='GET', token=auth_token)
+    clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
 @app.route('/api/sessions', methods=['GET'])
@@ -414,6 +446,7 @@ def user_sessions():
         return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
     
     res_data, status_code = call_central_api('/api/billing/sessions', method='GET', token=auth_token)
+    clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
 
