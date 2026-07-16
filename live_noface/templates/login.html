@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -80,6 +80,11 @@
             animation: fade-in-up 0.6s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
         }
 
+        .login-card.register-mode {
+            max-width: 860px;
+            padding: 36px 42px;
+        }
+
         @keyframes fade-in-up {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -103,6 +108,7 @@
             margin-bottom: 22px;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
         label {
@@ -116,6 +122,7 @@
 
         input {
             padding: 14px 16px;
+            height: 50px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(15, 23, 42, 0.6);
@@ -123,6 +130,7 @@
             font-size: 15px;
             outline: none;
             font-family: var(--font-main);
+            box-sizing: border-box;
             transition: all 0.3s ease;
         }
 
@@ -130,6 +138,20 @@
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(61, 124, 255, 0.25);
             background: rgba(15, 23, 42, 0.8);
+        }
+
+        .field-error {
+            min-height: 18px;
+            margin-top: 6px;
+            color: #fda4af;
+            font-size: 12.5px;
+            line-height: 1.35;
+            display: none;
+        }
+
+        .form-group.has-error input {
+            border-color: rgba(254, 44, 85, 0.7);
+            box-shadow: 0 0 0 3px rgba(254, 44, 85, 0.16);
         }
 
         .error-message {
@@ -217,6 +239,7 @@
 
         .password-wrapper input {
             width: 100%;
+            height: 50px;
             padding-right: 48px; /* Leave space for the eye icon */
             box-sizing: border-box;
         }
@@ -300,7 +323,7 @@
         .register-mode .confirm-password-group,
         .register-mode .register-extra-group,
         .verify-mode .verification-code-group {
-            display: block;
+            display: flex;
         }
 
         .verify-mode .register-extra-group,
@@ -313,41 +336,71 @@
             opacity: 0.55;
         }
 
-        .login-denied-modal {
-            position: fixed;
-            inset: 0;
+        .otp-countdown {
             display: none;
-            align-items: center;
-            justify-content: center;
-            background: rgba(2, 6, 23, 0.72);
-            z-index: 50;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .login-denied-card {
-            width: 100%;
-            max-width: 380px;
-            background: rgba(30, 41, 59, 0.96);
-            border: 1px solid rgba(254, 44, 85, 0.24);
-            border-radius: 18px;
-            padding: 24px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+            margin-top: 8px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(61, 124, 255, 0.22);
+            background: rgba(61, 124, 255, 0.08);
+            color: #c7d2fe;
+            font-size: 13px;
+            font-weight: 600;
             text-align: center;
         }
 
-        .login-denied-card h3 {
-            margin: 0 0 12px;
-            color: #fda4af;
-            font-size: 18px;
+        .verify-mode .otp-countdown {
+            display: block;
         }
 
-        .login-denied-card p {
-            margin: 0 0 18px;
-            color: #e2e8f0;
-            line-height: 1.5;
-            font-size: 14px;
+        .otp-countdown strong {
+            color: #00f0ff;
+            font-family: var(--font-cyber);
+            font-size: 15px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.36);
         }
+
+        .register-mode #login-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 18px;
+            row-gap: 2px;
+        }
+
+        .register-mode .username-group,
+        .register-mode #submit-btn,
+        .register-mode .verification-code-group {
+            grid-column: 1 / -1;
+        }
+
+        .register-mode .form-group {
+            margin-bottom: 16px;
+        }
+
+        .register-mode #submit-btn {
+            margin-top: 2px;
+        }
+
+        @media (max-width: 767px) {
+            body {
+                overflow-x: hidden;
+                overflow-y: auto;
+                padding: 24px 0;
+                align-items: flex-start;
+            }
+
+            .login-card,
+            .login-card.register-mode {
+                width: 92vw;
+                max-width: 92vw;
+                padding: 28px 22px;
+            }
+
+            .register-mode #login-form {
+                grid-template-columns: 1fr;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -362,7 +415,7 @@
         <div id="error-box" class="error-message"></div>
 
         <form id="login-form">
-            <div class="form-group">
+            <div class="form-group username-group">
                 <label for="username" id="username-label">Tài khoản</label>
                 <input type="text" id="username" name="username" placeholder="Nhập tài khoản" required autocomplete="username">
             </div>
@@ -370,14 +423,16 @@
             <div class="form-group register-extra-group" id="email-wrapper">
                 <label for="email">Email xác thực</label>
                 <input type="email" id="email" name="email" placeholder="Nhập email nhận mã xác thực" autocomplete="email">
+                <div class="field-error" id="email-error"></div>
             </div>
 
             <div class="form-group register-extra-group" id="phone-wrapper">
                 <label for="phone">Số điện thoại</label>
-                <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại" autocomplete="tel">
+                <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại" inputmode="numeric" autocomplete="tel">
+                <div class="field-error" id="phone-error"></div>
             </div>
             
-            <div class="form-group">
+            <div class="form-group password-group">
                 <label for="password">Mật khẩu</label>
                 <div class="password-wrapper">
                     <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required autocomplete="current-password">
@@ -395,12 +450,20 @@
                 <label for="confirm-password">Xác nhận mật khẩu</label>
                 <div class="password-wrapper">
                     <input type="password" id="confirm-password" placeholder="Nhập lại mật khẩu">
+                    <span role="button" id="toggle-confirm-password" class="password-toggle" aria-label="Hiện mật khẩu xác nhận">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </span>
                 </div>
+                <div class="field-error" id="confirm-password-error"></div>
             </div>
 
             <div class="form-group verification-code-group" id="verification-code-wrapper">
                 <label for="verification-code">Mã xác thực email</label>
                 <input type="text" id="verification-code" name="verification-code" placeholder="Nhập mã 6 số" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+                <div class="otp-countdown" id="otp-countdown">OTP còn hiệu lực trong <strong id="otp-countdown-value">60</strong> giây</div>
             </div>
             
             <button type="submit" id="submit-btn">Đăng nhập</button>
@@ -408,14 +471,6 @@
         
         <div class="footer-note" id="footer-note-text">
             Đăng nhập để điều khiển hệ thống livestream MC AI thông minh.
-        </div>
-    </div>
-
-    <div id="login-denied-modal" class="login-denied-modal">
-        <div class="login-denied-card">
-            <h3>Đăng nhập thất bại</h3>
-            <p id="login-denied-message">Thiết bị đang đăng nhập trước đó đã từ chối quyền truy cập của bạn.</p>
-            <button type="button" id="login-denied-ok">Đã hiểu</button>
         </div>
     </div>
 
@@ -430,17 +485,39 @@
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirm-password');
         const verificationCodeInput = document.getElementById('verification-code');
+        const otpCountdownValue = document.getElementById('otp-countdown-value');
+        const emailError = document.getElementById('email-error');
+        const phoneError = document.getElementById('phone-error');
+        const confirmPasswordError = document.getElementById('confirm-password-error');
 
         const tabLogin = document.getElementById('tab-login');
         const tabRegister = document.getElementById('tab-register');
-        const loginDeniedModal = document.getElementById('login-denied-modal');
-        const loginDeniedMessage = document.getElementById('login-denied-message');
-        const loginDeniedOk = document.getElementById('login-denied-ok');
 
         let isRegisterMode = false;
         let isVerificationMode = false;
-        let pendingLoginPollInterval = null;
-        let isWaitingLoginApproval = false;
+        let otpCountdownInterval = null;
+        let otpRemainingSeconds = 60;
+
+        function stopOtpCountdown() {
+            if (otpCountdownInterval) {
+                clearInterval(otpCountdownInterval);
+                otpCountdownInterval = null;
+            }
+        }
+
+        function startOtpCountdown() {
+            stopOtpCountdown();
+            otpRemainingSeconds = 60;
+            otpCountdownValue.textContent = otpRemainingSeconds;
+            otpCountdownInterval = setInterval(() => {
+                otpRemainingSeconds = Math.max(0, otpRemainingSeconds - 1);
+                otpCountdownValue.textContent = otpRemainingSeconds;
+                if (otpRemainingSeconds === 0) {
+                    stopOtpCountdown();
+                    showMessage('Mã OTP đã hết hiệu lực. Vui lòng đăng ký lại để nhận mã mới.');
+                }
+            }, 1000);
+        }
 
         function activateLoginMode(keepUsername = '') {
             isRegisterMode = false;
@@ -455,6 +532,8 @@
             verificationCodeInput.required = false;
             usernameInput.disabled = false;
             passwordInput.disabled = false;
+            stopOtpCountdown();
+            clearRegisterFieldErrors();
             form.reset();
             usernameInput.value = keepUsername;
         }
@@ -473,6 +552,8 @@
             verificationCodeInput.required = false;
             usernameInput.disabled = false;
             passwordInput.disabled = false;
+            stopOtpCountdown();
+            clearRegisterFieldErrors();
             form.reset();
         }
 
@@ -488,8 +569,10 @@
             verificationCodeInput.required = true;
             usernameInput.disabled = true;
             passwordInput.disabled = true;
+            clearRegisterFieldErrors();
             verificationCodeInput.value = '';
             verificationCodeInput.focus();
+            startOtpCountdown();
         }
 
         // Switch to Login Tab
@@ -525,6 +608,10 @@
                 errorBox.style.background = 'rgba(16, 185, 129, 0.1)';
                 errorBox.style.color = '#a7f3d0';
                 errorBox.style.borderColor = 'rgba(16, 185, 129, 0.2)';
+            } else if (type === 'warning') {
+                errorBox.style.background = 'rgba(250, 204, 21, 0.12)';
+                errorBox.style.color = '#fde68a';
+                errorBox.style.borderColor = 'rgba(250, 204, 21, 0.32)';
             } else {
                 errorBox.style.background = 'rgba(255, 0, 85, 0.1)';
                 errorBox.style.color = '#fda4af';
@@ -533,67 +620,81 @@
             errorBox.style.display = 'block';
         }
 
-        function showLoginDeniedModal(message) {
-            loginDeniedMessage.textContent = message || 'Thiết bị đang đăng nhập trước đó đã từ chối quyền truy cập của bạn.';
-            loginDeniedModal.style.display = 'flex';
+        function setFieldError(input, errorElement, message) {
+            input.closest('.form-group').classList.add('has-error');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
         }
 
-        loginDeniedOk.addEventListener('click', () => {
-            loginDeniedModal.style.display = 'none';
+        function clearFieldError(input, errorElement) {
+            input.closest('.form-group').classList.remove('has-error');
+            errorElement.textContent = '';
+            errorElement.style.display = 'none';
+        }
+
+        function clearRegisterFieldErrors() {
+            clearFieldError(emailInput, emailError);
+            clearFieldError(phoneInput, phoneError);
+            clearFieldError(confirmPasswordInput, confirmPasswordError);
+        }
+
+        function normalizePhone(value) {
+            return value.replace(/[\s-]+/g, '');
+        }
+
+        function validateRegisterFields() {
+            let isValid = true;
+            const email = emailInput.value.trim();
+            const phone = normalizePhone(phoneInput.value.trim());
+            const confirmPassword = confirmPasswordInput.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const vietnamMobileRegex = /^0(3|5|7|8|9)\d{8}$/;
+
+            clearRegisterFieldErrors();
+            emailInput.value = email;
+            phoneInput.value = phone;
+
+            if (!emailRegex.test(email)) {
+                setFieldError(emailInput, emailError, 'Email không đúng định dạng.');
+                isValid = false;
+            }
+
+            if (!vietnamMobileRegex.test(phone)) {
+                setFieldError(phoneInput, phoneError, 'Số điện thoại phải gồm 10 chữ số và đúng định dạng Việt Nam.');
+                isValid = false;
+            }
+
+            if (passwordInput.value !== confirmPassword) {
+                setFieldError(confirmPasswordInput, confirmPasswordError, 'Mật khẩu xác nhận không khớp.');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        emailInput.addEventListener('input', () => {
+            if (emailError.style.display === 'block') {
+                clearFieldError(emailInput, emailError);
+            }
         });
 
-        function stopPendingLoginPolling() {
-            if (pendingLoginPollInterval) {
-                clearInterval(pendingLoginPollInterval);
-                pendingLoginPollInterval = null;
+        phoneInput.addEventListener('input', () => {
+            const cleanedValue = phoneInput.value.replace(/[^\d\s-]/g, '');
+            if (phoneInput.value !== cleanedValue) {
+                phoneInput.value = cleanedValue;
             }
-            isWaitingLoginApproval = false;
-        }
+            if (phoneError.style.display === 'block') {
+                clearFieldError(phoneInput, phoneError);
+            }
+        });
 
-        function startPendingLoginPolling(requestId) {
-            stopPendingLoginPolling();
-            isWaitingLoginApproval = true;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Đang chờ xác nhận...';
-            showMessage('Tài khoản đang đăng nhập ở thiết bị khác. Đang chờ thiết bị đó xác nhận.', 'success');
+        confirmPasswordInput.addEventListener('input', () => {
+            if (confirmPasswordError.style.display === 'block') {
+                clearFieldError(confirmPasswordInput, confirmPasswordError);
+            }
+        });
 
-            const poll = async () => {
-                try {
-                    const response = await fetch('/login-request/status', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ requestId })
-                    });
-                    const data = await readJsonResponse(response);
-                    if (response.ok && data.success && data.token) {
-                        stopPendingLoginPolling();
-                        window.location.href = '/';
-                        return;
-                    }
-                    if (data.status === 'rejected') {
-                        stopPendingLoginPolling();
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Đăng nhập';
-                        showLoginDeniedModal(data.error || 'Đăng nhập thất bại. Người đang đăng nhập trước đó đã từ chối quyền của bạn.');
-                        return;
-                    }
-                    if (data.status === 'expired' || data.status === 'not_found') {
-                        stopPendingLoginPolling();
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Đăng nhập';
-                        showMessage(data.error || 'Yêu cầu đăng nhập đã hết hạn. Vui lòng thử lại.');
-                    }
-                } catch (err) {
-                    stopPendingLoginPolling();
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Đăng nhập';
-                    showMessage('Không kết nối được server khi chờ xác nhận đăng nhập.');
-                }
-            };
 
-            poll();
-            pendingLoginPollInterval = setInterval(poll, 2000);
-        }
         // Check query parameters for error message
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('error')) {
@@ -628,6 +729,7 @@
 
                         const data = await readJsonResponse(response);
                         if (response.ok && data.success) {
+                            stopOtpCountdown();
                             activateLoginMode(username);
                             showMessage(data.message || 'Xác thực email thành công. Vui lòng đăng nhập.', 'success');
                             passwordInput.focus();
@@ -645,16 +747,9 @@
                     return;
                 }
 
-                const confirmPassword = confirmPasswordInput.value;
-                if (password !== confirmPassword) {
-                    showMessage('Mật khẩu xác nhận không khớp.');
-                    return;
-                }
-
                 const email = emailInput.value.trim();
-                const phone = phoneInput.value.trim();
-                if (!email || !phone) {
-                    showMessage('Vui lòng nhập email và số điện thoại.');
+                const phone = normalizePhone(phoneInput.value.trim());
+                if (!validateRegisterFields()) {
                     return;
                 }
 
@@ -671,7 +766,7 @@
                     if (response.ok && data.success) {
                         activateVerificationMode();
                         const devCodeNote = data.devVerificationCode ? ` Mã test local: ${data.devVerificationCode}` : '';
-                        showMessage((data.message || 'Mã xác thực đã được gửi đến email.') + devCodeNote, 'success');
+                        showMessage(`Hãy xác thực email. OTP đã gửi về mail của bạn và có hiệu lực trong 60 giây.${devCodeNote}`, 'warning');
                     } else {
                         showMessage(data.error || 'Đăng ký tài khoản thất bại.');
                     }
@@ -698,52 +793,50 @@
                     const data = await readJsonResponse(response);
                     if (response.ok && data.success) {
                         window.location.href = '/';
-                    } else if (response.status === 202 && data.status === 'login_pending' && data.requestId) {
-                        startPendingLoginPolling(data.requestId);
                     } else {
                         showMessage(data.error || 'Sai tài khoản hoặc mật khẩu.');
                         errorBox.style.animation = 'none';
                         errorBox.offsetHeight; /* trigger reflow */
                         errorBox.style.animation = null;
-                    }                } catch (err) {
+                    }
+                } catch (err) {
                     showMessage('Không kết nối được server. Vui lòng kiểm tra backend.');
                 } finally {
-                    if (!isWaitingLoginApproval) {
-                        submitBtn.disabled = false;
-                        if (!isRegisterMode) {
-                            submitBtn.textContent = 'Đăng nhập';
-                        }
+                    submitBtn.disabled = false;
+                    if (!isRegisterMode) {
+                        submitBtn.textContent = 'Đăng nhập';
                     }
                 }
             }        });
 
-        // Show/Hide Password Toggle JS
-        const togglePassword = document.getElementById('toggle-password');
-
-        togglePassword.addEventListener('click', () => {
-            const isPassword = passwordInput.getAttribute('type') === 'password';
-            passwordInput.type = isPassword ? 'text' : 'password';
-            
-            if (isPassword) {
-                // Eye Off SVG
-                togglePassword.innerHTML = `
+        function eyeIconSvg(isHidden) {
+            return isHidden
+                ? `
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                `
+                : `
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                         <line x1="1" y1="1" x2="23" y2="23"></line>
                     </svg>
                 `;
-                togglePassword.setAttribute('aria-label', 'Ẩn mật khẩu');
-            } else {
-                // Eye SVG
-                togglePassword.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                    </svg>
-                `;
-                togglePassword.setAttribute('aria-label', 'Hiện mật khẩu');
-            }
-        });
-    </script>
+        }
+
+        function bindPasswordToggle(toggleId, input, label) {
+            const toggle = document.getElementById(toggleId);
+            toggle.addEventListener('click', () => {
+                const isHidden = input.getAttribute('type') === 'password';
+                input.type = isHidden ? 'text' : 'password';
+                toggle.innerHTML = eyeIconSvg(!isHidden);
+                toggle.setAttribute('aria-label', isHidden ? `Ẩn ${label}` : `Hiện ${label}`);
+            });
+        }
+
+        bindPasswordToggle('toggle-password', passwordInput, 'mật khẩu');
+        bindPasswordToggle('toggle-confirm-password', confirmPasswordInput, 'mật khẩu xác nhận');
+</script>
 </body>
 </html>

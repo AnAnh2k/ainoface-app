@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 
 <head>
@@ -726,6 +726,116 @@
             margin: 0;
         }
 
+        .topup-promo-banner {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(250, 204, 21, 0.38);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 14px;
+            background:
+                linear-gradient(135deg, rgba(250, 204, 21, 0.16), rgba(255, 0, 85, 0.13)),
+                rgba(15, 23, 42, 0.72);
+            box-shadow: 0 0 26px rgba(250, 204, 21, 0.16), inset 0 0 22px rgba(255, 255, 255, 0.035);
+        }
+
+        .topup-promo-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -55%;
+            width: 42%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+            transform: skewX(-18deg);
+            animation: promo-shine 3s ease-in-out infinite;
+        }
+
+        .promo-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            height: 22px;
+            padding: 0 9px;
+            border-radius: 999px;
+            background: rgba(250, 204, 21, 0.14);
+            border: 1px solid rgba(250, 204, 21, 0.28);
+            color: #fde68a;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .promo-title {
+            color: #fff7ed;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.35;
+            margin-bottom: 8px;
+        }
+
+        .promo-price-line {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .promo-old-price {
+            color: #94a3b8;
+            font-size: 12px;
+            text-decoration: line-through;
+        }
+
+        .promo-new-price {
+            color: #22c55e;
+            font-family: var(--font-cyber);
+            font-size: 18px;
+            font-weight: 800;
+            text-shadow: 0 0 14px rgba(34, 197, 94, 0.35);
+        }
+
+        .promo-countdown {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 7px;
+        }
+
+        .promo-countdown-cell {
+            min-width: 0;
+            border-radius: 10px;
+            padding: 8px 4px;
+            text-align: center;
+            background: rgba(2, 6, 23, 0.46);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .promo-countdown-cell strong {
+            display: block;
+            color: #fef3c7;
+            font-family: var(--font-cyber);
+            font-size: 15px;
+            line-height: 1;
+        }
+
+        .promo-countdown-cell span {
+            display: block;
+            color: #cbd5e1;
+            font-size: 9.5px;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        @keyframes promo-shine {
+            0% { left: -55%; opacity: 0; }
+            20% { opacity: 1; }
+            55% { left: 115%; opacity: 0; }
+            100% { left: 115%; opacity: 0; }
+        }
+
         .close-modal-btn {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1409,18 +1519,6 @@
                         <span class="stat-label">👥 Người xem</span>
                         <span class="stat-value" id="top-viewer-count">--</span>
                     </div>
-                    <div class="stat-item tiktok-stat">
-                        <span class="stat-label">💬 Bình luận/phút</span>
-                        <span class="stat-value" id="top-comment-rate">--</span>
-                    </div>
-                    <div class="stat-item tiktok-stat">
-                        <span class="stat-label">❤️ Tim/phút</span>
-                        <span class="stat-value" id="top-like-rate">--</span>
-                    </div>
-                    <div class="stat-item tiktok-stat">
-                        <span class="stat-label">🛒 Đơn hàng</span>
-                        <span class="stat-value" id="top-order-count">--</span>
-                    </div>
                     
                     <div class="stat-item stat-group-divider" onclick="openUserHistoryModal()" style="cursor: pointer;" title="Xem lịch sử tài khoản">
                         <span class="stat-label">👤 Khách</span>
@@ -1681,6 +1779,20 @@
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: center;">
                     Đơn giá hiện tại của bạn: <span id="price-modal-rate" style="color: var(--primary); font-weight: bold;">- đ/giờ</span>
                 </p>
+                <div class="topup-promo-banner" aria-live="polite">
+                    <div class="promo-eyebrow">Khuyến mãi tháng 7</div>
+                    <div class="promo-title">Giảm 50% giá nạp: từ 20.000đ/giờ còn 10.000đ/giờ</div>
+                    <div class="promo-price-line">
+                        <span class="promo-old-price">20.000đ/giờ</span>
+                        <span class="promo-new-price">10.000đ/giờ</span>
+                    </div>
+                    <div class="promo-countdown" id="july-promo-countdown">
+                        <div class="promo-countdown-cell"><strong id="promo-days">00</strong><span>Ngày</span></div>
+                        <div class="promo-countdown-cell"><strong id="promo-hours">00</strong><span>Giờ</span></div>
+                        <div class="promo-countdown-cell"><strong id="promo-minutes">00</strong><span>Phút</span></div>
+                        <div class="promo-countdown-cell"><strong id="promo-seconds">00</strong><span>Giây</span></div>
+                    </div>
+                </div>
                 
                 <!-- Quick select grid -->
                 <div class="price-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
@@ -1985,65 +2097,6 @@
         </div>
     </div>
 
-    <div id="session-replaced-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Đăng nhập ở thiết bị khác</h3>
-            </div>
-            <div class="modal-body" style="text-align: center; padding: 18px 0;">
-                <p style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
-                    Tài khoản này đã đăng nhập ở thiết bị khác. Phiên hiện tại đã bị đăng xuất.
-                </p>
-            </div>
-            <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
-                <button type="button" class="btn-red" onclick="logoutSessionReplacedAccount()" style="width: 100%; height: 38px; border-radius: 8px;">Đăng nhập lại</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="pending-login-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 480px;">
-            <div class="modal-header">
-                <h3>Yêu cầu đăng nhập mới</h3>
-            </div>
-            <div class="modal-body" style="padding: 18px 0;">
-                <p style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0 0 14px;">
-                    Tài khoản của bạn vừa được đăng nhập ở thiết bị khác. Có đúng là bạn không?
-                </p>
-                <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px; font-size: 13px;">
-                    <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
-                        <span style="color: var(--text-muted);">Tên thiết bị:</span>
-                        <strong id="pending-login-device-name" style="color: #fff; text-align: right;">-</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
-                        <span style="color: var(--text-muted);">Mã thiết bị:</span>
-                        <strong id="pending-login-device-id" style="color: #fff; text-align: right;">-</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
-                        <span style="color: var(--text-muted);">Địa chỉ IP:</span>
-                        <strong id="pending-login-ip" style="color: #fff; text-align: right;">-</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
-                        <span style="color: var(--text-muted);">Phiên bản app:</span>
-                        <strong id="pending-login-app-version" style="color: #fff; text-align: right;">-</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px;">
-                        <span style="color: var(--text-muted);">Thời gian:</span>
-                        <strong id="pending-login-time" style="color: #fff; text-align: right;">-</strong>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; gap: 12px;">
-                        <span style="color: var(--text-muted);">User agent:</span>
-                        <strong id="pending-login-user-agent" style="color: #fff; text-align: right; max-width: 260px; overflow-wrap: anywhere;">-</strong>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                <button id="pending-login-reject-btn" type="button" class="btn-gray" onclick="decidePendingLogin(false)" style="flex: 1; height: 38px; border-radius: 8px;">Không phải</button>
-                <button id="pending-login-approve-btn" type="button" class="btn-red" onclick="decidePendingLogin(true)" style="flex: 1; height: 38px; border-radius: 8px;">Xác nhận và đăng xuất</button>
-            </div>
-        </div>
-    </div>
-
     <div id="expired-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
@@ -2099,9 +2152,6 @@
         // Top bar indicators
         const topLiveTimer = document.getElementById('top-live-timer');
         const topViewerCount = document.getElementById('top-viewer-count');
-        const topCommentRate = document.getElementById('top-comment-rate');
-        const topLikeRate = document.getElementById('top-like-rate');
-        const topOrderCount = document.getElementById('top-order-count');
         const systemTiktokBadge = document.getElementById('system-tiktok-badge');
 
         // Reading panel state elements
@@ -2203,9 +2253,6 @@
 
         function resetLiveTopbarStats() {
             topViewerCount.textContent = '--';
-            topCommentRate.textContent = '--';
-            topLikeRate.textContent = '--';
-            topOrderCount.textContent = '--';
         }
 
         function formatLiveStat(value) {
@@ -2218,9 +2265,6 @@
                 return;
             }
             topViewerCount.textContent = formatLiveStat(data.currentViewers);
-            topCommentRate.textContent = formatLiveStat(data.commentsPerMinute);
-            topLikeRate.textContent = formatLiveStat(data.heartsPerMinute);
-            topOrderCount.textContent = formatLiveStat(data.ordersCount);
         }
 
         async function loadLiveStats() {
@@ -3214,12 +3258,8 @@
             showExpiredModal();
         }
 
-        function isSessionReplacedResponse(data) {
-            return data && (data.status === 'session_replaced' || data.reason === 'session_replaced');
-        }
-
         function isLockedResponse(data) {
-            return data && (data.status === 'locked' || (data.action === 'force_logout' && !isSessionReplacedResponse(data)));
+            return data && (data.status === 'locked' || data.action === 'force_logout');
         }
 
         function logoutForcedAccount() {
@@ -3230,69 +3270,6 @@
             logoutForcedAccount();
         }
 
-        function logoutSessionReplacedAccount() {
-            logoutForcedAccount();
-        }
-
-        let activePendingLoginRequestId = null;
-
-        function setPendingLoginDecisionButtons(disabled) {
-            const approveBtn = document.getElementById('pending-login-approve-btn');
-            const rejectBtn = document.getElementById('pending-login-reject-btn');
-            if (approveBtn) approveBtn.disabled = disabled;
-            if (rejectBtn) rejectBtn.disabled = disabled;
-        }
-
-        function showPendingLoginRequestModal(request) {
-            if (!request || !request.requestId) return;
-            activePendingLoginRequestId = request.requestId;
-            const setText = (id, value) => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = value || '-';
-            };
-
-            setText('pending-login-device-name', request.deviceName || request.deviceId || 'Thiết bị không xác định');
-            setText('pending-login-device-id', request.deviceId);
-            setText('pending-login-ip', request.ipAddress);
-            setText('pending-login-app-version', request.appVersion);
-            setText('pending-login-time', request.requestedAt ? new Date(request.requestedAt).toLocaleString('vi-VN') : '');
-            setText('pending-login-user-agent', request.userAgent);
-            setPendingLoginDecisionButtons(false);
-            document.getElementById('pending-login-modal').style.display = 'flex';
-        }
-
-        function hidePendingLoginRequestModal() {
-            activePendingLoginRequestId = null;
-            document.getElementById('pending-login-modal').style.display = 'none';
-            setPendingLoginDecisionButtons(false);
-        }
-
-        async function decidePendingLogin(allow) {
-            if (!activePendingLoginRequestId) return;
-            setPendingLoginDecisionButtons(true);
-            try {
-                const response = await fetch('/api/login-request/decision', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ requestId: activePendingLoginRequestId, allow })
-                });
-                const data = await response.json();
-                if (response.ok && data.success) {
-                    if (allow) {
-                        logoutForcedAccount();
-                        return;
-                    }
-                    hidePendingLoginRequestModal();
-                    showAppAlert('Đã từ chối', data.message || 'Đã từ chối yêu cầu đăng nhập từ thiết bị khác.');
-                    return;
-                }
-                showAppAlert('Lỗi', data.error || 'Không thể xử lý yêu cầu đăng nhập.');
-            } catch (err) {
-                showAppAlert('Lỗi', 'Không thể kết nối máy chủ để xử lý yêu cầu đăng nhập.');
-            } finally {
-                setPendingLoginDecisionButtons(false);
-            }
-        }
 
         function updateForceLogoutCountdown() {
             const countdownEl = document.getElementById('force-logout-countdown');
@@ -3316,7 +3293,6 @@
             if (messageEl) messageEl.textContent = options.message;
 
             document.getElementById('qr-modal').style.display = 'none';
-            document.getElementById('session-replaced-modal').style.display = 'none';
             document.getElementById('locked-modal').style.display = 'flex';
 
             forceLogoutRemainingSeconds = 10;
@@ -3334,44 +3310,6 @@
             }, 1000);
         }
 
-        function handleSessionReplacedAccount(data) {
-            if (forceLogoutModalVisible) return;
-            speechQueue.stop();
-            stopBillingHeartbeat();
-            stopTopTimer();
-            stopSessionElapsedTimer();
-
-            if (source) {
-                source.close();
-                source = null;
-            }
-            if (commentsSource) {
-                commentsSource.close();
-                commentsSource = null;
-            }
-
-            fetch('/stop-live', { method: 'POST' }).catch(err => console.error(err));
-
-            isRunning = false;
-            currentBillingSessionId = null;
-            startBtn.disabled = true;
-            stopBtn.disabled = true;
-            sendBtn.disabled = true;
-            tiktokControlsLocked = true;
-            connectBtn.disabled = true;
-            disconnectBtn.disabled = true;
-            tiktokUserInput.disabled = true;
-            systemTiktokBadge.textContent = 'OFF';
-            systemTiktokBadge.className = 'status-badge off';
-            status.className = 'error';
-            const message = (data && (data.message || data.error)) || 'T\u00E0i kho\u1EA3n n\u00E0y \u0111\u00E3 \u0111\u0103ng nh\u1EADp \u1EDF thi\u1EBFt b\u1ECB kh\u00E1c. Phi\u00EAn hi\u1EC7n t\u1EA1i \u0111\u00E3 b\u1ECB \u0111\u0103ng xu\u1EA5t.';
-            status.textContent = message;
-            setBillingSessionStatus('\u0110\u00E3 \u0111\u0103ng xu\u1EA5t', 'var(--danger)');
-            showForceLogoutModal({
-                title: '\u0110\u0103ng nh\u1EADp \u1EDF thi\u1EBFt b\u1ECB kh\u00E1c',
-                message
-            });
-        }
 
         function handleLockedAccount(data) {
             if (isAccountLocked) return;
@@ -3477,10 +3415,6 @@
             try {
                 const res = await fetch('/api/user/profile');
                 const data = await res.json();
-                if (isSessionReplacedResponse(data)) {
-                    handleSessionReplacedAccount(data);
-                    return;
-                }
 if (isLockedResponse(data)) {
                     handleLockedAccount(data);
                     return;
@@ -3494,13 +3428,6 @@ if (isLockedResponse(data)) {
                     document.getElementById('top-username').textContent = data.username;
                     document.getElementById('top-hourly-rate').textContent = data.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/h';
                     renderUserProfileInfo();
-                    if (data.pendingLoginRequest && data.pendingLoginRequest.requestId) {
-                        if (activePendingLoginRequestId !== data.pendingLoginRequest.requestId) {
-                            showPendingLoginRequestModal(data.pendingLoginRequest);
-                        }
-                    } else if (activePendingLoginRequestId) {
-                        hidePendingLoginRequestModal();
-                    }
                     const billingRateEl = document.getElementById('billing-rate-input');
                     if (billingRateEl) billingRateEl.value = data.hourlyRateVnd;
                     if (data.activeSession && data.activeSession.status === 'active') {
@@ -3578,6 +3505,38 @@ if (isLockedResponse(data)) {
         let currentSelectedAmount = null;
         let activeInvoiceId = null;
         let invoicePollingInterval = null;
+        let julyPromoCountdownInterval = null;
+
+        function getJulyPromoEndDate(now = new Date()) {
+            const year = now.getMonth() > 6 ? now.getFullYear() + 1 : now.getFullYear();
+            return new Date(year, 6, 31, 23, 59, 59);
+        }
+
+        function updateJulyPromoCountdown() {
+            const countdownEl = document.getElementById('july-promo-countdown');
+            if (!countdownEl) return;
+
+            const now = new Date();
+            const promoEnd = getJulyPromoEndDate(now);
+            const diffMs = Math.max(0, promoEnd.getTime() - now.getTime());
+            const totalSeconds = Math.floor(diffMs / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor((totalSeconds % 86400) / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            const pad = (value) => String(value).padStart(2, '0');
+
+            document.getElementById('promo-days').textContent = pad(days);
+            document.getElementById('promo-hours').textContent = pad(hours);
+            document.getElementById('promo-minutes').textContent = pad(minutes);
+            document.getElementById('promo-seconds').textContent = pad(seconds);
+        }
+
+        function startJulyPromoCountdown() {
+            updateJulyPromoCountdown();
+            if (julyPromoCountdownInterval) clearInterval(julyPromoCountdownInterval);
+            julyPromoCountdownInterval = setInterval(updateJulyPromoCountdown, 1000);
+        }
 
         function openPriceModal(options = {}) {
             const titleEl = document.getElementById('price-modal-title');
@@ -3613,12 +3572,17 @@ if (isLockedResponse(data)) {
             const pbuttons = document.querySelectorAll('.price-btn');
             pbuttons.forEach(btn => btn.classList.remove('active'));
             
+            startJulyPromoCountdown();
             document.getElementById('price-modal').style.display = 'flex';
         }
 
         function closePriceModal() {
             const titleEl = document.getElementById('price-modal-title');
             if (titleEl) titleEl.textContent = '💰 Chọn gói nạp tiền';
+            if (julyPromoCountdownInterval) {
+                clearInterval(julyPromoCountdownInterval);
+                julyPromoCountdownInterval = null;
+            }
             document.getElementById('price-modal').style.display = 'none';
         }
 
@@ -4083,10 +4047,6 @@ if (isLockedResponse(data)) {
                 try {
                      const res = await fetch('/api/session/heartbeat', { method: 'POST' });
                      const data = await res.json();
-                     if (isSessionReplacedResponse(data)) {
-                         handleSessionReplacedAccount(data);
-                         return;
-                     }
 if (isLockedResponse(data)) {
                          handleLockedAccount(data);
                          return;
@@ -4188,10 +4148,6 @@ if (isLockedResponse(data)) {
                     body: JSON.stringify({ deviceId: 'desktop-webview', appVersion: '1.0.0' })
                 });
                 const data = await res.json();
-                if (isSessionReplacedResponse(data)) {
-                    handleSessionReplacedAccount(data);
-                    return;
-                }
 if (isLockedResponse(data)) {
                     handleLockedAccount(data);
                     return;

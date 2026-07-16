@@ -1,11 +1,10 @@
-import os
+﻿import os
 import time
 import json
 import threading
 import subprocess
 import sys
 import uuid
-import platform
 
 # Load configuration and initialize LLM API base URLs in environment variables
 CONFIG_PATH = 'config.json'
@@ -297,6 +296,11 @@ def register():
     data = request.get_json(silent=True) or {}
     res_data, status_code = call_central_api('/api/auth/register', method='POST', data=data)
     if status_code in (200, 201) and res_data.get('success'):
+        if not res_data.get('requiresVerification'):
+            return jsonify({
+                'success': False,
+                'error': 'Backend đăng ký hiện tại chưa bật xác thực email. Vui lòng kiểm tra central_api_url trong config.json và restart app.'
+            }), 502
         # Registration must not log the user into the desktop app automatically.
         # The central API may return a token, but this client requires an
         # explicit login step so the next screen is always /login.
@@ -323,10 +327,7 @@ def login():
         # Authenticate via central API
         res_data, status_code = call_central_api('/api/auth/login', method='POST', data={
             'username': username,
-            'password': password,
-            'deviceId': config.get('desktop_device_id'),
-            'deviceName': platform.node() or os.environ.get('COMPUTERNAME') or 'Desktop',
-            'appVersion': '1.0.0'
+            'password': password
         })
 
         if status_code == 200 and res_data.get('success'):
@@ -335,34 +336,11 @@ def login():
             session['username'] = res_data.get('username')
             session.permanent = True
             return jsonify({'success': True})
-        if status_code == 202 and res_data.get('status') == 'login_pending':
-            return jsonify(res_data), 202
         return jsonify({'success': False, 'error': res_data.get('error') or 'TÃ i khoáº£n hoáº·c máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c.'}), status_code
     if session.get('logged_in'):
         return redirect(url_for('index'))
     return render_template('login.html')
 
-@app.route('/login-request/status', methods=['POST'])
-def login_request_status():
-    data = request.get_json(silent=True) or {}
-    res_data, status_code = call_central_api('/api/auth/login-request/status', method='POST', data=data)
-    if status_code == 200 and res_data.get('success') and res_data.get('token'):
-        session['logged_in'] = True
-        session['auth_token'] = res_data.get('token')
-        session['username'] = res_data.get('username')
-        session.permanent = True
-    return jsonify(res_data), status_code
-
-@app.route('/api/login-request/decision', methods=['POST'])
-def login_request_decision():
-    auth_token = session.get('auth_token')
-    if not auth_token:
-        return jsonify({'success': False, 'error': 'YÃªu cáº§u Ä‘Äƒng nháº­p.'}), 401
-    data = request.get_json(silent=True) or {}
-    res_data, status_code = call_central_api('/api/auth/login-request/decision', method='POST', data=data, token=auth_token)
-    if res_data.get('action') == 'force_logout':
-        session.clear()
-    return jsonify(res_data), status_code
 @app.route('/logout')
 def logout():
     # End session on central API if active
@@ -400,7 +378,7 @@ def session_heartbeat():
         
     res_data, status_code = call_central_api('/api/billing/session/heartbeat', method='POST', data={'sessionId': session_id}, token=auth_token)
     # If expired, clear session_id
-    if res_data.get('status') in ('expired', 'ended', 'stopped', 'locked', 'session_replaced') or res_data.get('action') in ('stop_live', 'force_logout'):
+    if res_data.get('status') in ('expired', 'ended', 'stopped', 'locked') or res_data.get('action') in ('stop_live', 'force_logout'):
         session.pop('session_id', None)
     clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
