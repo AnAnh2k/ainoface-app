@@ -1684,14 +1684,6 @@
                 
                 <!-- Quick select grid -->
                 <div class="price-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
-                    <button type="button" class="price-btn" id="pbtn-10000" onclick="selectPrice(10000)">
-                        <strong>10.000 đ</strong><br/>
-                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-10k">--</span>
-                    </button>
-                    <button type="button" class="price-btn" id="pbtn-20000" onclick="selectPrice(20000)">
-                        <strong>20.000 đ</strong><br/>
-                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-20k">--</span>
-                    </button>
                     <button type="button" class="price-btn" id="pbtn-50000" onclick="selectPrice(50000)">
                         <strong>50.000 đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-50k">--</span>
@@ -1717,8 +1709,8 @@
                 </div>
 
                 <div style="margin-bottom: 15px;">
-                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 5px;">Hoặc nhập số tiền mong muốn (tối thiểu 10.000đ):</label>
-                    <input type="number" id="custom-price-input" placeholder="Ví dụ: 15000" oninput="calculateCustomHours()" style="width: 100%; height: 38px; padding: 0 10px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #fff; box-sizing: border-box;" />
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 5px;">Hoặc nhập số tiền mong muốn (tối thiểu 50.000đ):</label>
+                    <input type="number" id="custom-price-input" placeholder="Ví dụ: 50000" oninput="calculateCustomHours()" style="width: 100%; height: 38px; padding: 0 10px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #fff; box-sizing: border-box;" />
                     <span id="custom-price-hours-desc" style="font-size: 11px; color: var(--primary); display: block; margin-top: 5px; font-weight: 500;"></span>
                 </div>
             </div>
@@ -1936,15 +1928,18 @@
     <div id="locked-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Tài khoản bị khóa</h3>
+                <h3 id="force-logout-modal-title">Tài khoản bị khóa</h3>
             </div>
             <div class="modal-body" style="text-align: center; padding: 18px 0;">
-                <p style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
+                <p id="force-logout-modal-message" style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
                     Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.
+                </p>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 12px 0 0;">
+                    Hệ thống sẽ tự động đăng xuất sau <span id="force-logout-countdown">10</span> giây.
                 </p>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
-                <button type="button" class="btn-red" onclick="logoutLockedAccount()" style="width: 100%; height: 38px; border-radius: 8px;">Đăng xuất</button>
+                <button id="force-logout-button" type="button" class="btn-red" onclick="logoutForcedAccount()" style="width: 100%; height: 38px; border-radius: 8px;">Đăng xuất (10)</button>
             </div>
         </div>
     </div>
@@ -2983,6 +2978,9 @@
         let sessionElapsedInterval = null;
         let noBalanceMode = false;
         let expiredModalVisible = false;
+        let forceLogoutTimer = null;
+        let forceLogoutRemainingSeconds = 10;
+        let forceLogoutModalVisible = false;
 
         function formatSecondsToHHMMSS(totalSeconds) {
             if (totalSeconds <= 0) return '00:00:00';
@@ -3140,15 +3138,60 @@
             return data && (data.status === 'locked' || (data.action === 'force_logout' && !isSessionReplacedResponse(data)));
         }
 
-        function logoutLockedAccount() {
+        function logoutForcedAccount() {
             window.location.href = '/logout';
+        }
+
+        function logoutLockedAccount() {
+            logoutForcedAccount();
         }
 
         function logoutSessionReplacedAccount() {
-            window.location.href = '/logout';
+            logoutForcedAccount();
+        }
+
+        function updateForceLogoutCountdown() {
+            const countdownEl = document.getElementById('force-logout-countdown');
+            const buttonEl = document.getElementById('force-logout-button');
+            if (countdownEl) countdownEl.textContent = forceLogoutRemainingSeconds;
+            if (buttonEl) buttonEl.textContent = `Đăng xuất (${forceLogoutRemainingSeconds})`;
+        }
+
+        function showForceLogoutModal(options) {
+            if (forceLogoutModalVisible) return;
+            forceLogoutModalVisible = true;
+
+            if (profilePollingInterval) {
+                clearInterval(profilePollingInterval);
+                profilePollingInterval = null;
+            }
+
+            const titleEl = document.getElementById('force-logout-modal-title');
+            const messageEl = document.getElementById('force-logout-modal-message');
+            if (titleEl) titleEl.textContent = options.title;
+            if (messageEl) messageEl.textContent = options.message;
+
+            document.getElementById('qr-modal').style.display = 'none';
+            document.getElementById('session-replaced-modal').style.display = 'none';
+            document.getElementById('locked-modal').style.display = 'flex';
+
+            forceLogoutRemainingSeconds = 10;
+            updateForceLogoutCountdown();
+            if (forceLogoutTimer) clearInterval(forceLogoutTimer);
+            forceLogoutTimer = setInterval(() => {
+                forceLogoutRemainingSeconds -= 1;
+                if (forceLogoutRemainingSeconds <= 0) {
+                    clearInterval(forceLogoutTimer);
+                    forceLogoutTimer = null;
+                    logoutForcedAccount();
+                    return;
+                }
+                updateForceLogoutCountdown();
+            }, 1000);
         }
 
         function handleSessionReplacedAccount(data) {
+            if (forceLogoutModalVisible) return;
             speechQueue.stop();
             stopBillingHeartbeat();
             stopTopTimer();
@@ -3177,11 +3220,13 @@
             systemTiktokBadge.textContent = 'OFF';
             systemTiktokBadge.className = 'status-badge off';
             status.className = 'error';
-            status.textContent = (data && (data.message || data.error)) || 'T\u00E0i kho\u1EA3n n\u00E0y \u0111\u00E3 \u0111\u0103ng nh\u1EADp \u1EDF thi\u1EBFt b\u1ECB kh\u00E1c. Phi\u00EAn hi\u1EC7n t\u1EA1i \u0111\u00E3 b\u1ECB \u0111\u0103ng xu\u1EA5t.';
+            const message = (data && (data.message || data.error)) || 'T\u00E0i kho\u1EA3n n\u00E0y \u0111\u00E3 \u0111\u0103ng nh\u1EADp \u1EDF thi\u1EBFt b\u1ECB kh\u00E1c. Phi\u00EAn hi\u1EC7n t\u1EA1i \u0111\u00E3 b\u1ECB \u0111\u0103ng xu\u1EA5t.';
+            status.textContent = message;
             setBillingSessionStatus('\u0110\u00E3 \u0111\u0103ng xu\u1EA5t', 'var(--danger)');
-            document.getElementById('qr-modal').style.display = 'none';
-            document.getElementById('locked-modal').style.display = 'none';
-            document.getElementById('session-replaced-modal').style.display = 'flex';
+            showForceLogoutModal({
+                title: '\u0110\u0103ng nh\u1EADp \u1EDF thi\u1EBFt b\u1ECB kh\u00E1c',
+                message
+            });
         }
 
         function handleLockedAccount(data) {
@@ -3215,10 +3260,13 @@
             systemTiktokBadge.textContent = 'OFF';
             systemTiktokBadge.className = 'status-badge off';
             status.className = 'error';
-            status.textContent = (data && (data.message || data.error)) || 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.';
+            const message = (data && (data.message || data.error)) || 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.';
+            status.textContent = message;
             setBillingSessionStatus('Tài khoản bị khóa', 'var(--danger)');
-            document.getElementById('qr-modal').style.display = 'none';
-            document.getElementById('locked-modal').style.display = 'flex';
+            showForceLogoutModal({
+                title: 'Tài khoản bị khóa',
+                message
+            });
         }
 
         async function checkActivePendingInvoice() {
@@ -3372,7 +3420,7 @@ if (isLockedResponse(data)) {
 
         function startProfilePolling() {
             if (profilePollingInterval) clearInterval(profilePollingInterval);
-            profilePollingInterval = setInterval(loadUserProfile, 10000);
+            profilePollingInterval = setInterval(loadUserProfile, 2000);
         }
 
         let currentSelectedAmount = null;
@@ -3389,8 +3437,8 @@ if (isLockedResponse(data)) {
             document.getElementById('price-modal-rate').textContent = rate.toLocaleString('vi-VN') + ' đ/giờ';
             
             // Cập nhật số giờ quy đổi hiển thị trong các nút chọn nhanh
-            const amounts = [10000, 20000, 50000, 100000, 200000, 500000, 1000000];
-            const ids = ['10k', '20k', '50k', '100k', '200k', '500k', '1m'];
+            const amounts = [50000, 100000, 200000, 500000, 1000000];
+            const ids = ['50k', '100k', '200k', '500k', '1m'];
             
             amounts.forEach((amt, idx) => {
                 const hours = Math.floor(amt / rate);
@@ -3434,6 +3482,41 @@ if (isLockedResponse(data)) {
             if (activeBtn) activeBtn.classList.add('active');
         }
 
+        function getPayosQrImageUrl(qrCode) {
+            if (!qrCode) return '';
+            return 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(qrCode);
+        }
+
+        function applyInvoicePaymentToQrModal(invoice, profile = {}) {
+            const bankDetails = profile.bankDetails || {};
+            const isPayos = invoice.paymentProvider === 'payos' || invoice.payosQrCode || invoice.payosCheckoutUrl;
+            const qrImage = document.getElementById('qr-image');
+
+            document.getElementById('modal-rate').textContent = invoice.hourlyRateSnapshot ? invoice.hourlyRateSnapshot.toLocaleString('vi-VN') + ' ?/gi?' : (profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' ?/gi?' : '10.000 ?/gi?');
+            document.getElementById('modal-bank-name').textContent = isPayos ? 'payOS' : (bankDetails.bankName || '--');
+            document.getElementById('modal-bank-acc').textContent = isPayos ? (invoice.payosOrderCode || '--') : (bankDetails.accountNumber || '--');
+            document.getElementById('modal-bank-owner').textContent = isPayos ? 'S-Live Auto Topup' : (bankDetails.accountName || '--');
+            document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
+            document.getElementById('modal-bank-memo').textContent = isPayos ? (invoice.transferContent || invoice.code) : invoice.transferContent;
+
+            if (isPayos && invoice.payosQrCode) {
+                qrImage.src = getPayosQrImageUrl(invoice.payosQrCode);
+                qrImage.style.display = 'block';
+            } else if (!isPayos && bankDetails.accountNumber) {
+                const qrUrl = `https://api.vietqr.io/image/970422-${bankDetails.accountNumber}-qr_only.jpg?accountName=${encodeURIComponent(bankDetails.accountName)}&amount=${invoice.amountVnd}&addInfo=${encodeURIComponent(invoice.transferContent)}`;
+                qrImage.src = qrUrl;
+                qrImage.style.display = 'block';
+            } else {
+                qrImage.removeAttribute('src');
+                qrImage.style.display = 'none';
+            }
+
+            const msg = document.getElementById('polling-status-msg');
+            if (msg && isPayos && invoice.payosCheckoutUrl) {
+                msg.innerHTML = '\uD83D\uDD52 \u0110ang ch\u1EDD thanh to\u00E1n payOS... <a href="' + invoice.payosCheckoutUrl + '" target="_blank" style="color: var(--primary); font-weight: 700;">M\u1EDF trang thanh to\u00E1n</a>';
+            }
+        }
+
         function calculateCustomHours() {
             const val = document.getElementById('custom-price-input').value;
             const descEl = document.getElementById('custom-price-hours-desc');
@@ -3466,8 +3549,8 @@ if (isLockedResponse(data)) {
         }
 
         async function confirmPriceSelection() {
-            if (!currentSelectedAmount || currentSelectedAmount < 10000) {
-                showAppAlert('Cảnh báo', 'Vui lòng chọn hoặc nhập số tiền nạp tối thiểu 10.000 VNĐ.');
+            if (!currentSelectedAmount || currentSelectedAmount < 50000) {
+                showAppAlert('Cảnh báo', 'Vui lòng chọn hoặc nhập số tiền nạp tối thiểu 50.000 VNĐ.');
                 return;
             }
             
@@ -3743,24 +3826,7 @@ if (isLockedResponse(data)) {
             if (btnExecute) btnExecute.disabled = false;
 
             const profile = userProfileData || {};
-            const bankDetails = profile.bankDetails || {};
-            
-            document.getElementById('modal-rate').textContent = invoice.hourlyRateSnapshot ? invoice.hourlyRateSnapshot.toLocaleString('vi-VN') + ' đ/giờ' : (profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '10.000 đ/giờ');
-            document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
-            document.getElementById('modal-bank-acc').textContent = bankDetails.accountNumber || '--';
-            document.getElementById('modal-bank-owner').textContent = bankDetails.accountName || '--';
-            document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
-            document.getElementById('modal-bank-memo').textContent = invoice.transferContent;
-            
-            const qrImage = document.getElementById('qr-image');
-            if (bankDetails.accountNumber) {
-                const qrUrl = `https://api.vietqr.io/image/970422-${bankDetails.accountNumber}-qr_only.jpg?accountName=${encodeURIComponent(bankDetails.accountName)}&amount=${invoice.amountVnd}&addInfo=${encodeURIComponent(invoice.transferContent)}`;
-                qrImage.src = qrUrl;
-                qrImage.style.display = 'block';
-            } else {
-                qrImage.removeAttribute('src');
-                qrImage.style.display = 'none';
-            }
+            applyInvoicePaymentToQrModal(invoice, profile);
             
             document.getElementById('qr-loading-spinner').style.display = 'none';
             document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ bạn chuyển khoản...';
