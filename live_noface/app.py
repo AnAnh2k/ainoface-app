@@ -5,6 +5,7 @@ import threading
 import subprocess
 import sys
 import uuid
+import platform
 
 # Load configuration and initialize LLM API base URLs in environment variables
 CONFIG_PATH = 'config.json'
@@ -266,7 +267,7 @@ def live_stats_snapshot():
 def require_login():
     if request.endpoint == 'static':
         return
-    if request.path in ('/login', '/logout', '/register'):
+    if request.path in ('/login', '/logout', '/register', '/verify-registration'):
         return
     if request.path in ('/human', '/live-event'):
         # Allow TikTok Live local listener process to call /human
@@ -295,10 +296,19 @@ def set_unread_count():
 def register():
     data = request.get_json(silent=True) or {}
     res_data, status_code = call_central_api('/api/auth/register', method='POST', data=data)
-    if status_code == 201 and res_data.get('success'):
+    if status_code in (200, 201) and res_data.get('success'):
         # Registration must not log the user into the desktop app automatically.
         # The central API may return a token, but this client requires an
         # explicit login step so the next screen is always /login.
+        session.clear()
+        res_data.pop('token', None)
+    return jsonify(res_data), status_code
+
+@app.route('/verify-registration', methods=['POST'])
+def verify_registration():
+    data = request.get_json(silent=True) or {}
+    res_data, status_code = call_central_api('/api/auth/verify-registration', method='POST', data=data)
+    if status_code == 201 and res_data.get('success'):
         session.clear()
         res_data.pop('token', None)
     return jsonify(res_data), status_code
@@ -315,22 +325,44 @@ def login():
             'username': username,
             'password': password,
             'deviceId': config.get('desktop_device_id'),
+            'deviceName': platform.node() or os.environ.get('COMPUTERNAME') or 'Desktop',
             'appVersion': '1.0.0'
         })
-        
+
         if status_code == 200 and res_data.get('success'):
             session['logged_in'] = True
             session['auth_token'] = res_data.get('token')
             session['username'] = res_data.get('username')
             session.permanent = True
             return jsonify({'success': True})
-        else:
-            return jsonify({'success': False, 'error': res_data.get('error') or 'Tài khoản hoặc mật khẩu không chính xác.'}), status_code
-            
+        if status_code == 202 and res_data.get('status') == 'login_pending':
+            return jsonify(res_data), 202
+        return jsonify({'success': False, 'error': res_data.get('error') or 'TÃ i khoáº£n hoáº·c máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c.'}), status_code
     if session.get('logged_in'):
         return redirect(url_for('index'))
     return render_template('login.html')
 
+@app.route('/login-request/status', methods=['POST'])
+def login_request_status():
+    data = request.get_json(silent=True) or {}
+    res_data, status_code = call_central_api('/api/auth/login-request/status', method='POST', data=data)
+    if status_code == 200 and res_data.get('success') and res_data.get('token'):
+        session['logged_in'] = True
+        session['auth_token'] = res_data.get('token')
+        session['username'] = res_data.get('username')
+        session.permanent = True
+    return jsonify(res_data), status_code
+
+@app.route('/api/login-request/decision', methods=['POST'])
+def login_request_decision():
+    auth_token = session.get('auth_token')
+    if not auth_token:
+        return jsonify({'success': False, 'error': 'YÃªu cáº§u Ä‘Äƒng nháº­p.'}), 401
+    data = request.get_json(silent=True) or {}
+    res_data, status_code = call_central_api('/api/auth/login-request/decision', method='POST', data=data, token=auth_token)
+    if res_data.get('action') == 'force_logout':
+        session.clear()
+    return jsonify(res_data), status_code
 @app.route('/logout')
 def logout():
     # End session on central API if active

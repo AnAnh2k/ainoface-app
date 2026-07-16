@@ -292,8 +292,61 @@
             display: none;
         }
 
-        .register-mode .confirm-password-group {
+        .register-extra-group,
+        .verification-code-group {
+            display: none;
+        }
+
+        .register-mode .confirm-password-group,
+        .register-mode .register-extra-group,
+        .verify-mode .verification-code-group {
             display: block;
+        }
+
+        .verify-mode .register-extra-group,
+        .verify-mode .confirm-password-group {
+            display: none;
+        }
+
+        .verify-mode #username,
+        .verify-mode #password {
+            opacity: 0.55;
+        }
+
+        .login-denied-modal {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(2, 6, 23, 0.72);
+            z-index: 50;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .login-denied-card {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(30, 41, 59, 0.96);
+            border: 1px solid rgba(254, 44, 85, 0.24);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+            text-align: center;
+        }
+
+        .login-denied-card h3 {
+            margin: 0 0 12px;
+            color: #fda4af;
+            font-size: 18px;
+        }
+
+        .login-denied-card p {
+            margin: 0 0 18px;
+            color: #e2e8f0;
+            line-height: 1.5;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -312,6 +365,16 @@
             <div class="form-group">
                 <label for="username" id="username-label">Tài khoản</label>
                 <input type="text" id="username" name="username" placeholder="Nhập tài khoản" required autocomplete="username">
+            </div>
+
+            <div class="form-group register-extra-group" id="email-wrapper">
+                <label for="email">Email xác thực</label>
+                <input type="email" id="email" name="email" placeholder="Nhập email nhận mã xác thực" autocomplete="email">
+            </div>
+
+            <div class="form-group register-extra-group" id="phone-wrapper">
+                <label for="phone">Số điện thoại</label>
+                <input type="tel" id="phone" name="phone" placeholder="Nhập số điện thoại" autocomplete="tel">
             </div>
             
             <div class="form-group">
@@ -334,6 +397,11 @@
                     <input type="password" id="confirm-password" placeholder="Nhập lại mật khẩu">
                 </div>
             </div>
+
+            <div class="form-group verification-code-group" id="verification-code-wrapper">
+                <label for="verification-code">Mã xác thực email</label>
+                <input type="text" id="verification-code" name="verification-code" placeholder="Nhập mã 6 số" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+            </div>
             
             <button type="submit" id="submit-btn">Đăng nhập</button>
         </form>
@@ -343,44 +411,98 @@
         </div>
     </div>
 
+    <div id="login-denied-modal" class="login-denied-modal">
+        <div class="login-denied-card">
+            <h3>Đăng nhập thất bại</h3>
+            <p id="login-denied-message">Thiết bị đang đăng nhập trước đó đã từ chối quyền truy cập của bạn.</p>
+            <button type="button" id="login-denied-ok">Đã hiểu</button>
+        </div>
+    </div>
+
     <script>
         const form = document.getElementById('login-form');
         const errorBox = document.getElementById('error-box');
         const cardContainer = document.getElementById('login-card-container');
         const submitBtn = document.getElementById('submit-btn');
         const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirm-password');
+        const verificationCodeInput = document.getElementById('verification-code');
 
         const tabLogin = document.getElementById('tab-login');
         const tabRegister = document.getElementById('tab-register');
+        const loginDeniedModal = document.getElementById('login-denied-modal');
+        const loginDeniedMessage = document.getElementById('login-denied-message');
+        const loginDeniedOk = document.getElementById('login-denied-ok');
 
         let isRegisterMode = false;
+        let isVerificationMode = false;
+        let pendingLoginPollInterval = null;
+        let isWaitingLoginApproval = false;
+
+        function activateLoginMode(keepUsername = '') {
+            isRegisterMode = false;
+            isVerificationMode = false;
+            tabLogin.classList.add('active');
+            tabRegister.classList.remove('active');
+            cardContainer.classList.remove('register-mode', 'verify-mode');
+            submitBtn.textContent = 'Đăng nhập';
+            confirmPasswordInput.required = false;
+            emailInput.required = false;
+            phoneInput.required = false;
+            verificationCodeInput.required = false;
+            usernameInput.disabled = false;
+            passwordInput.disabled = false;
+            form.reset();
+            usernameInput.value = keepUsername;
+        }
+
+        function activateRegisterMode() {
+            isRegisterMode = true;
+            isVerificationMode = false;
+            tabRegister.classList.add('active');
+            tabLogin.classList.remove('active');
+            cardContainer.classList.add('register-mode');
+            cardContainer.classList.remove('verify-mode');
+            submitBtn.textContent = 'Đăng ký tài khoản';
+            confirmPasswordInput.required = true;
+            emailInput.required = true;
+            phoneInput.required = true;
+            verificationCodeInput.required = false;
+            usernameInput.disabled = false;
+            passwordInput.disabled = false;
+            form.reset();
+        }
+
+        function activateVerificationMode() {
+            isRegisterMode = true;
+            isVerificationMode = true;
+            cardContainer.classList.remove('register-mode');
+            cardContainer.classList.add('verify-mode');
+            submitBtn.textContent = 'Xác thực email';
+            confirmPasswordInput.required = false;
+            emailInput.required = false;
+            phoneInput.required = false;
+            verificationCodeInput.required = true;
+            usernameInput.disabled = true;
+            passwordInput.disabled = true;
+            verificationCodeInput.value = '';
+            verificationCodeInput.focus();
+        }
 
         // Switch to Login Tab
         tabLogin.addEventListener('click', () => {
             if (!isRegisterMode) return;
-            isRegisterMode = false;
-            tabLogin.classList.add('active');
-            tabRegister.classList.remove('active');
-            cardContainer.classList.remove('register-mode');
-            submitBtn.textContent = 'Đăng nhập';
-            confirmPasswordInput.required = false;
             errorBox.style.display = 'none';
-            form.reset();
+            activateLoginMode();
         });
 
         // Switch to Register Tab
         tabRegister.addEventListener('click', () => {
-            if (isRegisterMode) return;
-            isRegisterMode = true;
-            tabRegister.classList.add('active');
-            tabLogin.classList.remove('active');
-            cardContainer.classList.add('register-mode');
-            submitBtn.textContent = 'Đăng ký tài khoản';
-            confirmPasswordInput.required = true;
             errorBox.style.display = 'none';
-            form.reset();
+            activateRegisterMode();
         });
 
         async function readJsonResponse(response) {
@@ -411,6 +533,67 @@
             errorBox.style.display = 'block';
         }
 
+        function showLoginDeniedModal(message) {
+            loginDeniedMessage.textContent = message || 'Thiết bị đang đăng nhập trước đó đã từ chối quyền truy cập của bạn.';
+            loginDeniedModal.style.display = 'flex';
+        }
+
+        loginDeniedOk.addEventListener('click', () => {
+            loginDeniedModal.style.display = 'none';
+        });
+
+        function stopPendingLoginPolling() {
+            if (pendingLoginPollInterval) {
+                clearInterval(pendingLoginPollInterval);
+                pendingLoginPollInterval = null;
+            }
+            isWaitingLoginApproval = false;
+        }
+
+        function startPendingLoginPolling(requestId) {
+            stopPendingLoginPolling();
+            isWaitingLoginApproval = true;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang chờ xác nhận...';
+            showMessage('Tài khoản đang đăng nhập ở thiết bị khác. Đang chờ thiết bị đó xác nhận.', 'success');
+
+            const poll = async () => {
+                try {
+                    const response = await fetch('/login-request/status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ requestId })
+                    });
+                    const data = await readJsonResponse(response);
+                    if (response.ok && data.success && data.token) {
+                        stopPendingLoginPolling();
+                        window.location.href = '/';
+                        return;
+                    }
+                    if (data.status === 'rejected') {
+                        stopPendingLoginPolling();
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Đăng nhập';
+                        showLoginDeniedModal(data.error || 'Đăng nhập thất bại. Người đang đăng nhập trước đó đã từ chối quyền của bạn.');
+                        return;
+                    }
+                    if (data.status === 'expired' || data.status === 'not_found') {
+                        stopPendingLoginPolling();
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Đăng nhập';
+                        showMessage(data.error || 'Yêu cầu đăng nhập đã hết hạn. Vui lòng thử lại.');
+                    }
+                } catch (err) {
+                    stopPendingLoginPolling();
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Đăng nhập';
+                    showMessage('Không kết nối được server khi chờ xác nhận đăng nhập.');
+                }
+            };
+
+            poll();
+            pendingLoginPollInterval = setInterval(poll, 2000);
+        }
         // Check query parameters for error message
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('error')) {
@@ -427,11 +610,51 @@
             const password = passwordInput.value;
 
             if (isRegisterMode) {
+                if (isVerificationMode) {
+                    const code = verificationCodeInput.value.trim();
+                    if (!/^\d{6}$/.test(code)) {
+                        showMessage('Mã xác thực phải gồm 6 số.');
+                        return;
+                    }
+
+                    try {
+                        submitBtn.disabled = true;
+                        submitBtn.textContent = 'Đang xác thực...';
+                        const response = await fetch('/verify-registration', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email: emailInput.value.trim(), code })
+                        });
+
+                        const data = await readJsonResponse(response);
+                        if (response.ok && data.success) {
+                            activateLoginMode(username);
+                            showMessage(data.message || 'Xác thực email thành công. Vui lòng đăng nhập.', 'success');
+                            passwordInput.focus();
+                        } else {
+                            showMessage(data.error || 'Xác thực email thất bại.');
+                        }
+                    } catch (err) {
+                        showMessage('Không kết nối được server. Vui lòng kiểm tra backend.');
+                    } finally {
+                        submitBtn.disabled = false;
+                        if (isVerificationMode) {
+                            submitBtn.textContent = 'Xác thực email';
+                        }
+                    }
+                    return;
+                }
+
                 const confirmPassword = confirmPasswordInput.value;
                 if (password !== confirmPassword) {
-                    errorBox.textContent = 'Mật khẩu xác nhận không khớp.';
-                    errorBox.className = 'error-message';
-                    errorBox.style.display = 'block';
+                    showMessage('Mật khẩu xác nhận không khớp.');
+                    return;
+                }
+
+                const email = emailInput.value.trim();
+                const phone = phoneInput.value.trim();
+                if (!email || !phone) {
+                    showMessage('Vui lòng nhập email và số điện thoại.');
                     return;
                 }
 
@@ -441,23 +664,14 @@
                     const response = await fetch('/register', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username, password })
+                        body: JSON.stringify({ username, password, email, phone })
                     });
 
                     const data = await readJsonResponse(response);
                     if (response.ok && data.success) {
-                        // Registration success: require an explicit login before entering the app.
-                        isRegisterMode = false;
-                        tabLogin.classList.add('active');
-                        tabRegister.classList.remove('active');
-                        cardContainer.classList.remove('register-mode');
-                        submitBtn.textContent = 'Đăng nhập';
-                        confirmPasswordInput.required = false;
-                        form.reset();
-                        
-                        usernameInput.value = username;
-                        showMessage(data.message || 'Đăng ký thành công! Vui lòng đăng nhập lại.', 'success');
-                        passwordInput.focus();
+                        activateVerificationMode();
+                        const devCodeNote = data.devVerificationCode ? ` Mã test local: ${data.devVerificationCode}` : '';
+                        showMessage((data.message || 'Mã xác thực đã được gửi đến email.') + devCodeNote, 'success');
                     } else {
                         showMessage(data.error || 'Đăng ký tài khoản thất bại.');
                     }
@@ -465,7 +679,9 @@
                     showMessage('Không kết nối được server. Vui lòng kiểm tra backend.');
                 } finally {
                     submitBtn.disabled = false;
-                    if (isRegisterMode) {
+                    if (isVerificationMode) {
+                        submitBtn.textContent = 'Xác thực email';
+                    } else if (isRegisterMode) {
                         submitBtn.textContent = 'Đăng ký tài khoản';
                     }
                 }
@@ -482,22 +698,24 @@
                     const data = await readJsonResponse(response);
                     if (response.ok && data.success) {
                         window.location.href = '/';
+                    } else if (response.status === 202 && data.status === 'login_pending' && data.requestId) {
+                        startPendingLoginPolling(data.requestId);
                     } else {
                         showMessage(data.error || 'Sai tài khoản hoặc mật khẩu.');
                         errorBox.style.animation = 'none';
                         errorBox.offsetHeight; /* trigger reflow */
                         errorBox.style.animation = null;
-                    }
-                } catch (err) {
+                    }                } catch (err) {
                     showMessage('Không kết nối được server. Vui lòng kiểm tra backend.');
                 } finally {
-                    submitBtn.disabled = false;
-                    if (!isRegisterMode) {
-                        submitBtn.textContent = 'Đăng nhập';
+                    if (!isWaitingLoginApproval) {
+                        submitBtn.disabled = false;
+                        if (!isRegisterMode) {
+                            submitBtn.textContent = 'Đăng nhập';
+                        }
                     }
                 }
-            }
-        });
+            }        });
 
         // Show/Hide Password Toggle JS
         const togglePassword = document.getElementById('toggle-password');
