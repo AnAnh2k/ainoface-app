@@ -428,6 +428,14 @@ def stream():
     if not prompt:
         return 'Prompt không được để trống.', 400
 
+    # Save prompt to live_prompt.txt
+    try:
+        prompt_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'live_prompt.txt')
+        with open(prompt_file, 'w', encoding='utf-8') as f:
+            f.write(prompt)
+    except Exception as e:
+        print(f"WARN: Failed to save prompt to live_prompt.txt: {e}")
+
     quit_event = threading.Event()
     sentence_queue = Queue()
 
@@ -690,6 +698,16 @@ def start_live():
     if not room:
         return jsonify({'success': False, 'error': 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.'}), 400
     reset_live_stats(username=room, connected=False)
+
+    # Save prompt to live_prompt.txt if provided in start-live payload
+    prompt = payload.get('prompt', '').strip()
+    if prompt:
+        try:
+            prompt_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'live_prompt.txt')
+            with open(prompt_file, 'w', encoding='utf-8') as f:
+                f.write(prompt)
+        except Exception as e:
+            print(f"WARN: Failed to save prompt during start-live: {e}")
 
     # Load configuration dynamically from config.json before starting subprocess
     llm_url = DEFAULT_LLM_URL

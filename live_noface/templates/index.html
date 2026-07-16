@@ -3999,10 +3999,23 @@
             }
             status.textContent = '';
             applyTikTokUiState('connecting');
+
+            // Lấy prompt hiện tại để đồng bộ sang live.py
+            const promptVal = document.getElementById('prompt').value.trim();
+            const selectEls = document.querySelectorAll('.system-prompt-selectors select');
+            let fullPrompt = promptVal;
+            if (promptVal && selectEls.length >= 4) {
+                const vaiTro = selectEls[0].value;
+                const phongCach = selectEls[1].value;
+                const mucTieu = selectEls[2].value;
+                const nganhHang = selectEls[3].value;
+                fullPrompt = `Viết kịch bản livestream.\n- Chủ đề: ${promptVal}\n- Vai trò: ${vaiTro}\n- Phong cách: ${phongCach}\n- Mục tiêu: ${mucTieu}\n- Ngành hàng: ${nganhHang}`;
+            }
+
             fetch('/start-live', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ room: user })
+                body: JSON.stringify({ room: user, prompt: fullPrompt })
             })
                 .then(parseResponse)
                 .then(({ ok, body, text }) => {

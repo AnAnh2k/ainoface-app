@@ -4,6 +4,8 @@ import os
 import sys
 import json
 import re
+import random
+
 
 # Force sys.stdout and sys.stderr to UTF-8 with character replacement on Windows
 if hasattr(sys.stdout, 'reconfigure'):
@@ -55,7 +57,7 @@ else:
     unique_id = '@' + unique_id
 client: TikTokLiveClient = TikTokLiveClient(unique_id=unique_id)
 client_llm = OpenAI(
-    api_key=os.getenv('OLLAMA_API_KEY', 'ollama'),
+    api_key=os.getenv('LIVE_LLM_API_KEY', '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'),
     base_url=OLLAMA_BASE_URL,
 )
 
@@ -146,10 +148,17 @@ def _clean_comment_reply(text: str, user_name: str) -> str:
         for part in name_parts:
             text = re.sub(r'\b' + re.escape(part) + r'\b[,.:!?-]?\s*', '', text, flags=re.IGNORECASE).strip()
     text = re.sub(r'\b(xin lỗi|xin loi|tôi xin lỗi|toi xin loi|rất xin lỗi|rat xin loi)\b[^,.:!?]*[,.:!?]?\s*', '', text, flags=re.IGNORECASE).strip()
-    text = re.sub(r'^(chào|hello|hi)\s+' + re.escape(user_name) + r'\s*[,.:!?]?\s*', '', text, flags=re.IGNORECASE).strip()
-    text = re.sub(r'^(chào|hello|hi)\b\s*(chào|hello|hi)?\b\s*', '', text, flags=re.IGNORECASE).strip()
-    text = re.sub(r'\b(chào|hello|hi)\b[,.:!?]?\s*', '', text, flags=re.IGNORECASE).strip()
+    text = re.sub(r'^(xin\s+)?(chào|hello|hi|chao)\s+' + re.escape(user_name) + r'\s*[,.:!?]?\s*', '', text, flags=re.IGNORECASE).strip()
+    text = re.sub(r'^(xin\s+)?(chào|hello|hi|chao)\b(\s+(bạn|quý khách|khách|moi nguoi|mọi người|anh|chị|em|ban|quy khach|khach|cả nhà|ca nha))?\b\s*[,.:!?-]?\s*', '', text, flags=re.IGNORECASE).strip()
     text = re.sub(r'\b(tôi là|toi la|mình là|minh la|của tôi|cua toi|của mình|cua minh)\b[^,.:!?]*[,.:!?]?\s*', '', text, flags=re.IGNORECASE).strip()
+    
+    # Strip unwanted prefix role labels like "Bạn:", "Shop!", "AI -", "Xin bạn!" repeatedly
+    while True:
+        new_text = re.sub(r'^(xin\s+)?(bạn|shop|ai|trợ lý|tro ly)\b\s*[:!?-]?\s*', '', text, flags=re.IGNORECASE).strip()
+        if new_text == text:
+            break
+        text = new_text
+
     text = re.sub(r'`+', ' ', text)
     text = re.sub(r'\s+', ' ', text).strip()
     return text
@@ -179,37 +188,6 @@ def _enforce_comment_response(user_name: str, llm_response: str, comment_text: s
         return f'{greeting}. {intro_core} {cta}'
 
     return f'{greeting}. {cta}'
-
-
-def _build_grounded_comment_reply(user_name: str, comment_text: str) -> str:
-    text = _sanitize_tts_text(comment_text).lower()
-
-    if any(keyword in text for keyword in ['giá', 'gia', 'bao nhiêu', 'bao nhieu', 'cost', 'price']):
-        return (
-            f'Chào {user_name}. Sản phẩm của chúng tôi đang có giá rất tốt. '
-            'Bạn inbox để được báo giá chi tiết nhé.'
-        )
-
-    if any(keyword in text for keyword in ['ưu đãi', 'uu dai', 'khuyến mãi', 'khuyen mai', 'giảm', 'giam', 'sale', 'deal']):
-        return (
-            f'Chào {user_name}. Hôm nay shop đang có chương trình ưu đãi cực tốt. '
-            'Bạn inbox ngay để nhận ưu đãi nhé.'
-        )
-
-    if any(keyword in text for keyword in ['chức năng', 'chuc nang', 'làm gì', 'lam gi', 'công dụng', 'cong dung', 'sản phẩm', 'san pham', 'tư vấn', 'tu van']):
-        return (
-            f'Chào {user_name}. Sản phẩm của shop chất lượng cao, được nhiều khách hàng tin dùng. '
-            'Bạn inbox để được tư vấn chi tiết nhé.'
-        )
-
-    if any(keyword in text for keyword in ['hello', 'hi', 'xin chào', 'xin chao', 'chào', 'chao', 'alo', 'hey']):
-        return (
-            f'Chào {user_name}. Cảm ơn bạn đã ghé thăm livestream. '
-            'Bạn inbox để được tư vấn nhé.'
-        )
-
-    return ''
-
 
 def send_to_tts(text: str, sessionid: str = 'current', event: bool = False, priority: int | bool = None) -> bool:
     """Send text to LiveTalking app via /human endpoint for TTS."""
@@ -246,20 +224,33 @@ def send_to_tts(text: str, sessionid: str = 'current', event: bool = False, prio
 
 
 def generate_live_response(user_name: str, event_text: str, event_type: str = 'comment') -> str:
-    """Generate a Vietnamese response for TikTok comment or gift."""
+    """Generate a Vietnamese response for TikTok comment."""
     try:
         current_llm_url = os.getenv('LLM_API_BASE_URL') or os.getenv('OLLAMA_BASE_URL', _get_default_llm_url())
-        if event_type == 'gift':
-            system_prompt = (
-                'Bạn là trợ lý bán hàng livestream trên TikTok. '
-                'Khi có người tặng quà, hãy cảm ơn ngắn gọn bằng tiếng Việt, ấm áp, tự nhiên, không emoji, không ký tự đặc biệt. '
-                'Có thể mời họ xem sản phẩm đang bán trên livestream.'
+        
+        # Read custom prompt from live_prompt.txt dynamically
+        custom_prompt = ""
+        try:
+            prompt_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'live_prompt.txt')
+            if os.path.exists(prompt_path):
+                with open(prompt_path, 'r', encoding='utf-8') as f:
+                    custom_prompt = f.read().strip()
+        except Exception as e:
+            print(f"WARN: Could not read live_prompt.txt: {e}")
+
+        if custom_prompt:
+            system_prompt = "Bạn là trợ lý ảo hỗ trợ livestream trên TikTok. Hãy trả lời câu hỏi/bình luận của khách hàng dựa trên thông tin kịch bản/chủ đề được cung cấp."
+            user_message = (
+                f"Thông tin kịch bản/chủ đề livestream:\n{custom_prompt}\n\n"
+                f"Bình luận từ khách hàng: {event_text}\n\n"
+                f"Nhiệm vụ: Hãy trả lời bình luận này một cách tự nhiên, ngắn gọn dưới 30 từ, bám sát thông tin kịch bản trên. "
+                f"Hãy sử dụng từ ngữ sinh động, diễn đạt đa dạng và tránh lặp lại các mẫu câu rập khuôn giữa các câu trả lời. "
+                f"Nếu kịch bản không có thông tin hoặc không đủ thông tin để trả lời bình luận, hãy khéo léo hướng dẫn khách hàng nhắn tin (inbox) cho shop để được tư vấn chi tiết."
             )
-            user_message = f'Người dùng {user_name} đã tặng: {event_text}. Hãy cảm ơn họ thật ngắn gọn.'
         else:
             system_prompt = (
                 'Bạn là trợ lý bán hàng livestream trên TikTok. '
-                'Trả lời bình luận bằng tiếng Việt tự nhiên, ngắn gọn dưới 30 từ, thân thiện như đang livestream bán hàng tư vấn. '
+                'Trả lời bình luận bằng tiếng Việt tự nhiên, ngắn gọn dưới 30 từ, thân thiện, dùng diễn đạt đa dạng và tránh lặp lại mẫu câu rập khuôn giữa các câu. '
                 'Nếu người dùng hỏi giá, mời họ inbox để được báo giá chi tiết. '
                 'Nếu người dùng hỏi về sản phẩm, trả lời ngắn gọn và mời inbox để tư vấn thêm. '
                 'Nếu người dùng chào hỏi, chào lại thân thiện và mời xem sản phẩm. '
@@ -268,109 +259,59 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
             )
             user_message = f'Comment từ {user_name}: {event_text}.'
 
-            grounded_reply = _build_grounded_comment_reply(user_name, event_text)
-            if grounded_reply:
-                return grounded_reply
-
-        is_slink = "slink" in current_llm_url or "8080" in current_llm_url
-        if is_slink:
-            generate_url = current_llm_url.rstrip('/')
-            if not generate_url.endswith('/generate'):
-                generate_url = f"{generate_url}/generate"
-            
-            # Construct Slink prompt
-            if event_type == 'gift':
-                prompt_text = f"Người dùng {user_name} đã tặng {event_text}. Hãy viết một câu cảm ơn ngắn gọn, ấm áp bằng tiếng Việt."
-            else:
-                prompt_text = (
-                    f"Bạn là trợ lý bán hàng livestream trên TikTok. "
-                    f"Hãy trả lời bình luận bằng tiếng Việt tự nhiên, cực kỳ ngắn gọn dưới 30 từ, thân thiện.\n"
-                    f"Nếu người dùng hỏi giá, mời họ inbox để báo giá chi tiết.\n"
-                    f"Nếu người dùng hỏi sản phẩm, trả lời ngắn gọn và mời inbox tư vấn.\n\n"
-                    f"Bình luận từ {user_name}: {event_text}\n"
-                    f"Trả lời:"
-                )
-            
-            payload = {"prompt": prompt_text, "interval": 1}
-            with requests.post(generate_url, json=payload, timeout=15) as r:
-                if r.status_code != 200:
-                    raise RuntimeError(f"Slink API error {r.status_code}")
-                
-                extracted_tokens = []
-                for line in r.iter_lines(decode_unicode=True):
-                    if not line:
-                        continue
-                    line_str = line.strip()
-                    if line_str.startswith("data:"):
-                        line_str = line_str[5:].strip()
-                    if not line_str:
-                        continue
-                    try:
-                        data = json.loads(line_str)
-                        if isinstance(data, dict):
-                            val = data.get("response") or data.get("text") or data.get("content")
-                            if val is None and "choices" in data and isinstance(data["choices"], list) and len(data["choices"]) > 0:
-                                choice = data["choices"][0]
-                                if isinstance(choice, dict):
-                                    val = choice.get("text") or (choice.get("delta", {}).get("content") if "delta" in choice else None) or (choice.get("message", {}).get("content") if "message" in choice else None)
-                            if val is not None:
-                                extracted_tokens.append(str(val))
-                            else:
-                                extracted_tokens.append(line_str)
-                        else:
-                            extracted_tokens.append(str(data))
-                    except Exception:
-                        extracted_tokens.append(line_str)
-                
-                # Smart join tokens/sentences
-                response = ""
-                for part in extracted_tokens:
-                    if not response:
-                        response = part
-                    else:
-                        if part.startswith(" ") or part.startswith("\n") or response.endswith(" ") or response.endswith("\n"):
-                            response += part
-                        else:
-                            if (response[-1].isalnum() or response[-1] in ['.', ',', '!', '?', ';', ':']) and part[0].isalnum():
-                                response += " " + part
-                            else:
-                                response += part
-                response = response.strip()
+        llm_url = current_llm_url
+        llm_model = OLLAMA_MODEL
+        llm_api_key = os.getenv('LIVE_LLM_API_KEY', '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')
+        
+        extra_params = {
+            'max_tokens': 48,
+            'temperature': 0.7,
+            'presence_penalty': 0.6,
+            'frequency_penalty': 0.6,
+        }
+        if llm_api_key.startswith(('AQ.', 'AIzaSy')):
+            llm_url = "https://generativelanguage.googleapis.com/v1beta/openai/"
+            llm_model = "gemini-1.5-flash"
+        elif llm_api_key.startswith('sk-'):
+            llm_url = "https://api.openai.com/v1/"
+            llm_model = "gpt-4o-mini"
         else:
-            client_llm.base_url = current_llm_url
-            completion = client_llm.chat.completions.create(
-                model=OLLAMA_MODEL,
-                messages=[
-                    {'role': 'system', 'content': system_prompt},
-                    {'role': 'user', 'content': user_message},
-                ],
-                max_tokens=48,
-                temperature=0.3,
-                extra_body={
-                    'keep_alive': '10m',
-                    'options': {
-                        'num_predict': 48,
-                    },
+            extra_params['extra_body'] = {
+                'keep_alive': '10m',
+                'options': {
+                    'num_predict': 48,
                 },
-            )
-            response = completion.choices[0].message.content.strip()
+            }
+
+        client_llm.base_url = llm_url
+        client_llm.api_key = llm_api_key
+        completion = client_llm.chat.completions.create(
+            model=llm_model,
+            messages=[
+                {'role': 'system', 'content': system_prompt},
+                {'role': 'user', 'content': user_message},
+            ],
+            **extra_params
+        )
+        response = completion.choices[0].message.content.strip()
         if not response:
             raise ValueError('Empty response from LLM')
 
-        if event_type == 'comment':
+        if custom_prompt:
+            cleaned = _clean_comment_reply(response, user_name)
+            cleaned = re.sub(r'^(chào|hello|hi)\b[^,]*,?\s*', '', cleaned, flags=re.IGNORECASE).strip()
+            cleaned = cleaned.lstrip(' ,.-:;')
+            if cleaned:
+                cleaned = cleaned[0].upper() + cleaned[1:]
+            response = f"Chào {user_name}. {cleaned}"
+        else:
             response = _enforce_comment_response(user_name, response, event_text)
-
-        if not response.startswith('Cảm ơn') and event_type == 'gift':
-            response = f'Cảm ơn {user_name}. {response}'
         return response
     except Exception as e:
         print(f'ERROR: LLM generation failed: {e}')
-        if event_type == 'comment':
-            return (
-                f'Chào {user_name}. Cảm ơn bạn đã ghé thăm livestream. '
-                'Bạn inbox để được tư vấn sản phẩm nhé.'
-            )
-        return f'Cảm ơn {user_name} đã ủng hộ livestream của chúng tôi.'
+        return (
+            f'Chào {user_name}. Đã xảy ra lỗi AI: {str(e)}'
+        )
 
 
 @client.on(ConnectEvent)
@@ -415,8 +356,16 @@ async def on_gift(event: GiftEvent) -> None:
     gift_text = f'{gift_name} x{repeat_count}'
     print(f'GIFT: {user_name} sent {gift_text}')
 
-    ai_response = generate_live_response(user_name, gift_text, event_type='gift')
-    print(f'AI Response: {ai_response}')
+    # Chọn ngẫu nhiên 1 trong 5 câu cảm ơn tặng quà khác nhau
+    gift_templates = [
+        f'Cảm ơn {user_name} đã tặng {gift_name} nhé.',
+        f'Ui, cảm ơn {user_name} đã gửi tặng shop {gift_name} nha. Yêu quá!',
+        f'Cảm ơn {user_name} rất nhiều vì đã tặng {gift_name} dễ thương này nha.',
+        f'Cảm ơn món quà {gift_name} từ bạn {user_name} nhé, biết ơn bạn nhiều.',
+        f'Tuyệt vời quá, cảm ơn {user_name} đã gửi tặng shop món quà {gift_name} nhé.'
+    ]
+    ai_response = random.choice(gift_templates)
+    print(f'Gift Response: {ai_response}')
 
     if send_to_tts(ai_response, event=True, priority=0):
         print('✓ Sent to TTS')
@@ -434,7 +383,15 @@ async def on_like(event: LikeEvent) -> None:
     _debug_event_payload('like', event)
     post_live_event('like', count=like_count, viewerCount=_extract_viewer_count(event))
 
-    tts_text = f'Cảm ơn {user_name} đã thả {like_count} tim cho chúng tôi.'
+    # Chọn ngẫu nhiên 1 trong 5 câu cảm ơn thả tim khác nhau
+    like_templates = [
+        f'Cảm ơn {user_name} đã thả {like_count} tim cho chúng tôi.',
+        f'Cảm ơn {user_name} đã thả {like_count} tim ủng hộ shop nha.',
+        f'Yêu quá, cảm ơn {user_name} đã thả {like_count} tim dễ thương nhé.',
+        f'Cảm ơn bạn {user_name} đã nhiệt tình thả {like_count} tim cho live nhé.',
+        f'Thật tuyệt vời, cảm ơn {user_name} đã thả {like_count} tim cho shop.'
+    ]
+    tts_text = random.choice(like_templates)
     if send_to_tts(tts_text, event=True, priority=1):
         print('[OK] Like TTS sent')
     else:
@@ -448,7 +405,15 @@ async def on_follow(event: FollowEvent) -> None:
     user_name = event.user.nickname
     print(f'FOLLOW: {user_name} followed')
 
-    tts_text = f'Chào mừng {user_name} đã theo dõi kênh. Cảm ơn bạn rất nhiều nhé.'
+    # Chọn ngẫu nhiên 1 trong 5 câu chào đón follow mới khác nhau
+    follow_templates = [
+        f'Chào mừng {user_name} đã theo dõi kênh. Cảm ơn bạn rất nhiều nhé.',
+        f'Cảm ơn {user_name} đã bấm theo dõi kênh của shop nha. Chào mừng bạn!',
+        f'Chào mừng {user_name} gia nhập kênh, cảm ơn bạn đã nhấn theo dõi nhé.',
+        f'Cảm ơn bạn {user_name} rất nhiều vì đã nhấn theo dõi kênh ủng hộ shop.',
+        f'Cực kỳ biết ơn {user_name} đã theo dõi kênh của chúng tôi hôm nay.'
+    ]
+    tts_text = random.choice(follow_templates)
     if send_to_tts(tts_text, event=True, priority=0):
         print('[OK] Follow TTS sent')
     else:
