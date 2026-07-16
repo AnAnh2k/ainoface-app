@@ -1631,7 +1631,7 @@
                         <div class="billing-grid">
                             <div class="selector-item" style="margin-bottom: 8px;">
                                 <label>Đơn giá (VND/Giờ)</label>
-                                <input type="number" id="billing-rate-input" class="text-input" value="20000" readonly style="height:32px; font-weight:700; color:var(--primary); font-size:14px;" />
+                                <input type="number" id="billing-rate-input" class="text-input" value="50000" readonly style="height:32px; font-weight:700; color:var(--primary); font-size:14px;" />
                             </div>
 
                             <!-- Orbitron Glowing timer -->
@@ -1685,26 +1685,28 @@
                 <!-- Quick select grid -->
                 <div class="price-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
                     <button type="button" class="price-btn" id="pbtn-50000" onclick="selectPrice(50000)">
-                        <strong>50.000 đ</strong><br/>
+                        <strong>50.000 Đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-50k">--</span>
                     </button>
                     <button type="button" class="price-btn" id="pbtn-100000" onclick="selectPrice(100000)">
-                        <strong>100.000 đ</strong><br/>
+                        <strong>100.000 Đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-100k">--</span>
                     </button>
+                    <button type="button" class="price-btn" id="pbtn-150000" onclick="selectPrice(150000)">
+                        <strong>150.000 Đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-150k">--</span>
+                    </button>
                     <button type="button" class="price-btn" id="pbtn-200000" onclick="selectPrice(200000)">
-                        <strong>200.000 đ</strong><br/>
+                        <strong>200.000 Đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-200k">--</span>
                     </button>
-                    <button type="button" class="price-btn" id="pbtn-500000" onclick="selectPrice(500000)">
-                        <strong>500.000 đ</strong><br/>
-                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-500k">--</span>
+                    <button type="button" class="price-btn" id="pbtn-250000" onclick="selectPrice(250000)">
+                        <strong>250.000 Đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-250k">--</span>
                     </button>
-                    <button type="button" class="price-btn" id="pbtn-1000000" onclick="selectPrice(1000000)" style="grid-column: span 2;">
-                        <div style="text-align: center;">
-                            <strong>1.000.000 đ</strong><br/>
-                            <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-1m">--</span>
-                        </div>
+                    <button type="button" class="price-btn" id="pbtn-500000" onclick="selectPrice(500000)">
+                        <strong>500.000 Đ</strong><br/>
+                        <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-500k">--</span>
                     </button>
                 </div>
 
@@ -3011,7 +3013,7 @@
             const rateInput = document.getElementById('billing-rate-input');
             if (timerEl) timerEl.textContent = formatSecondsToHHMMSS(currentSessionElapsedSeconds);
 
-            const rate = parseFloat(rateInput ? rateInput.value : 0) || (userProfileData && userProfileData.hourlyRateVnd) || 20000;
+            const rate = parseFloat(rateInput ? rateInput.value : 0) || (userProfileData && userProfileData.hourlyRateVnd) || 50000;
             const amount = Math.round((currentSessionElapsedSeconds / 3600) * rate);
             if (amountEl) amountEl.textContent = amount.toLocaleString('vi-VN') + ' đ';
         }
@@ -3432,13 +3434,13 @@ if (isLockedResponse(data)) {
             if (titleEl) titleEl.textContent = options.title || '💰 Chọn gói nạp tiền';
 
             const profile = userProfileData || {};
-            const rate = profile.hourlyRateVnd || 10000;
+            const rate = profile.hourlyRateVnd || 50000;
             
             document.getElementById('price-modal-rate').textContent = rate.toLocaleString('vi-VN') + ' đ/giờ';
             
             // Cập nhật số giờ quy đổi hiển thị trong các nút chọn nhanh
-            const amounts = [50000, 100000, 200000, 500000, 1000000];
-            const ids = ['50k', '100k', '200k', '500k', '1m'];
+            const amounts = [50000, 100000, 150000, 200000, 250000, 500000];
+            const ids = ['50k', '100k', '150k', '200k', '250k', '500k'];
             
             amounts.forEach((amt, idx) => {
                 const hours = Math.floor(amt / rate);
@@ -3482,28 +3484,30 @@ if (isLockedResponse(data)) {
             if (activeBtn) activeBtn.classList.add('active');
         }
 
-        function getPayosQrImageUrl(qrCode) {
-            if (!qrCode) return '';
-            return 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' + encodeURIComponent(qrCode);
+        function buildTransferQrUrl(bankDetails, invoice) {
+            if (!bankDetails || !bankDetails.accountNumber) return '';
+
+            const template = bankDetails.qrTemplateUrl || 'https://api.vietqr.io/image/970422-{accountNumber}-qr_only.jpg?accountName={accountName}&amount={amount}&addInfo={addInfo}';
+            return template
+                .replaceAll('{accountNumber}', encodeURIComponent(bankDetails.accountNumber || ''))
+                .replaceAll('{accountName}', encodeURIComponent(bankDetails.accountName || ''))
+                .replaceAll('{amount}', encodeURIComponent(invoice.amountVnd || 0))
+                .replaceAll('{addInfo}', encodeURIComponent(invoice.transferContent || invoice.code || ''));
         }
 
         function applyInvoicePaymentToQrModal(invoice, profile = {}) {
             const bankDetails = profile.bankDetails || {};
-            const isPayos = invoice.paymentProvider === 'payos' || invoice.payosQrCode || invoice.payosCheckoutUrl;
             const qrImage = document.getElementById('qr-image');
 
-            document.getElementById('modal-rate').textContent = invoice.hourlyRateSnapshot ? invoice.hourlyRateSnapshot.toLocaleString('vi-VN') + ' ?/gi?' : (profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' ?/gi?' : '10.000 ?/gi?');
-            document.getElementById('modal-bank-name').textContent = isPayos ? 'payOS' : (bankDetails.bankName || '--');
-            document.getElementById('modal-bank-acc').textContent = isPayos ? (invoice.payosOrderCode || '--') : (bankDetails.accountNumber || '--');
-            document.getElementById('modal-bank-owner').textContent = isPayos ? 'S-Live Auto Topup' : (bankDetails.accountName || '--');
+            document.getElementById('modal-rate').textContent = invoice.hourlyRateSnapshot ? invoice.hourlyRateSnapshot.toLocaleString('vi-VN') + ' đ/giờ' : (profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '50.000 đ/giờ');
+            document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
+            document.getElementById('modal-bank-acc').textContent = bankDetails.accountNumber || '--';
+            document.getElementById('modal-bank-owner').textContent = bankDetails.accountName || '--';
             document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
-            document.getElementById('modal-bank-memo').textContent = isPayos ? (invoice.transferContent || invoice.code) : invoice.transferContent;
+            document.getElementById('modal-bank-memo').textContent = invoice.transferContent || invoice.code || '--';
 
-            if (isPayos && invoice.payosQrCode) {
-                qrImage.src = getPayosQrImageUrl(invoice.payosQrCode);
-                qrImage.style.display = 'block';
-            } else if (!isPayos && bankDetails.accountNumber) {
-                const qrUrl = `https://api.vietqr.io/image/970422-${bankDetails.accountNumber}-qr_only.jpg?accountName=${encodeURIComponent(bankDetails.accountName)}&amount=${invoice.amountVnd}&addInfo=${encodeURIComponent(invoice.transferContent)}`;
+            const qrUrl = buildTransferQrUrl(bankDetails, invoice);
+            if (qrUrl) {
                 qrImage.src = qrUrl;
                 qrImage.style.display = 'block';
             } else {
@@ -3512,8 +3516,8 @@ if (isLockedResponse(data)) {
             }
 
             const msg = document.getElementById('polling-status-msg');
-            if (msg && isPayos && invoice.payosCheckoutUrl) {
-                msg.innerHTML = '\uD83D\uDD52 \u0110ang ch\u1EDD thanh to\u00E1n payOS... <a href="' + invoice.payosCheckoutUrl + '" target="_blank" style="color: var(--primary); font-weight: 700;">M\u1EDF trang thanh to\u00E1n</a>';
+            if (msg) {
+                msg.textContent = '🕒 Đang chờ SePay xác nhận chuyển khoản...';
             }
         }
 
@@ -3535,7 +3539,7 @@ if (isLockedResponse(data)) {
             currentSelectedAmount = amount;
             
             const profile = userProfileData || {};
-            const rate = profile.hourlyRateVnd || 10000;
+            const rate = profile.hourlyRateVnd || 50000;
             
             const hours = Math.floor(amount / rate);
             const minutes = Math.floor(((amount / rate) % 1) * 60);
@@ -3581,29 +3585,10 @@ if (isLockedResponse(data)) {
                 
                 // Hiển thị thông tin hóa đơn lên QR modal
                 const profile = userProfileData || {};
-                const bankDetails = profile.bankDetails || {};
+                applyInvoicePaymentToQrModal(invoice, profile);
                 
-                document.getElementById('modal-rate').textContent = profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '10.000 đ/giờ';
-                document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
-                document.getElementById('modal-bank-acc').textContent = bankDetails.accountNumber || '--';
-                document.getElementById('modal-bank-owner').textContent = bankDetails.accountName || '--';
-                document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
-                document.getElementById('modal-bank-memo').textContent = invoice.transferContent;
-                
-                // Tải QR Code động
-                const qrImage = document.getElementById('qr-image');
-                if (bankDetails.accountNumber) {
-                    const qrUrl = `https://api.vietqr.io/image/970422-${bankDetails.accountNumber}-qr_only.jpg?accountName=${encodeURIComponent(bankDetails.accountName)}&amount=${invoice.amountVnd}&addInfo=${encodeURIComponent(invoice.transferContent)}`;
-                    qrImage.src = qrUrl;
-                    qrImage.style.display = 'block';
-                } else {
-                    qrImage.removeAttribute('src');
-                    qrImage.style.display = 'none';
-                }
-                
-                // Ẩn spinner, hiện QR
                 document.getElementById('qr-loading-spinner').style.display = 'none';
-                document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ bạn chuyển khoản...';
+                document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ SePay xác nhận chuyển khoản...';
                 
                 // Khởi chạy Polling kiểm tra trạng thái
                 startInvoicePolling(invoice._id);
@@ -3829,7 +3814,7 @@ if (isLockedResponse(data)) {
             applyInvoicePaymentToQrModal(invoice, profile);
             
             document.getElementById('qr-loading-spinner').style.display = 'none';
-            document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ bạn chuyển khoản...';
+            document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ SePay xác nhận chuyển khoản...';
             document.getElementById('qr-modal').style.display = 'flex';
             
             startInvoicePolling(invoice._id);
@@ -4427,7 +4412,7 @@ if (isLockedResponse(data)) {
 
         function updateBillingUI() {
             billingTimerEl.textContent = formatBillingTime(billingSeconds);
-            const rate = parseFloat(billingRateInput.value) || 20000;
+            const rate = parseFloat(billingRateInput.value) || 50000;
             const amount = Math.round((billingSeconds / 3600) * rate);
             billingAmountEl.textContent = amount.toLocaleString('vi-VN') + ' đ';
         }
@@ -4469,7 +4454,7 @@ if (isLockedResponse(data)) {
             btnBillingReset.disabled = false;
             clearInterval(billingInterval);
             
-            const rate = parseFloat(billingRateInput.value) || 20000;
+            const rate = parseFloat(billingRateInput.value) || 50000;
             const amount = Math.round((billingSeconds / 3600) * rate);
             
             // Appending a summary item in the logs list

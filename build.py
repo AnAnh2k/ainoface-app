@@ -1,6 +1,9 @@
 import os
 import subprocess
 import shutil
+import json
+
+PRODUCTION_CENTRAL_API_URL = "https://ainoface-backend.onrender.com"
 
 # 1. Stop running app instances
 try:
@@ -30,12 +33,19 @@ if os.path.exists(src_client):
 else:
     print("Error: live_client.exe not found.")
 
-# 5. Copy config.json to dist/Live_AI_SLive/ next to the executable
+# 5. Copy config.json to dist/Live_AI_SLive/ next to the executable.
+# Keep the packaged app pointed at production even when local config.json uses localhost.
 src_config = "config.json"
 dest_config = os.path.join("dist", "Live_AI_SLive", "config.json")
 if os.path.exists(src_config):
-    shutil.copy(src_config, dest_config)
-    print("Successfully copied config.json next to executable.")
+    with open(src_config, "r", encoding="utf-8") as f:
+        config_data = json.load(f)
+    config_data["central_api_url"] = PRODUCTION_CENTRAL_API_URL
+    config_data.pop("desktop_device_id", None)
+    os.makedirs(os.path.dirname(dest_config), exist_ok=True)
+    with open(dest_config, "w", encoding="utf-8") as f:
+        json.dump(config_data, f, ensure_ascii=False, indent=4)
+    print("Successfully wrote production config.json next to executable.")
 else:
     print("Warning: config.json not found in root.")
 
