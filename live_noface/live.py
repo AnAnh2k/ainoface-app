@@ -5,6 +5,7 @@ import sys
 import json
 import re
 import random
+import time
 
 
 # Force sys.stdout and sys.stderr to UTF-8 with character replacement on Windows
@@ -60,6 +61,8 @@ client_llm = OpenAI(
     api_key=os.getenv('LIVE_LLM_API_KEY', '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'),
     base_url=OLLAMA_BASE_URL,
 )
+
+connection_time = time.time()
 
 _debug_event_logged = set()
 
@@ -239,14 +242,15 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
             print(f"WARN: Could not read live_prompt.txt: {e}")
 
         if custom_prompt:
-            system_prompt = "Bạn là trợ lý ảo hỗ trợ livestream trên TikTok. Hãy trả lời câu hỏi/bình luận của khách hàng dựa trên thông tin kịch bản/chủ đề được cung cấp."
-            user_message = (
-                f"Thông tin kịch bản/chủ đề livestream:\n{custom_prompt}\n\n"
-                f"Bình luận từ khách hàng: {event_text}\n\n"
-                f"Nhiệm vụ: Hãy trả lời bình luận này một cách tự nhiên, ngắn gọn dưới 30 từ, bám sát thông tin kịch bản trên. "
-                f"Hãy sử dụng từ ngữ sinh động, diễn đạt đa dạng và tránh lặp lại các mẫu câu rập khuôn giữa các câu trả lời. "
-                f"Nếu kịch bản không có thông tin hoặc không đủ thông tin để trả lời bình luận, hãy khéo léo hướng dẫn khách hàng nhắn tin (inbox) cho shop để được tư vấn chi tiết."
+            system_prompt = (
+                "Bạn là trợ lý ảo hỗ trợ livestream trên TikTok. Nhiệm vụ của bạn là:\n"
+                "1. Xác định xem bình luận của khách hàng có liên quan trực tiếp đến thông tin kịch bản/chủ đề livestream sau đây không:\n"
+                f"{custom_prompt}\n"
+                "Hoặc bình luận đó có phải là một câu chào hỏi, tương tác lịch sự ban đầu không (ví dụ: chào shop, xin chào, hello, hi, chúc shop đắt hàng...).\n\n"
+                "2. Nếu có liên quan hoặc là lời chào hỏi lịch sự: Hãy trả lời bình luận đó một cách tự nhiên, ngắn gọn dưới 30 từ, bám sát kịch bản (nếu là câu hỏi) hoặc chào đón khách hàng một cách thân thiện, vui vẻ (nếu là lời chào). Sử dụng từ ngữ đa dạng, sinh động.\n"
+                "3. Nếu hoàn toàn KHÔNG liên quan đến kịch bản/chủ đề trên và CŨNG KHÔNG phải là lời chào hỏi tương tác (ví dụ: spam, hỏi chuyện riêng tư, lạc đề hoàn toàn): Hãy bắt đầu câu trả lời bằng từ khóa '[IGNORE]' và viết tiếp một câu phản hồi lịch sự, thân thiện chung chung, ngắn gọn dưới 20 từ đằng sau (phân tách bằng ký tự '|'). Ví dụ: [IGNORE] | Cảm ơn bạn đã tương tác, cùng xem livestream vui vẻ nhé!"
             )
+            user_message = f"Bình luận từ khách hàng: {event_text}"
         else:
             system_prompt = (
                 'Bạn là trợ lý bán hàng livestream trên TikTok. '
@@ -261,7 +265,7 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
 
         llm_url = current_llm_url
         llm_model = OLLAMA_MODEL
-        llm_api_key = os.getenv('LIVE_LLM_API_KEY', 'api_key')
+        llm_api_key = os.getenv('LIVE_LLM_API_KEY', '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')
         
         extra_params = {
             'max_tokens': 48,
@@ -298,6 +302,17 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
             raise ValueError('Empty response from LLM')
 
         if custom_prompt:
+            if '[IGNORE]' in response:
+                # 15% chance to reply to unrelated comments anyway, 85% chance to ignore entirely
+                if random.random() < 0.15:
+                    parts = response.split('|')
+                    if len(parts) > 1:
+                        response = parts[1].strip()
+                    else:
+                        response = response.replace('[IGNORE]', '').strip()
+                else:
+                    return ""  # Ignore entirely
+
             cleaned = _clean_comment_reply(response, user_name)
             cleaned = re.sub(r'^(chào|hello|hi)\b[^,]*,?\s*', '', cleaned, flags=re.IGNORECASE).strip()
             cleaned = cleaned.lstrip(' ,.-:;')
@@ -316,6 +331,8 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
 
 @client.on(ConnectEvent)
 async def on_connect(event: ConnectEvent):
+    global connection_time
+    connection_time = time.time()
     print(f'Connected to @{event.unique_id} (Room ID: {client.room_id})')
     _debug_event_payload('connect', event)
     post_live_event(
@@ -331,6 +348,9 @@ async def on_connect(event: ConnectEvent):
 
 
 async def on_comment(event: CommentEvent) -> None:
+    global connection_time
+    if connection_time is None or (time.time() - connection_time < 1.5):
+        return
     user_name = event.user.nickname
     comment_text = event.comment
     print(f'COMMENT: {user_name} -> {comment_text}')
@@ -338,6 +358,9 @@ async def on_comment(event: CommentEvent) -> None:
     post_live_event('comment', viewerCount=_extract_viewer_count(event))
 
     ai_response = generate_live_response(user_name, comment_text, event_type='comment')
+    if not ai_response:
+        print('[INFO] Comment ignored (unrelated to prompt)')
+        return
     print(f'AI Response: {ai_response}')
 
     if send_to_tts(ai_response, event=True, priority=0):
@@ -350,6 +373,9 @@ client.add_listener(CommentEvent, on_comment)
 
 
 async def on_gift(event: GiftEvent) -> None:
+    global connection_time
+    if connection_time is None or (time.time() - connection_time < 1.5):
+        return
     user_name = event.user.nickname
     gift_name = event.gift.name
     repeat_count = event.repeat_count
@@ -377,6 +403,9 @@ client.add_listener(GiftEvent, on_gift)
 
 
 async def on_like(event: LikeEvent) -> None:
+    global connection_time
+    if connection_time is None or (time.time() - connection_time < 1.5):
+        return
     user_name = event.user.nickname
     like_count = event.count
     print(f'LIKE: {user_name} liked x{like_count}')
@@ -402,6 +431,9 @@ client.add_listener(LikeEvent, on_like)
 
 
 async def on_follow(event: FollowEvent) -> None:
+    global connection_time
+    if connection_time is None or (time.time() - connection_time < 1.5):
+        return
     user_name = event.user.nickname
     print(f'FOLLOW: {user_name} followed')
 
