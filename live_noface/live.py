@@ -265,7 +265,7 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
 
         llm_url = current_llm_url
         llm_model = OLLAMA_MODEL
-        llm_api_key = os.getenv('LIVE_LLM_API_KEY', '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')
+        llm_api_key = os.getenv('LIVE_LLM_API_KEY', 'api_key')
         
         extra_params = {
             'max_tokens': 48,
