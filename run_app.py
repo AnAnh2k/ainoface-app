@@ -4,7 +4,7 @@ import subprocess
 import time
 import urllib.request
 import runpy
-import webview
+import webbrowser
 
 # Force UTF-8 for stdout and stderr to avoid encoding crashes on Windows
 if sys.stdout:
@@ -176,6 +176,40 @@ def initialize_app(window):
     print("Loading main application interface...")
     window.load_url('http://127.0.0.1:5000')
 
+class BrowserFallbackWindow:
+    def evaluate_js(self, script):
+        print(f"[STARTUP] {script}")
+
+    def load_url(self, url):
+        print(f"Opening browser fallback: {url}")
+        webbrowser.open(url)
+
+
+def cleanup_processes():
+    print("Terminating background processes...")
+    if flask_proc:
+        flask_proc.terminate()
+    if fastapi_proc:
+        fastapi_proc.terminate()
+
+    if flask_log_file:
+        flask_log_file.close()
+    if fastapi_log_file:
+        fastapi_log_file.close()
+
+
+def wait_for_browser_fallback():
+    try:
+        while True:
+            if flask_proc and flask_proc.poll() is not None:
+                break
+            if fastapi_proc and fastapi_proc.poll() is not None:
+                break
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
+
+
 if __name__ == "__main__":
     splash_html = """
     <!DOCTYPE html>
@@ -282,41 +316,37 @@ if __name__ == "__main__":
     </html>
     """
 
-    window = webview.create_window(
-        title='Hệ Thống Live AI - S Live',
-        html=splash_html,
-        width=1280,
-        height=850,
-        resizable=True
-    )
-    
-    # Locate icon file for window
-    icon_path = None
-    if getattr(sys, 'frozen', False):
-        possible_paths = [
-            os.path.join(app_dir, "_internal", "live_noface", "static", "favicon.ico"),
-            os.path.join(app_dir, "live_noface", "static", "favicon.ico"),
-        ]
-        for p in possible_paths:
-            if os.path.exists(p):
-                icon_path = p
-                break
-    else:
-        icon_path = os.path.join(app_dir, "icon.ico")
-        if not os.path.exists(icon_path):
-            icon_path = os.path.join(app_dir, "live_noface", "static", "favicon.ico")
+    try:
+        import webview
+        window = webview.create_window(
+            title='Hệ Thống Live AI - S Live',
+            html=splash_html,
+            width=1280,
+            height=850,
+            resizable=True
+        )
 
-    # Run webview start without debug=True to prevent opening devtools automatically
-    webview.start(initialize_app, window, icon=icon_path)
-    
-    # Clean up file handles and subprocesses on exit
-    print("Terminating background processes...")
-    if flask_proc:
-        flask_proc.terminate()
-    if fastapi_proc:
-        fastapi_proc.terminate()
-    
-    if flask_log_file:
-        flask_log_file.close()
-    if fastapi_log_file:
-        fastapi_log_file.close()
+        # Locate icon file for window
+        icon_path = None
+        if getattr(sys, 'frozen', False):
+            possible_paths = [
+                os.path.join(app_dir, "_internal", "live_noface", "static", "favicon.ico"),
+                os.path.join(app_dir, "live_noface", "static", "favicon.ico"),
+            ]
+            for p in possible_paths:
+                if os.path.exists(p):
+                    icon_path = p
+                    break
+        else:
+            icon_path = os.path.join(app_dir, "icon.ico")
+            if not os.path.exists(icon_path):
+                icon_path = os.path.join(app_dir, "live_noface", "static", "favicon.ico")
+
+        # Run webview start without debug=True to prevent opening devtools automatically
+        webview.start(initialize_app, window, icon=icon_path)
+    except Exception as exc:
+        print(f"Webview startup failed, using browser fallback: {exc}")
+        initialize_app(BrowserFallbackWindow())
+        wait_for_browser_fallback()
+    finally:
+        cleanup_processes()
