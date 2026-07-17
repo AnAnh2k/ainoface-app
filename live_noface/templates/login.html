@@ -200,6 +200,18 @@
             box-shadow: 0 6px 20px rgba(61, 124, 255, 0.4);
         }
 
+
+        button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        button:disabled::after {
+            display: none;
+        }
+
         button:active {
             transform: translateY(1px);
             border-bottom-width: 1px;
@@ -336,6 +348,28 @@
             opacity: 0.55;
         }
 
+        .otp-input-row {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .otp-digit-input {
+            width: 100%;
+            height: 58px;
+            padding: 0;
+            text-align: center;
+            font-family: var(--font-cyber);
+            font-size: 24px;
+            font-weight: 800;
+            color: #ffffff;
+            caret-color: var(--primary);
+        }
+
+        .otp-digit-input::placeholder {
+            color: rgba(148, 163, 184, 0.35);
+        }
+
         .otp-countdown {
             display: none;
             margin-top: 8px;
@@ -353,6 +387,23 @@
             display: block;
         }
 
+        .resend-otp-btn {
+            display: none;
+            margin-top: 10px;
+            height: 44px;
+            padding: 0 14px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.18), rgba(61, 124, 255, 0.28));
+            border: 1px solid rgba(0, 240, 255, 0.34);
+            color: #00f0ff;
+            box-shadow: 0 0 18px rgba(0, 240, 255, 0.12);
+        }
+
+        .verify-mode .resend-otp-btn.visible {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
         .otp-countdown strong {
             color: #00f0ff;
             font-family: var(--font-cyber);
@@ -461,9 +512,18 @@
             </div>
 
             <div class="form-group verification-code-group" id="verification-code-wrapper">
-                <label for="verification-code">Mã xác thực email</label>
-                <input type="text" id="verification-code" name="verification-code" placeholder="Nhập mã 6 số" inputmode="numeric" maxlength="6" autocomplete="one-time-code">
+                <label for="otp-digit-1">Mã xác thực email</label>
+                <div class="otp-input-row" aria-label="Nhập mã xác thực email gồm 6 số">
+                    <input type="text" id="otp-digit-1" class="otp-digit-input" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Số thứ 1">
+                    <input type="text" class="otp-digit-input" inputmode="numeric" maxlength="1" aria-label="Số thứ 2">
+                    <input type="text" class="otp-digit-input" inputmode="numeric" maxlength="1" aria-label="Số thứ 3">
+                    <input type="text" class="otp-digit-input" inputmode="numeric" maxlength="1" aria-label="Số thứ 4">
+                    <input type="text" class="otp-digit-input" inputmode="numeric" maxlength="1" aria-label="Số thứ 5">
+                    <input type="text" class="otp-digit-input" inputmode="numeric" maxlength="1" aria-label="Số thứ 6">
+                </div>
+                <input type="hidden" id="verification-code" name="verification-code">
                 <div class="otp-countdown" id="otp-countdown">OTP còn hiệu lực trong <strong id="otp-countdown-value">60</strong> giây</div>
+                <button type="button" id="resend-otp-btn" class="resend-otp-btn">Gửi lại mã</button>
             </div>
             
             <button type="submit" id="submit-btn">Đăng nhập</button>
@@ -485,7 +545,9 @@
         const passwordInput = document.getElementById('password');
         const confirmPasswordInput = document.getElementById('confirm-password');
         const verificationCodeInput = document.getElementById('verification-code');
+        const otpDigitInputs = Array.from(document.querySelectorAll('.otp-digit-input'));
         const otpCountdownValue = document.getElementById('otp-countdown-value');
+        const resendOtpBtn = document.getElementById('resend-otp-btn');
         const emailError = document.getElementById('email-error');
         const phoneError = document.getElementById('phone-error');
         const confirmPasswordError = document.getElementById('confirm-password-error');
@@ -497,6 +559,47 @@
         let isVerificationMode = false;
         let otpCountdownInterval = null;
         let otpRemainingSeconds = 60;
+        let isOtpExpired = false;
+
+        function getOtpCode() {
+            return otpDigitInputs.map(input => input.value).join('');
+        }
+
+        function clearOtpInputs() {
+            otpDigitInputs.forEach(input => {
+                input.value = '';
+            });
+            verificationCodeInput.value = '';
+            updateVerificationSubmitState();
+        }
+
+        function syncVerificationCode() {
+            verificationCodeInput.value = getOtpCode();
+            updateVerificationSubmitState();
+        }
+
+        function updateVerificationSubmitState() {
+            if (!isVerificationMode) {
+                submitBtn.disabled = false;
+                return;
+            }
+            submitBtn.disabled = isOtpExpired || !/^\d{6}$/.test(getOtpCode());
+        }
+
+        function focusOtpInput(index) {
+            const target = otpDigitInputs[index];
+            if (target) {
+                target.focus();
+                target.select();
+            }
+        }
+
+        function setOtpExpiredState(isExpired) {
+            isOtpExpired = isExpired;
+            resendOtpBtn.classList.toggle('visible', isExpired);
+            resendOtpBtn.disabled = false;
+            updateVerificationSubmitState();
+        }
 
         function stopOtpCountdown() {
             if (otpCountdownInterval) {
@@ -509,12 +612,14 @@
             stopOtpCountdown();
             otpRemainingSeconds = 60;
             otpCountdownValue.textContent = otpRemainingSeconds;
+            setOtpExpiredState(false);
             otpCountdownInterval = setInterval(() => {
                 otpRemainingSeconds = Math.max(0, otpRemainingSeconds - 1);
                 otpCountdownValue.textContent = otpRemainingSeconds;
                 if (otpRemainingSeconds === 0) {
                     stopOtpCountdown();
-                    showMessage('Mã OTP đã hết hiệu lực. Vui lòng đăng ký lại để nhận mã mới.');
+                    setOtpExpiredState(true);
+                    showMessage('Mã OTP đã hết hiệu lực. Bạn có thể gửi lại mã mới.');
                 }
             }, 1000);
         }
@@ -526,6 +631,7 @@
             tabRegister.classList.remove('active');
             cardContainer.classList.remove('register-mode', 'verify-mode');
             submitBtn.textContent = 'Đăng nhập';
+            submitBtn.disabled = false;
             confirmPasswordInput.required = false;
             emailInput.required = false;
             phoneInput.required = false;
@@ -535,6 +641,7 @@
             stopOtpCountdown();
             clearRegisterFieldErrors();
             form.reset();
+            clearOtpInputs();
             usernameInput.value = keepUsername;
         }
 
@@ -546,6 +653,7 @@
             cardContainer.classList.add('register-mode');
             cardContainer.classList.remove('verify-mode');
             submitBtn.textContent = 'Đăng ký tài khoản';
+            submitBtn.disabled = false;
             confirmPasswordInput.required = true;
             emailInput.required = true;
             phoneInput.required = true;
@@ -555,6 +663,7 @@
             stopOtpCountdown();
             clearRegisterFieldErrors();
             form.reset();
+            clearOtpInputs();
         }
 
         function activateVerificationMode() {
@@ -570,8 +679,9 @@
             usernameInput.disabled = true;
             passwordInput.disabled = true;
             clearRegisterFieldErrors();
-            verificationCodeInput.value = '';
-            verificationCodeInput.focus();
+            clearOtpInputs();
+            updateVerificationSubmitState();
+            focusOtpInput(0);
             startOtpCountdown();
         }
 
@@ -600,6 +710,49 @@
                 };
             }
         }
+
+        async function resendOtpCode() {
+            if (!isVerificationMode) return;
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+            const email = emailInput.value.trim();
+            const phone = normalizePhone(phoneInput.value.trim());
+
+            if (!username || !password || !email || !phone) {
+                showMessage('Thiếu thông tin đăng ký. Vui lòng đăng ký lại để nhận mã mới.');
+                return;
+            }
+
+            try {
+                resendOtpBtn.disabled = true;
+                resendOtpBtn.textContent = 'Đang gửi...';
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, email, phone })
+                });
+
+                const data = await readJsonResponse(response);
+                if (response.ok && data.success) {
+                    clearOtpInputs();
+                    startOtpCountdown();
+                    focusOtpInput(0);
+                    const devCodeNote = data.devVerificationCode ? ` Mã test local: ${data.devVerificationCode}` : '';
+                    showMessage(`Đã gửi lại mã OTP. Mã có hiệu lực trong 60 giây.${devCodeNote}`, 'warning');
+                } else {
+                    setOtpExpiredState(true);
+                    showMessage(data.error || 'Không thể gửi lại mã OTP. Vui lòng thử lại.');
+                }
+            } catch (err) {
+                setOtpExpiredState(true);
+                showMessage('Không kết nối được server. Vui lòng kiểm tra backend.');
+            } finally {
+                resendOtpBtn.textContent = 'Gửi lại mã';
+            }
+        }
+
+        resendOtpBtn.addEventListener('click', resendOtpCode);
 
         function showMessage(message, type = 'error') {
             errorBox.textContent = message;
@@ -693,6 +846,71 @@
                 clearFieldError(confirmPasswordInput, confirmPasswordError);
             }
         });
+        otpDigitInputs.forEach((input, index) => {
+            input.addEventListener('input', () => {
+                const digits = input.value.replace(/\D/g, '');
+                input.value = '';
+
+                if (!digits) {
+                    syncVerificationCode();
+                    return;
+                }
+
+                digits.slice(0, otpDigitInputs.length - index).split('').forEach((digit, offset) => {
+                    otpDigitInputs[index + offset].value = digit;
+                });
+
+                syncVerificationCode();
+                focusOtpInput(Math.min(index + digits.length, otpDigitInputs.length - 1));
+            });
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Backspace') {
+                    event.preventDefault();
+                    if (input.value) {
+                        input.value = '';
+                        syncVerificationCode();
+                        return;
+                    }
+                    if (index > 0) {
+                        otpDigitInputs[index - 1].value = '';
+                        syncVerificationCode();
+                        focusOtpInput(index - 1);
+                    }
+                    return;
+                }
+
+                if (event.key === 'Delete') {
+                    event.preventDefault();
+                    input.value = '';
+                    syncVerificationCode();
+                    return;
+                }
+
+                if (event.key === 'ArrowLeft' && index > 0) {
+                    event.preventDefault();
+                    focusOtpInput(index - 1);
+                    return;
+                }
+
+                if (event.key === 'ArrowRight' && index < otpDigitInputs.length - 1) {
+                    event.preventDefault();
+                    focusOtpInput(index + 1);
+                }
+            });
+
+            input.addEventListener('paste', (event) => {
+                event.preventDefault();
+                const pastedDigits = (event.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, otpDigitInputs.length);
+                if (!pastedDigits) return;
+
+                otpDigitInputs.forEach((otpInput, pasteIndex) => {
+                    otpInput.value = pastedDigits[pasteIndex] || '';
+                });
+                syncVerificationCode();
+                focusOtpInput(Math.min(pastedDigits.length, otpDigitInputs.length) - 1);
+            });
+        });
 
 
         // Check query parameters for error message
@@ -739,9 +957,11 @@
                     } catch (err) {
                         showMessage('Không kết nối được server. Vui lòng kiểm tra backend.');
                     } finally {
-                        submitBtn.disabled = false;
                         if (isVerificationMode) {
                             submitBtn.textContent = 'Xác thực email';
+                            updateVerificationSubmitState();
+                        } else {
+                            submitBtn.disabled = false;
                         }
                     }
                     return;
@@ -773,10 +993,11 @@
                 } catch (err) {
                     showMessage('Không kết nối được server. Vui lòng kiểm tra backend.');
                 } finally {
-                    submitBtn.disabled = false;
                     if (isVerificationMode) {
                         submitBtn.textContent = 'Xác thực email';
+                        updateVerificationSubmitState();
                     } else if (isRegisterMode) {
+                        submitBtn.disabled = false;
                         submitBtn.textContent = 'Đăng ký tài khoản';
                     }
                 }
@@ -807,7 +1028,8 @@
                         submitBtn.textContent = 'Đăng nhập';
                     }
                 }
-            }        });
+            }
+        });
 
         function eyeIconSvg(isHidden) {
             return isHidden
