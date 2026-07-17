@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Há»‡ thá»‘ng Live AI - S Live</title>
+    <title>Hệ thống Live AI - S Live</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1351,36 +1351,36 @@
 
                 <div class="top-bar-stats">
                     <div class="stat-item" style="display: none;">
-                        <span class="stat-label">ðŸ‘¥ NgÆ°á»i xem</span>
+                        <span class="stat-label">👥 Người xem</span>
                         <span class="stat-value" id="top-viewer-count">--</span>
                     </div>
                     
-                    <div class="stat-item stat-group-divider" onclick="openUserHistoryModal()" style="cursor: pointer;" title="Xem lá»‹ch sá»­ tÃ i khoáº£n">
-                        <span class="stat-label">ðŸ‘¤ KhÃ¡ch</span>
+                    <div class="stat-item stat-group-divider" onclick="openUserHistoryModal()" style="cursor: pointer;" title="Xem lịch sử tài khoản">
+                        <span class="stat-label">👤 Khách</span>
                         <span class="stat-value primary" id="top-username" style="text-decoration: underline;">-</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">â³ Sá»‘ dÆ°</span>
+                        <span class="stat-label">⏳ Số dư</span>
                         <span class="stat-value success" id="top-time-balance">00:00:00</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">ðŸ’¸ ÄÆ¡n giÃ¡</span>
+                        <span class="stat-label">💸 Đơn giá</span>
                         <span class="stat-value" id="top-hourly-rate">-</span>
                     </div>
                     <div class="stat-item stat-action">
-                        <button class="btn-green topbar-action-btn" onclick="openPriceModal()">Náº¡p tiá»n</button>
+                        <button class="btn-green topbar-action-btn" onclick="openPriceModal()">Nạp tiền</button>
                     </div>
                     
                     <div class="stat-item voice-control stat-group-divider">
-                        <span class="stat-label">ðŸŽ™ï¸ AI Voice</span>
+                        <span class="stat-label">🎙️ AI Voice</span>
                         <label class="switch">
                             <input type="checkbox" id="web-audio-toggle" checked>
                             <span class="slider"></span>
                         </label>
                     </div>
 
-                    <button type="button" id="version-card" class="stat-item topbar-version-btn" onclick="openVersionModal()" title="Xem phiÃªn báº£n vÃ  cáº­p nháº­t">
-                        <span class="stat-label">â¬† PhiÃªn báº£n</span>
+                    <button type="button" id="version-card" class="stat-item topbar-version-btn" onclick="openVersionModal()" title="Xem phiên bản và cập nhật">
+                        <span class="stat-label">⬆ Phiên bản</span>
                         <span class="stat-value primary" id="top-app-version">--</span>
                     </button>
 
@@ -1398,28 +1398,28 @@
                             <polyline points="16 17 21 12 16 7"></polyline>
                             <line x1="21" y1="12" x2="9" y2="12"></line>
                         </svg>
-                        ÄÄƒng xuáº¥t
+                        Đăng xuất
                     </a>
                 </div>
             </header>
 
             <!-- Grid container for dashboard panels -->
             <div class="container">
-                <!-- Panel 1: AI Sáº¯p Ä‘á»c -->
+                <!-- Panel 1: AI Sắp đọc -->
                 <section class="panel panel-ai-read">
                     <h3>
-                        <span>ðŸŽ™ï¸ AI Sáº¯p Ä‘á»c</span>
-                        <span style="font-size: 11px; text-transform: none; color: var(--primary);">Báº£ng Ä‘iá»u khiá»ƒn giá»ng Ä‘á»c MC</span>
+                        <span>🎙️ AI Sắp đọc</span>
+                        <span style="font-size: 11px; text-transform: none; color: var(--primary);">Bảng điều khiển giọng đọc MC</span>
                     </h3>
                     <div class="panel-body">
                         <!-- Active sentence widget -->
                         <div class="active-sentence-container">
                             <div class="active-sentence-label">
-                                <span>ðŸ”Š ÄANG Äá»ŒC PHÃT Ã‚M THANH</span>
+                                <span>🔊 ĐANG ĐỌC PHÁT ÂM THANH</span>
                                 <span style="font-size: 10px; color:#64748b;">VieNeu TTS Engine</span>
                             </div>
                             <span class="active-sentence-number" id="reading-num">01</span>
-                            <div class="active-sentence-text" id="reading-text">Xin chÃ o má»i ngÆ°á»i! HÃ´m nay mÃ¬nh sáº½ giá»›i thiá»‡u Ä‘áº¿n cÃ¡c báº¡n má»™t sáº£n pháº©m cá»±c ká»³ há»¯u Ã­ch...</div>
+                            <div class="active-sentence-text" id="reading-text">Xin chào mọi người! Hôm nay mình sẽ giới thiệu đến các bạn một sản phẩm cực kỳ hữu ích...</div>
                         </div>
 
                         <!-- Pulse wave visualizer canvas -->
@@ -1430,7 +1430,7 @@
                         <!-- Progress Bar -->
                         <div class="progress-container">
                             <div class="progress-label">
-                                <span>Tiáº¿n Ä‘á»™ Ä‘á»c cÃ¢u hiá»‡n táº¡i</span>
+                                <span>Tiến độ đọc câu hiện tại</span>
                                 <span id="reading-progress-percent">0%</span>
                             </div>
                             <div class="progress-bar-bg">
@@ -1440,48 +1440,48 @@
 
                         <!-- Start/Stop and Sound Controls grid -->
                         <div style="display:flex; gap:10px; margin-bottom:16px;">
-                            <button type="button" id="start-btn" class="btn-cyan" style="flex:1; height:42px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>Báº¯t Ä‘áº§u</button>
-                            <button type="button" id="stop-btn" class="btn-pink" disabled style="flex:1; height:42px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect></svg>Ngá»«ng</button>
+                            <button type="button" id="start-btn" class="btn-cyan" style="flex:1; height:42px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>Bắt đầu</button>
+                            <button type="button" id="stop-btn" class="btn-pink" disabled style="flex:1; height:42px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect></svg>Ngừng</button>
                         </div>
 
                         <!-- Control settings bar -->
                         <div class="sound-controls-bar">
                             <div class="sound-control-item">
-                                <label>ðŸ”Š Ã‚m lÆ°á»£ng</label>
+                                <label>🔊 Âm lượng</label>
                                 <input type="range" id="web-audio-volume" min="0" max="1" step="0.1" value="0.8">
                             </div>
                             <div class="sound-control-item">
-                                <label>âš¡ Tá»‘c Ä‘á»™ (<span id="speed-val" style="color:var(--primary); font-weight:700;">0.80x</span>)</label>
+                                <label>⚡ Tốc độ (<span id="speed-val" style="color:var(--primary); font-weight:700;">0.80x</span>)</label>
                                 <input type="range" id="web-audio-speed" min="0.8" max="1.4" step="0.05" value="0.8">
                             </div>
                             <div class="sound-control-item">
-                                <label>ðŸŽ™ï¸ Giá»ng Ä‘á»c</label>
+                                <label>🎙️ Giọng đọc</label>
                                 <select id="voice-select" style="padding: 2px 6px; font-size:11.5px; height:24px;">
-                                    <option value="TrÃºc Ly" selected>TrÃºc Ly (Ná»¯)</option>
-                                    <option value="Pháº¡m TuyÃªn">Pháº¡m TuyÃªn (Nam)</option>
-                                    <option value="ThÃ¡i SÆ¡n">ThÃ¡i SÆ¡n (Nam)</option>
-                                    <option value="XuÃ¢n VÄ©nh">XuÃ¢n VÄ©nh (Nam)</option>
-                                    <option value="Thanh BÃ¬nh">Thanh BÃ¬nh (Nam)</option>
-                                    <option value="Minh Äá»©c">Minh Äá»©c (Nam)</option>
-                                    <option value="Ngá»c Linh">Ngá»c Linh (Ná»¯)</option>
-                                    <option value="Äoan Trang">Äoan Trang (Ná»¯)</option>
-                                    <option value="Mai Anh">Mai Anh (Ná»¯)</option>
-                                    <option value="Thá»¥c Äoan">Thá»¥c Äoan (Ná»¯)</option>
+                                    <option value="Trúc Ly" selected>Trúc Ly (Nữ)</option>
+                                    <option value="Phạm Tuyên">Phạm Tuyên (Nam)</option>
+                                    <option value="Thái Sơn">Thái Sơn (Nam)</option>
+                                    <option value="Xuân Vĩnh">Xuân Vĩnh (Nam)</option>
+                                    <option value="Thanh Bình">Thanh Bình (Nam)</option>
+                                    <option value="Minh Đức">Minh Đức (Nam)</option>
+                                    <option value="Ngọc Linh">Ngọc Linh (Nữ)</option>
+                                    <option value="Đoan Trang">Đoan Trang (Nữ)</option>
+                                    <option value="Mai Anh">Mai Anh (Nữ)</option>
+                                    <option value="Thục Đoan">Thục Đoan (Nữ)</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <!-- Panel 2: Comments & AI Tráº£ lá»i -->
+                <!-- Panel 2: Comments & AI Trả lời -->
                 <section class="panel panel-comments">
                     <h3 class="panel-header-stack">
-                        <span class="panel-header-title">ðŸ’¬ COMMENT & AI TRáº¢ Lá»œI</span>
+                        <span class="panel-header-title">💬 COMMENT & AI TRẢ LỜI</span>
                         <div class="comment-connect-row">
-                            <input id="tiktok-user" class="text-input" placeholder="Nháº­p username hoáº·c link TikTok Live" />
-                            <button id="connect-live" class="btn-cyan" type="button">Káº¾T Ná»I</button>
-                            <button id="disconnect-live" class="btn-gray" type="button" disabled>NGáº®T</button>
-                            <button id="mute-ai-comment" class="btn-pink" type="button" style="min-width:120px;">NGáº®T GIá»ŒNG AI</button>
+                            <input id="tiktok-user" class="text-input" placeholder="Nhập username hoặc link TikTok Live" />
+                            <button id="connect-live" class="btn-cyan" type="button">KẾT NỐI</button>
+                            <button id="disconnect-live" class="btn-gray" type="button" disabled>NGẮT</button>
+                            <button id="mute-ai-comment" class="btn-pink" type="button" style="min-width:120px;">NGẮT GIỌNG AI</button>
                         </div>
                     </h3>
                     <div class="panel-body">
@@ -1490,7 +1490,7 @@
 
                         <!-- Feed scrolling area -->
                         <div id="comments" class="comments-list">
-                            <div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Äang chá» bÃ¬nh luáº­n TikTok...</div>
+                            <div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ bình luận TikTok...</div>
                         </div>
                     </div>
                 </section>
@@ -1498,7 +1498,7 @@
                 <!-- Panel 3: Noi dung live -->
                 <section class="panel panel-prompt">
                     <h3>
-                        <span>Ná»˜I DUNG LIVE</span>
+                        <span>NỘI DUNG LIVE</span>
                     </h3>
                     <div class="panel-body">
                         <div class="prompt-builder-grid">
@@ -1507,53 +1507,53 @@
                                 <form id="prompt-form" style="display:flex; flex-direction:column; gap:10px; height:100%;">
                                     <div class="system-prompt-selectors">
                                         <div class="selector-item">
-                                            <label>Vai trÃ² AI</label>
+                                            <label>Vai trò AI</label>
                                             <select style="height:26px; padding:2px 6px; font-size:12px;">
-                                                <option selected>MC bÃ¡n hÃ ng</option>
-                                                <option>MC review cÃ´ng nghá»‡</option>
-                                                <option>MC tÆ° váº¥n má»¹ pháº©m</option>
+                                                <option selected>MC bán hàng</option>
+                                                <option>MC review công nghệ</option>
+                                                <option>MC tư vấn mỹ phẩm</option>
                                             </select>
                                         </div>
                                         <div class="selector-item">
-                                            <label>Phong cÃ¡ch</label>
+                                            <label>Phong cách</label>
                                             <select style="height:26px; padding:2px 6px; font-size:12px;">
-                                                <option selected>Nhiá»‡t tÃ¬nh, gáº§n gÅ©i</option>
-                                                <option>HÃ i hÆ°á»›c, dÃ­ dá»m</option>
-                                                <option>ChuyÃªn nghiá»‡p, sÃ¢u sáº¯c</option>
+                                                <option selected>Nhiệt tình, gần gũi</option>
+                                                <option>Hài hước, dí dỏm</option>
+                                                <option>Chuyên nghiệp, sâu sắc</option>
                                             </select>
                                         </div>
                                         <div class="selector-item">
-                                            <label>Má»¥c tiÃªu</label>
+                                            <label>Mục tiêu</label>
                                             <select style="height:26px; padding:2px 6px; font-size:12px;">
-                                                <option selected>Chá»‘t Ä‘Æ¡n hÃ ng</option>
-                                                <option>TÄƒng tÆ°Æ¡ng tÃ¡c</option>
-                                                <option>Giáº£i thÃ­ch sáº£n pháº©m</option>
+                                                <option selected>Chốt đơn hàng</option>
+                                                <option>Tăng tương tác</option>
+                                                <option>Giải thích sản phẩm</option>
                                             </select>
                                         </div>
                                         <div class="selector-item">
-                                            <label>NgÃ nh hÃ ng</label>
+                                            <label>Ngành hàng</label>
                                             <select style="height:26px; padding:2px 6px; font-size:12px;">
-                                                <option selected>Gia dá»¥ng</option>
-                                                <option>Thá»i trang</option>
-                                                <option>Má»¹ pháº©m & LÃ m Ä‘áº¹p</option>
+                                                <option selected>Gia dụng</option>
+                                                <option>Thời trang</option>
+                                                <option>Mỹ phẩm & Làm đẹp</option>
                                             </select>
                                         </div>
                                     </div>
 
                                     <div style="display:flex; flex-direction:column; flex:1;">
-                                        <label for="prompt">Nháº­p chá»§ Ä‘á» Livestream:</label>
-                                        <textarea id="prompt" name="prompt" placeholder="Nháº­p ká»‹ch báº£n hoáº·c yÃªu cáº§u prompt táº¡i Ä‘Ã¢y..." required style="flex:1; min-height:80px;"></textarea>
+                                        <label for="prompt">Nhập chủ đề Livestream:</label>
+                                        <textarea id="prompt" name="prompt" placeholder="Nhập kịch bản hoặc yêu cầu prompt tại đây..." required style="flex:1; min-height:80px;"></textarea>
                                     </div>
                                     
-                                    <button type="button" id="send-btn" class="btn-green" style="height:36px; padding:0 16px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>Gá»­i ká»‹ch báº£n</button>
+                                    <button type="button" id="send-btn" class="btn-green" style="height:36px; padding:0 16px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>Gửi kịch bản</button>
                                 </form>
                             </div>
 
                             <!-- Right stream output column -->
                             <div class="prompt-script-column">
-                                <label style="margin-bottom:8px; font-size:11px; font-family:var(--font-cyber);">Ná»™i dung live sinh ra (Live Script)</label>
+                                <label style="margin-bottom:8px; font-size:11px; font-family:var(--font-cyber);">Nội dung live sinh ra (Live Script)</label>
                                 <div id="llm-result" class="llm-result">
-                                    <div class="script-empty-state">ChÆ°a cÃ³ ná»™i dung live. HÃ£y nháº­p chá»§ Ä‘á» vÃ  táº¡o ká»‹ch báº£n.</div>
+                                    <div class="script-empty-state">Chưa có nội dung live. Hãy nhập chủ đề và tạo kịch bản.</div>
                                 </div>
                             </div>
                         </div>
@@ -1563,12 +1563,12 @@
                 <!-- Panel 4: Tinh gio su dung -->
                 <section class="panel panel-billing">
                     <h3>
-                        <span>ðŸ’³ TÃNH GIá»œ Sá»¬ Dá»¤NG</span>
+                        <span>💳 TÍNH GIỜ SỬ DỤNG</span>
                     </h3>
                     <div class="panel-body">
                         <div class="billing-grid">
                             <div class="selector-item" style="margin-bottom: 8px;">
-                                <label>ÄÆ¡n giÃ¡ (VND/Giá»)</label>
+                                <label>Đơn giá (VND/Giờ)</label>
                                 <input type="number" id="billing-rate-input" class="text-input" value="50000" readonly style="height:32px; font-weight:700; color:var(--primary); font-size:14px;" />
                             </div>
 
@@ -1577,28 +1577,28 @@
 
                             <div class="billing-stats">
                                 <div class="billing-stat-row">
-                                    <span>Tráº¡ng thÃ¡i phiÃªn:</span>
-                                    <span id="billing-session-status" style="color:#ffffff; font-weight:700;">ChÆ°a báº¯t Ä‘áº§u</span>
+                                    <span>Trạng thái phiên:</span>
+                                    <span id="billing-session-status" style="color:#ffffff; font-weight:700;">Chưa bắt đầu</span>
                                 </div>
                                 <div class="billing-stat-row">
-                                    <span>Sá»‘ dÆ° cÃ²n láº¡i:</span>
+                                    <span>Số dư còn lại:</span>
                                     <span id="billing-balance-left" style="color:var(--success); font-weight:700;">00:00:00</span>
                                 </div>
                                 <div class="billing-stat-row">
-                                    <span>Báº¯t Ä‘áº§u lÃºc:</span>
+                                    <span>Bắt đầu lúc:</span>
                                     <span id="billing-start-time" style="color:#ffffff; font-weight:600;">--:--:--</span>
                                 </div>
                                 <div class="billing-stat-row" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top:8px; margin-top:4px;">
-                                    <span>Táº¡m tÃ­nh theo phiÃªn:</span>
-                                    <span class="billing-amount-value" id="billing-amount">0 Ä‘</span>
+                                    <span>Tạm tính theo phiên:</span>
+                                    <span class="billing-amount-value" id="billing-amount">0 đ</span>
                                 </div>
                             </div>
 
                             <div class="billing-controls" style="display: none;">
-                                <button type="button" id="btn-billing-start" class="btn-green" style="height:36px; font-size:11px;">Báº¯t Ä‘áº§u</button>
-                                <button type="button" id="btn-billing-pause" class="btn-gray" disabled style="height:36px; font-size:11px;">Táº¡m dá»«ng</button>
-                                <button type="button" id="btn-billing-end" class="btn-pink" disabled style="height:36px; font-size:11px; grid-column: span 2; margin-top:4px;">Káº¿t thÃºc phiÃªn</button>
-                                <button type="button" id="btn-billing-reset" class="btn-gray" style="height:30px; font-size:10px; grid-column: span 2; margin-top:4px;">Reset bá»™ Ä‘áº¿m</button>
+                                <button type="button" id="btn-billing-start" class="btn-green" style="height:36px; font-size:11px;">Bắt đầu</button>
+                                <button type="button" id="btn-billing-pause" class="btn-gray" disabled style="height:36px; font-size:11px;">Tạm dừng</button>
+                                <button type="button" id="btn-billing-end" class="btn-pink" disabled style="height:36px; font-size:11px; grid-column: span 2; margin-top:4px;">Kết thúc phiên</button>
+                                <button type="button" id="btn-billing-reset" class="btn-gray" style="height:30px; font-size:10px; grid-column: span 2; margin-top:4px;">Reset bộ đếm</button>
                             </div>
                         </div>
                     </div>
@@ -1612,65 +1612,65 @@
     <div id="price-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 440px;">
             <div class="modal-header">
-                <h3 id="price-modal-title">ðŸ’° Chá»n gÃ³i náº¡p tiá»n</h3>
-                <button type="button" class="close-modal-btn" onclick="closePriceModal()">âœ•</button>
+                <h3 id="price-modal-title">💰 Chọn gói nạp tiền</h3>
+                <button type="button" class="close-modal-btn" onclick="closePriceModal()">✕</button>
             </div>
             <div class="modal-body" style="padding: 15px 0;">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: center;">
-                    ÄÆ¡n giÃ¡ hiá»‡n táº¡i cá»§a báº¡n: <span id="price-modal-rate" style="color: var(--primary); font-weight: bold;">- Ä‘/giá»</span>
+                    Đơn giá hiện tại của bạn: <span id="price-modal-rate" style="color: var(--primary); font-weight: bold;">- đ/giờ</span>
                 </p>
                 <div class="topup-promo-banner" aria-live="polite">
-                    <div class="promo-eyebrow">Khuyáº¿n mÃ£i thÃ¡ng 7</div>
-                    <div class="promo-title">Giáº£m 50% giÃ¡ náº¡p: tá»« 20.000Ä‘/giá» cÃ²n 10.000Ä‘/giá»</div>
+                    <div class="promo-eyebrow">Khuyến mãi tháng 7</div>
+                    <div class="promo-title">Giảm 50% giá nạp: từ 20.000đ/giờ còn 10.000đ/giờ</div>
                     <div class="promo-price-line">
-                        <span class="promo-old-price">20.000Ä‘/giá»</span>
-                        <span class="promo-new-price">10.000Ä‘/giá»</span>
+                        <span class="promo-old-price">20.000đ/giờ</span>
+                        <span class="promo-new-price">10.000đ/giờ</span>
                     </div>
                     <div class="promo-countdown" id="july-promo-countdown">
-                        <div class="promo-countdown-cell"><strong id="promo-days">00</strong><span>NgÃ y</span></div>
-                        <div class="promo-countdown-cell"><strong id="promo-hours">00</strong><span>Giá»</span></div>
-                        <div class="promo-countdown-cell"><strong id="promo-minutes">00</strong><span>PhÃºt</span></div>
-                        <div class="promo-countdown-cell"><strong id="promo-seconds">00</strong><span>GiÃ¢y</span></div>
+                        <div class="promo-countdown-cell"><strong id="promo-days">00</strong><span>Ngày</span></div>
+                        <div class="promo-countdown-cell"><strong id="promo-hours">00</strong><span>Giờ</span></div>
+                        <div class="promo-countdown-cell"><strong id="promo-minutes">00</strong><span>Phút</span></div>
+                        <div class="promo-countdown-cell"><strong id="promo-seconds">00</strong><span>Giây</span></div>
                     </div>
                 </div>
                 
                 <!-- Quick select grid -->
                 <div class="price-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
                     <button type="button" class="price-btn" id="pbtn-50000" onclick="selectPrice(50000)">
-                        <strong>50.000 Ä</strong><br/>
+                        <strong>50.000 Đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-50k">--</span>
                     </button>
                     <button type="button" class="price-btn" id="pbtn-100000" onclick="selectPrice(100000)">
-                        <strong>100.000 Ä</strong><br/>
+                        <strong>100.000 Đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-100k">--</span>
                     </button>
                     <button type="button" class="price-btn" id="pbtn-150000" onclick="selectPrice(150000)">
-                        <strong>150.000 Ä</strong><br/>
+                        <strong>150.000 Đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-150k">--</span>
                     </button>
                     <button type="button" class="price-btn" id="pbtn-200000" onclick="selectPrice(200000)">
-                        <strong>200.000 Ä</strong><br/>
+                        <strong>200.000 Đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-200k">--</span>
                     </button>
                     <button type="button" class="price-btn" id="pbtn-250000" onclick="selectPrice(250000)">
-                        <strong>250.000 Ä</strong><br/>
+                        <strong>250.000 Đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-250k">--</span>
                     </button>
                     <button type="button" class="price-btn" id="pbtn-500000" onclick="selectPrice(500000)">
-                        <strong>500.000 Ä</strong><br/>
+                        <strong>500.000 Đ</strong><br/>
                         <span style="font-size: 11px; color: var(--text-muted);" id="price-desc-500k">--</span>
                     </button>
                 </div>
 
                 <div style="margin-bottom: 15px;">
-                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 5px;">Hoáº·c nháº­p sá»‘ tiá»n mong muá»‘n (tá»‘i thiá»ƒu 50.000Ä‘):</label>
-                    <input type="number" id="custom-price-input" placeholder="VÃ­ dá»¥: 50000" oninput="calculateCustomHours()" style="width: 100%; height: 38px; padding: 0 10px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #fff; box-sizing: border-box;" />
+                    <label style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 5px;">Hoặc nhập số tiền mong muốn (tối thiểu 50.000đ):</label>
+                    <input type="number" id="custom-price-input" placeholder="Ví dụ: 50000" oninput="calculateCustomHours()" style="width: 100%; height: 38px; padding: 0 10px; border-radius: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: #fff; box-sizing: border-box;" />
                     <span id="custom-price-hours-desc" style="font-size: 11px; color: var(--primary); display: block; margin-top: 5px; font-weight: 500;"></span>
                 </div>
             </div>
             <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button type="button" class="btn-gray" onclick="closePriceModal()" style="height: 38px; border-radius: 8px; padding: 0 15px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Há»§y bá»</button>
-                <button type="button" class="btn-green" onclick="confirmPriceSelection()" style="height: 38px; border-radius: 8px; padding: 0 20px; cursor: pointer;">XÃ¡c nháº­n</button>
+                <button type="button" class="btn-gray" onclick="closePriceModal()" style="height: 38px; border-radius: 8px; padding: 0 15px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Hủy bỏ</button>
+                <button type="button" class="btn-green" onclick="confirmPriceSelection()" style="height: 38px; border-radius: 8px; padding: 0 20px; cursor: pointer;">Xác nhận</button>
             </div>
         </div>
     </div>
@@ -1679,34 +1679,34 @@
     <div id="qr-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>ðŸ¦ QuÃ©t mÃ£ QR Ä‘á»ƒ náº¡p thÃªm thá»i gian</h3>
-                <button type="button" class="close-modal-btn" onclick="closeQrModal()">âœ•</button>
+                <h3>🏦 Quét mã QR để nạp thêm thời gian</h3>
+                <button type="button" class="close-modal-btn" onclick="closeQrModal()">✕</button>
             </div>
             <div class="modal-body" style="text-align: center; padding: 15px 0;">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
-                    Chuyá»ƒn khoáº£n theo mÃ£ QR bÃªn dÆ°á»›i, há»‡ thá»‘ng sáº½ tá»± quy Ä‘á»•i thÃ nh giá» chÆ¡i (Ä‘Æ¡n giÃ¡: <span id="modal-rate" style="color:var(--primary); font-weight:bold;">-</span>).
+                    Chuyển khoản theo mã QR bên dưới, hệ thống sẽ tự quy đổi thành giờ chơi (đơn giá: <span id="modal-rate" style="color:var(--primary); font-weight:bold;">-</span>).
                 </p>
                 <div style="position: relative; width: 250px; height: 250px; margin: 0 auto 15px;">
                     <img id="qr-image" src="" alt="VietQR" style="width: 250px; height: 250px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);" />
                     <div id="qr-loading-spinner" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; color: #fff; font-size: 13px;">
                         <span style="display: inline-block; width: 30px; height: 30px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: var(--primary); animation: spin 1s ease-in-out infinite; margin-bottom: 10px;"></span>
-                        Äang káº¿t ná»‘i hÃ³a Ä‘Æ¡n...
+                        Đang kết nối hóa đơn...
                     </div>
                 </div>
                 <div style="background: rgba(255, 255, 255, 0.02); padding: 12px; border-radius: 8px; font-size: 13px; text-align: left; border: 1px solid rgba(255,255,255,0.05);">
-                    <div style="margin-bottom: 6px; color:#fff;">ðŸ¦ NgÃ¢n hÃ ng: <strong id="modal-bank-name">-</strong></div>
-                    <div style="margin-bottom: 6px; color:#fff;">ðŸ’³ Sá»‘ tÃ i khoáº£n: <strong id="modal-bank-acc" style="color: var(--primary);">-</strong></div>
-                    <div style="margin-bottom: 6px; color:#fff;">ðŸ‘¤ Chá»§ tÃ i khoáº£n: <strong id="modal-bank-owner">-</strong></div>
-                    <div style="margin-bottom: 6px; color:#fff;">ðŸ’° Sá»‘ tiá»n: <strong id="modal-amount" style="color: var(--success); font-size:15px;">-</strong></div>
-                    <div style="color:#fff;">ðŸ“ Ná»™i dung CK: <strong id="modal-bank-memo" style="color: var(--danger); font-size:15px; font-family:var(--font-cyber);">-</strong></div>
+                    <div style="margin-bottom: 6px; color:#fff;">🏦 Ngân hàng: <strong id="modal-bank-name">-</strong></div>
+                    <div style="margin-bottom: 6px; color:#fff;">💳 Số tài khoản: <strong id="modal-bank-acc" style="color: var(--primary);">-</strong></div>
+                    <div style="margin-bottom: 6px; color:#fff;">👤 Chủ tài khoản: <strong id="modal-bank-owner">-</strong></div>
+                    <div style="margin-bottom: 6px; color:#fff;">💰 Số tiền: <strong id="modal-amount" style="color: var(--success); font-size:15px;">-</strong></div>
+                    <div style="color:#fff;">📝 Nội dung CK: <strong id="modal-bank-memo" style="color: var(--danger); font-size:15px; font-family:var(--font-cyber);">-</strong></div>
                 </div>
                 <div id="polling-status-msg" style="margin-top: 15px; font-size: 13px; color: var(--primary); font-weight: 500;">
-                    ðŸ•’ Äang chá» báº¡n chuyá»ƒn khoáº£n...
+                    🕒 Đang chờ bạn chuyển khoản...
                 </div>
             </div>
             <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                <button type="button" class="btn-red" id="btn-cancel-invoice" onclick="cancelPendingInvoice()" style="height: 38px; border-radius: 8px; padding: 0 15px; font-weight: bold; flex: 1;">Há»§y hÃ³a Ä‘Æ¡n</button>
-                <button type="button" class="btn-green" onclick="closeQrModal()" style="height: 38px; border-radius: 8px; padding: 0 15px; flex: 1;">TÃ´i Ä‘Ã£ chuyá»ƒn tiá»n</button>
+                <button type="button" class="btn-red" id="btn-cancel-invoice" onclick="cancelPendingInvoice()" style="height: 38px; border-radius: 8px; padding: 0 15px; font-weight: bold; flex: 1;">Hủy hóa đơn</button>
+                <button type="button" class="btn-green" onclick="closeQrModal()" style="height: 38px; border-radius: 8px; padding: 0 15px; flex: 1;">Tôi đã chuyển tiền</button>
             </div>
         </div>
     </div>
@@ -1715,33 +1715,33 @@
     <div id="cancel-confirm-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--danger); box-shadow: 0 0 40px rgba(239, 68, 68, 0.15);">
             <div class="modal-header" style="border-bottom-color: rgba(239, 68, 68, 0.15);">
-                <h3 style="color: var(--danger); display: flex; align-items: center; gap: 8px; font-size: 15px;">âš ï¸ XÃ¡c nháº­n há»§y hÃ³a Ä‘Æ¡n</h3>
-                <button type="button" class="close-modal-btn" onclick="closeCancelConfirmModal()">âœ•</button>
+                <h3 style="color: var(--danger); display: flex; align-items: center; gap: 8px; font-size: 15px;">⚠️ Xác nhận hủy hóa đơn</h3>
+                <button type="button" class="close-modal-btn" onclick="closeCancelConfirmModal()">✕</button>
             </div>
             <div class="modal-body" style="padding: 20px 0; text-align: center;">
                 <p style="font-size: 14px; color: #fff; line-height: 1.5; margin: 0;">
-                    Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n há»§y hÃ³a Ä‘Æ¡n náº¡p tiá»n nÃ y khÃ´ng? HÃ nh Ä‘á»™ng nÃ y khÃ´ng thá»ƒ hoÃ n tÃ¡c.
+                    Bạn có chắc chắn muốn hủy hóa đơn nạp tiền này không? Hành động này không thể hoàn tác.
                 </p>
             </div>
             <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 10px;">
-                <button type="button" class="btn-gray" onclick="closeCancelConfirmModal()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Bá» qua</button>
-                <button type="button" class="btn-red" id="btn-execute-cancel-invoice" onclick="executeCancelPendingInvoice()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold;">Há»§y hÃ³a Ä‘Æ¡n</button>
+                <button type="button" class="btn-gray" onclick="closeCancelConfirmModal()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Bỏ qua</button>
+                <button type="button" class="btn-red" id="btn-execute-cancel-invoice" onclick="executeCancelPendingInvoice()" style="height: 38px; border-radius: 8px; flex: 1; cursor: pointer; font-weight: bold;">Hủy hóa đơn</button>
             </div>
         </div>
     </div>
 
-    <!-- App Alert Modal (Thay tháº¿ alert) -->
+    <!-- App Alert Modal (Thay thế alert) -->
     <div id="app-alert-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--primary); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15);">
             <div class="modal-header" style="border-bottom-color: rgba(0, 240, 255, 0.15);">
-                <h3 id="app-alert-title" style="color: var(--primary); display: flex; align-items: center; gap: 8px; font-size: 15px;">ðŸ“¢ ThÃ´ng bÃ¡o</h3>
-                <button type="button" class="close-modal-btn" onclick="closeAppAlertModal()">âœ•</button>
+                <h3 id="app-alert-title" style="color: var(--primary); display: flex; align-items: center; gap: 8px; font-size: 15px;">📢 Thông báo</h3>
+                <button type="button" class="close-modal-btn" onclick="closeAppAlertModal()">✕</button>
             </div>
             <div class="modal-body" style="padding: 20px 0; text-align: center;">
                 <p id="app-alert-message" style="font-size: 14px; color: #fff; line-height: 1.5; margin: 0;"></p>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 10px;">
-                <button type="button" class="btn-gray" onclick="closeAppAlertModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">ÄÃ³ng</button>
+                <button type="button" class="btn-gray" onclick="closeAppAlertModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Đóng</button>
             </div>
         </div>
     </div>
@@ -1750,39 +1750,39 @@
     <div id="payment-success-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--success); box-shadow: 0 0 50px rgba(16, 185, 129, 0.15);">
             <div class="modal-header" style="border-bottom-color: rgba(16, 185, 129, 0.1);">
-                <h3 style="color: var(--success); display: flex; align-items: center; gap: 8px; font-size: 15px;">ðŸŽ‰ Thanh toÃ¡n thÃ nh cÃ´ng</h3>
-                <button type="button" class="close-modal-btn" onclick="closePaymentSuccessModal()">âœ•</button>
+                <h3 style="color: var(--success); display: flex; align-items: center; gap: 8px; font-size: 15px;">🎉 Thanh toán thành công</h3>
+                <button type="button" class="close-modal-btn" onclick="closePaymentSuccessModal()">✕</button>
             </div>
             <div class="modal-body" style="padding: 15px 0; text-align: center;">
-                <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px; border: 1px solid rgba(16, 185, 129, 0.2);">âœ“</div>
+                <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px; border: 1px solid rgba(16, 185, 129, 0.2);">✓</div>
                 <p style="font-size: 13px; color: var(--text-main); margin-bottom: 15px;">
-                    Cáº£m Æ¡n báº¡n! HÃ³a Ä‘Æ¡n cá»§a báº¡n Ä‘Ã£ Ä‘Æ°á»£c duyá»‡t thanh toÃ¡n thÃ nh cÃ´ng.
+                    Cảm ơn bạn! Hóa đơn của bạn đã được duyệt thanh toán thành công.
                 </p>
                 <div style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 8px; font-size: 13px; text-align: left; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-muted);">MÃ£ hÃ³a Ä‘Æ¡n:</span>
+                        <span style="color: var(--text-muted);">Mã hóa đơn:</span>
                         <strong id="success-det-code" style="color: #fff; font-family: var(--font-cyber);">-</strong>
                     </div>
                     <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-muted);">Thá»i gian:</span>
+                        <span style="color: var(--text-muted);">Thời gian:</span>
                         <span id="success-det-time" style="color: #fff;">-</span>
                     </div>
                     <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-muted);">Sá»‘ tiá»n náº¡p:</span>
+                        <span style="color: var(--text-muted);">Số tiền nạp:</span>
                         <strong id="success-det-amount" style="color: var(--success);">-</strong>
                     </div>
                     <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-muted);">Thá»i gian nháº­n:</span>
+                        <span style="color: var(--text-muted);">Thời gian nhận:</span>
                         <strong id="success-det-hours" style="color: var(--primary);">-</strong>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="color: var(--text-muted);">Tráº¡ng thÃ¡i:</span>
-                        <span style="color: var(--success); font-weight: bold;">Thanh toÃ¡n thÃ nh cÃ´ng</span>
+                        <span style="color: var(--text-muted);">Trạng thái:</span>
+                        <span style="color: var(--success); font-weight: bold;">Thanh toán thành công</span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
-                <button type="button" class="btn-green" onclick="closePaymentSuccessModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer;">ÄÃ³ng vÃ  Báº¯t Ä‘áº§u</button>
+                <button type="button" class="btn-green" onclick="closePaymentSuccessModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer;">Đóng và Bắt đầu</button>
             </div>
         </div>
     </div>
@@ -1791,35 +1791,35 @@
     <div id="invoice-detail-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 400px; padding: 20px;">
             <div class="modal-header">
-                <h3>ðŸ“„ Chi tiáº¿t hÃ³a Ä‘Æ¡n</h3>
-                <button type="button" class="close-modal-btn" onclick="closeInvoiceDetailModal()">âœ•</button>
+                <h3>📄 Chi tiết hóa đơn</h3>
+                <button type="button" class="close-modal-btn" onclick="closeInvoiceDetailModal()">✕</button>
             </div>
             <div class="modal-body" style="padding: 15px 0;">
                 <div style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 8px; font-size: 13px; border: 1px solid rgba(255,255,255,0.05);">
                     <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-muted);">MÃ£ hÃ³a Ä‘Æ¡n:</span>
+                        <span style="color: var(--text-muted);">Mã hóa đơn:</span>
                         <strong id="det-code" style="color: #fff; font-family: var(--font-cyber);">-</strong>
                     </div>
                     <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-muted);">Thá»i gian:</span>
+                        <span style="color: var(--text-muted);">Thời gian:</span>
                         <span id="det-time" style="color: #fff;">-</span>
                     </div>
                     <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-muted);">Sá»‘ tiá»n náº¡p:</span>
+                        <span style="color: var(--text-muted);">Số tiền nạp:</span>
                         <strong id="det-amount" style="color: var(--success);">-</strong>
                     </div>
                     <div style="margin-bottom: 10px; display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-muted);">Thá»i gian nháº­n:</span>
+                        <span style="color: var(--text-muted);">Thời gian nhận:</span>
                         <strong id="det-hours" style="color: var(--primary);">-</strong>
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="color: var(--text-muted);">Tráº¡ng thÃ¡i:</span>
+                        <span style="color: var(--text-muted);">Trạng thái:</span>
                         <span id="det-status" style="font-weight: bold;">-</span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
-                <button type="button" class="btn-gray" onclick="closeInvoiceDetailModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">ÄÃ³ng</button>
+                <button type="button" class="btn-gray" onclick="closeInvoiceDetailModal()" style="width: 100%; height: 38px; border-radius: 8px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Đóng</button>
             </div>
         </div>
     </div>
@@ -1828,26 +1828,26 @@
     <div id="user-history-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 680px; width: 90%;">
             <div class="modal-header">
-                <h3>ðŸ‘¤ Lá»‹ch sá»­ hoáº¡t Ä‘á»™ng tÃ i khoáº£n</h3>
-                <button type="button" class="close-modal-btn" onclick="closeUserHistoryModal()">âœ•</button>
+                <h3>👤 Lịch sử hoạt động tài khoản</h3>
+                <button type="button" class="close-modal-btn" onclick="closeUserHistoryModal()">✕</button>
             </div>
             <div class="modal-body" style="padding: 10px 0;">
                 <!-- Tab Headers -->
                 <div style="display: flex; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 15px;">
-                    <button type="button" id="tab-profile-btn" class="history-tab-btn active" onclick="switchHistoryTab('profile')">ðŸ‘¤ ThÃ´ng tin tÃ i khoáº£n</button>
-                    <button type="button" id="tab-invoices-btn" class="history-tab-btn" onclick="switchHistoryTab('invoices')">ðŸ’³ Lá»‹ch sá»­ náº¡p tiá»n</button>
-                    <button type="button" id="tab-sessions-btn" class="history-tab-btn" onclick="switchHistoryTab('sessions')">ðŸŽ¬ Lá»‹ch sá»­ phiÃªn live</button>
+                    <button type="button" id="tab-profile-btn" class="history-tab-btn active" onclick="switchHistoryTab('profile')">👤 Thông tin tài khoản</button>
+                    <button type="button" id="tab-invoices-btn" class="history-tab-btn" onclick="switchHistoryTab('invoices')">💳 Lịch sử nạp tiền</button>
+                    <button type="button" id="tab-sessions-btn" class="history-tab-btn" onclick="switchHistoryTab('sessions')">🎬 Lịch sử phiên live</button>
                 </div>
 
                 <!-- Tab 0: Profile -->
                 <div id="tab-profile-content" style="max-height: 350px; overflow-y: auto;">
                     <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; font-size: 13px;">
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px;">
-                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">TÃ i khoáº£n</div>
+                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Tài khoản</div>
                             <strong id="profile-username" style="color: #fff;">-</strong>
                         </div>
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px;">
-                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Tráº¡ng thÃ¡i</div>
+                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Trạng thái</div>
                             <strong id="profile-status" style="color: var(--success);">-</strong>
                         </div>
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px;">
@@ -1855,23 +1855,23 @@
                             <strong id="profile-email" style="color: #fff;">-</strong>
                         </div>
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px;">
-                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Sá»‘ Ä‘iá»‡n thoáº¡i</div>
+                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Số điện thoại</div>
                             <strong id="profile-phone" style="color: #fff;">-</strong>
                         </div>
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px;">
-                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Sá»‘ dÆ° thá»i gian</div>
+                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Số dư thời gian</div>
                             <strong id="profile-balance" style="color: var(--primary);">-</strong>
                         </div>
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px;">
-                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">ÄÆ¡n giÃ¡</div>
+                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Đơn giá</div>
                             <strong id="profile-rate" style="color: var(--primary);">-</strong>
                         </div>
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px;">
-                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">NgÃ y táº¡o</div>
+                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Ngày tạo</div>
                             <strong id="profile-created-at" style="color: #fff;">-</strong>
                         </div>
                         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 12px;">
-                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">ÄÄƒng nháº­p gáº§n nháº¥t</div>
+                            <div style="color: var(--text-muted); font-size: 11px; text-transform: uppercase; margin-bottom: 6px;">Đăng nhập gần nhất</div>
                             <strong id="profile-last-login-at" style="color: #fff;">-</strong>
                         </div>
                     </div>
@@ -1882,11 +1882,11 @@
                     <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
                         <thead>
                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-muted);">
-                                <th style="padding: 8px; font-weight: bold;">MÃ£ hÃ³a Ä‘Æ¡n</th>
-                                <th style="padding: 8px; font-weight: bold;">Thá»i gian</th>
-                                <th style="padding: 8px; font-weight: bold;">Sá»‘ tiá»n</th>
-                                <th style="padding: 8px; font-weight: bold;">Quy Ä‘á»•i</th>
-                                <th style="padding: 8px; font-weight: bold;">Tráº¡ng thÃ¡i</th>
+                                <th style="padding: 8px; font-weight: bold;">Mã hóa đơn</th>
+                                <th style="padding: 8px; font-weight: bold;">Thời gian</th>
+                                <th style="padding: 8px; font-weight: bold;">Số tiền</th>
+                                <th style="padding: 8px; font-weight: bold;">Quy đổi</th>
+                                <th style="padding: 8px; font-weight: bold;">Trạng thái</th>
                             </tr>
                         </thead>
                         <tbody id="user-invoices-tbody">
@@ -1900,10 +1900,10 @@
                     <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
                         <thead>
                             <tr style="border-bottom: 1px solid rgba(255,255,255,0.08); color: var(--text-muted);">
-                                <th style="padding: 8px; font-weight: bold;">Báº¯t Ä‘áº§u</th>
-                                <th style="padding: 8px; font-weight: bold;">Káº¿t thÃºc</th>
-                                <th style="padding: 8px; font-weight: bold;">ÄÃ£ dÃ¹ng</th>
-                                <th style="padding: 8px; font-weight: bold;">Tráº¡ng thÃ¡i</th>
+                                <th style="padding: 8px; font-weight: bold;">Bắt đầu</th>
+                                <th style="padding: 8px; font-weight: bold;">Kết thúc</th>
+                                <th style="padding: 8px; font-weight: bold;">Đã dùng</th>
+                                <th style="padding: 8px; font-weight: bold;">Trạng thái</th>
                             </tr>
                         </thead>
                         <tbody id="user-sessions-tbody">
@@ -1913,7 +1913,7 @@
                 </div>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: flex-end; margin-top: 15px;">
-                <button type="button" class="btn-gray" onclick="closeUserHistoryModal()" style="height: 38px; border-radius: 8px; padding: 0 20px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">ÄÃ³ng</button>
+                <button type="button" class="btn-gray" onclick="closeUserHistoryModal()" style="height: 38px; border-radius: 8px; padding: 0 20px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">Đóng</button>
             </div>
         </div>
     </div>
@@ -1921,18 +1921,18 @@
     <div id="locked-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="force-logout-modal-title">TÃ i khoáº£n bá»‹ khÃ³a</h3>
+                <h3 id="force-logout-modal-title">Tài khoản bị khóa</h3>
             </div>
             <div class="modal-body" style="text-align: center; padding: 18px 0;">
                 <p id="force-logout-modal-message" style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
-                    TÃ i khoáº£n Ä‘Ã£ bá»‹ khÃ³a. Vui lÃ²ng liÃªn há»‡ quáº£n trá»‹ viÃªn.
+                    Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.
                 </p>
                 <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.5; margin: 12px 0 0;">
-                    Há»‡ thá»‘ng sáº½ tá»± Ä‘á»™ng Ä‘Äƒng xuáº¥t sau <span id="force-logout-countdown">10</span> giÃ¢y.
+                    Hệ thống sẽ tự động đăng xuất sau <span id="force-logout-countdown">10</span> giây.
                 </p>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
-                <button id="force-logout-button" type="button" class="btn-red" onclick="logoutForcedAccount()" style="width: 100%; height: 38px; border-radius: 8px;">ÄÄƒng xuáº¥t (10)</button>
+                <button id="force-logout-button" type="button" class="btn-red" onclick="logoutForcedAccount()" style="width: 100%; height: 38px; border-radius: 8px;">Đăng xuất (10)</button>
             </div>
         </div>
     </div>
@@ -1940,11 +1940,11 @@
     <div id="expired-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Háº¿t thá»i gian sá»­ dá»¥ng</h3>
+                <h3>Hết thời gian sử dụng</h3>
             </div>
             <div class="modal-body" style="text-align: center; padding: 18px 0;">
                 <p style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
-                    TÃ i khoáº£n Ä‘Ã£ háº¿t thá»i gian sá»­ dá»¥ng. PhiÃªn live Ä‘Ã£ Ä‘Æ°á»£c dá»«ng tá»± Ä‘á»™ng.
+                    Tài khoản đã hết thời gian sử dụng. Phiên live đã được dừng tự động.
                 </p>
             </div>
             <div class="modal-footer" style="display: flex; justify-content: center; margin-top: 15px;">
@@ -1957,40 +1957,40 @@
     <div id="version-update-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 460px;">
             <div class="modal-header">
-                <h3>PhiÃªn báº£n á»©ng dá»¥ng</h3>
-                <button type="button" class="modal-close" onclick="closeVersionModal()">Ã—</button>
+                <h3>Phiên bản ứng dụng</h3>
+                <button type="button" class="modal-close" onclick="closeVersionModal()">×</button>
             </div>
             <div style="display: grid; gap: 10px; font-size: 14px; color: var(--text-main);">
-                <div>PhiÃªn báº£n hiá»‡n táº¡i: <strong id="version-current-text" style="color: var(--primary);">--</strong></div>
-                <div id="version-latest-row" style="display: none;">PhiÃªn báº£n má»›i: <strong id="version-latest-text" style="color: var(--success);">--</strong></div>
+                <div>Phiên bản hiện tại: <strong id="version-current-text" style="color: var(--primary);">--</strong></div>
+                <div id="version-latest-row" style="display: none;">Phiên bản mới: <strong id="version-latest-text" style="color: var(--success);">--</strong></div>
                 <div id="version-release-notes" style="display: none; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: rgba(10, 16, 32, 0.65); white-space: pre-wrap;"></div>
                 <div id="version-download-box" style="display: none;">
                     <div style="height: 9px; background: rgba(148,163,184,0.18); border-radius: 999px; overflow: hidden;">
                         <div id="version-download-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--success)); transition: width 0.2s ease;"></div>
                     </div>
-                    <div id="version-download-meta" style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">Äang táº£i báº£n cáº­p nháº­t...</div>
+                    <div id="version-download-meta" style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">Đang tải bản cập nhật...</div>
                 </div>
-                <div id="version-status-text" style="color: var(--text-muted);">Äang kiá»ƒm tra phiÃªn báº£n...</div>
+                <div id="version-status-text" style="color: var(--text-muted);">Đang kiểm tra phiên bản...</div>
             </div>
             <div class="modal-footer" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 15px;">
-                <button type="button" class="btn-gray" onclick="closeVersionModal()" style="height: 36px; border-radius: 8px;">ÄÃ³ng</button>
-                <button type="button" id="version-update-btn" class="btn-green" onclick="startVersionUpdate()" style="height: 36px; border-radius: 8px; display: none;">Cáº­p nháº­t ngay</button>
+                <button type="button" class="btn-gray" onclick="closeVersionModal()" style="height: 36px; border-radius: 8px;">Đóng</button>
+                <button type="button" id="version-update-btn" class="btn-green" onclick="startVersionUpdate()" style="height: 36px; border-radius: 8px; display: none;">Cập nhật ngay</button>
             </div>
         </div>
     </div>
     <div id="logout-confirm-modal" class="modal-overlay" style="display: none;">
         <div class="modal-content" style="max-width: 380px;">
             <div class="modal-header">
-                <h3>XÃ¡c nháº­n Ä‘Äƒng xuáº¥t</h3>
+                <h3>Xác nhận đăng xuất</h3>
             </div>
             <div class="modal-body" style="text-align: center; padding: 18px 0;">
                 <p style="font-size: 15px; color: #fff; line-height: 1.5; margin: 0;">
-                    Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n Ä‘Äƒng xuáº¥t khá»i á»©ng dá»¥ng khÃ´ng?
+                    Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng không?
                 </p>
             </div>
             <div class="modal-footer" style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                <button type="button" class="btn-gray" onclick="closeLogoutModal()" style="flex: 1; height: 38px; border-radius: 8px;">Há»§y bá»</button>
-                <button type="button" class="btn-red" onclick="executeLogout()" style="flex: 1; height: 38px; border-radius: 8px;">ÄÄƒng xuáº¥t</button>
+                <button type="button" class="btn-gray" onclick="closeLogoutModal()" style="flex: 1; height: 38px; border-radius: 8px;">Hủy bỏ</button>
+                <button type="button" class="btn-red" onclick="executeLogout()" style="flex: 1; height: 38px; border-radius: 8px;">Đăng xuất</button>
             </div>
         </div>
     </div>
@@ -2019,7 +2019,7 @@
                 currentAppVersion = info.currentVersion || '--';
                 latestUpdateInfo = info.update || null;
                 if (latestUpdateInfo) {
-                    versionLabel.textContent = `Má»›i ${latestUpdateInfo.version}`;
+                    versionLabel.textContent = `Mới ${latestUpdateInfo.version}`;
                     versionCard.classList.add('has-update');
                 } else {
                     versionLabel.textContent = currentAppVersion;
@@ -2034,7 +2034,7 @@
             const modal = document.getElementById('version-update-modal');
             modal.style.display = 'flex';
             document.getElementById('version-current-text').textContent = currentAppVersion || '--';
-            document.getElementById('version-status-text').textContent = 'Äang kiá»ƒm tra phiÃªn báº£n...';
+            document.getElementById('version-status-text').textContent = 'Đang kiểm tra phiên bản...';
             document.getElementById('version-update-btn').style.display = 'none';
             document.getElementById('version-download-box').style.display = 'none';
             await refreshVersionInfo();
@@ -2046,12 +2046,12 @@
                 document.getElementById('version-latest-text').textContent = latestUpdateInfo.version;
                 notesBox.style.display = latestUpdateInfo.releaseNotes ? 'block' : 'none';
                 notesBox.textContent = latestUpdateInfo.releaseNotes || '';
-                document.getElementById('version-status-text').textContent = 'CÃ³ báº£n cáº­p nháº­t má»›i. Báº¡n cÃ³ thá»ƒ cáº­p nháº­t ngay.';
+                document.getElementById('version-status-text').textContent = 'Có bản cập nhật mới. Bạn có thể cập nhật ngay.';
                 document.getElementById('version-update-btn').style.display = 'inline-flex';
             } else {
                 latestRow.style.display = 'none';
                 notesBox.style.display = 'none';
-                document.getElementById('version-status-text').textContent = 'Báº¡n Ä‘ang dÃ¹ng phiÃªn báº£n má»›i nháº¥t.';
+                document.getElementById('version-status-text').textContent = 'Bạn đang dùng phiên bản mới nhất.';
             }
         }
 
@@ -2063,7 +2063,7 @@
             if (!latestUpdateInfo || !window.pywebview || !window.pywebview.api) return;
             document.getElementById('version-download-box').style.display = 'block';
             document.getElementById('version-update-btn').disabled = true;
-            setUpdateStatus('Äang táº£i báº£n cáº­p nháº­t...');
+            setUpdateStatus('Đang tải bản cập nhật...');
             await window.pywebview.api.start_update(latestUpdateInfo);
         }
 
@@ -2074,7 +2074,7 @@
             if (fill) fill.style.width = safePercent + '%';
             if (meta) {
                 const totalText = total ? ' / ' + formatUpdateBytes(total) : '';
-                meta.textContent = 'Äang táº£i: ' + safePercent + '% - ' + formatUpdateBytes(downloaded) + totalText;
+                meta.textContent = 'Đang tải: ' + safePercent + '% - ' + formatUpdateBytes(downloaded) + totalText;
             }
         }
 
@@ -2086,10 +2086,10 @@
         function setUpdateError(message) {
             const meta = document.getElementById('version-download-meta');
             const btn = document.getElementById('version-update-btn');
-            if (meta) meta.textContent = 'Lá»—i cáº­p nháº­t: ' + message;
+            if (meta) meta.textContent = 'Lỗi cập nhật: ' + message;
             if (btn) {
                 btn.disabled = false;
-                btn.textContent = 'Thá»­ láº¡i';
+                btn.textContent = 'Thử lại';
             }
         }
         const stopBtn = document.getElementById('stop-btn');
@@ -2289,7 +2289,7 @@
         function scrollParentToSecondLine(parent, child) {
             if (!parent || !child) return;
             
-            // KhÃ´ng tá»± Ä‘á»™ng cuá»™n náº¿u ngÆ°á»i dÃ¹ng Ä‘ang tÆ°Æ¡ng tÃ¡c/focus vÃ o form nháº­p liá»‡u
+            // Không tự động cuộn nếu người dùng đang tương tác/focus vào form nhập liệu
             const activeEl = document.activeElement;
             if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
                 return;
@@ -2420,7 +2420,7 @@
                 
                 // Clear active reading states
                 readingNum.textContent = '00';
-                readingText.textContent = 'ÄÃ£ dá»«ng phÃ¡t Ã¢m thanh.';
+                readingText.textContent = 'Đã dừng phát âm thanh.';
                 readingProgressBar.style.width = '0%';
                 readingProgressPercent.textContent = '0%';
             }
@@ -2446,7 +2446,7 @@
                 }
 
                 // Clear comments list
-                commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Äang chá» bÃ¬nh luáº­n TikTok...</div>';
+                commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ bình luận TikTok...</div>';
             }
 
             interruptCurrent() {
@@ -2588,7 +2588,7 @@
                 }
 
                 item.isFetching = true;
-                const voiceSelectVal = voiceSelect.value || 'TrÃºc Ly';
+                const voiceSelectVal = voiceSelect.value || 'Trúc Ly';
 
                 try {
                     const response = await fetch('/tts', {
@@ -2810,7 +2810,7 @@
                     scrollParentToSecondLine(scrollParent, item.containerEl);
                 }
 
-                // Animate progress bar in AI Sáº¯p Ä‘á»c panel
+                // Animate progress bar in AI Sắp đọc panel
                 let start = null;
                 let lastScrollAt = 0;
                 const progressFill = (timestamp) => {
@@ -2850,7 +2850,7 @@
                             setTimeout(() => {
                                 commentItem.remove();
                                 if (commentsDiv.children.length === 0) {
-                                    commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Äang chá» bÃ¬nh luáº­n TikTok...</div>';
+                                    commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ bình luận TikTok...</div>';
                                 }
                             }, 1000);
                         }
@@ -2877,7 +2877,7 @@
                 .then(data => {
                     if (data && data.success) {
                         applyBillingSnapshot(data);
-                        setBillingSessionStatus('ÄÃ£ dá»«ng', 'var(--text-muted)');
+                        setBillingSessionStatus('Đã dừng', 'var(--text-muted)');
                     } else if (isLockedResponse(data)) {
                         handleLockedAccount(data);
                     }
@@ -2898,19 +2898,19 @@
             if (isAccountLocked) {
                 startBtn.disabled = true;
                 status.className = 'error';
-                status.textContent = 'TÃ i khoáº£n Ä‘Ã£ bá»‹ khÃ³a. Vui lÃ²ng liÃªn há»‡ quáº£n trá»‹ viÃªn.';
+                status.textContent = 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.';
             } else if (timeBalanceSeconds <= 0) {
                 startBtn.disabled = true;
                 status.className = 'error';
-                status.textContent = 'TÃ i khoáº£n Ä‘Ã£ háº¿t thá»i gian sá»­ dá»¥ng. Vui lÃ²ng quÃ©t mÃ£ QR náº¡p tiá»n.';
+                status.textContent = 'Tài khoản đã hết thời gian sử dụng. Vui lòng quét mã QR nạp tiền.';
             } else {
                 startBtn.disabled = false;
-                status.textContent = 'ÄÃ£ dá»«ng.';
+                status.textContent = 'Đã dừng.';
             }
         }
 
         function queueAudio(text) {
-            const voice = voiceSelect ? voiceSelect.value : 'TrÃºc Ly';
+            const voice = voiceSelect ? voiceSelect.value : 'Trúc Ly';
             audioQueue = audioQueue.then(() =>
                 fetch('/add-tts', {
                     method: 'POST',
@@ -2922,9 +2922,9 @@
                             return response.text().then(text => {
                                 try {
                                     const data = JSON.parse(text);
-                                    throw new Error(data.error || data.detail || text || 'Lá»—i TTS');
+                                    throw new Error(data.error || data.detail || text || 'Lỗi TTS');
                                 } catch {
-                                    throw new Error(text || response.statusText || 'Lá»—i TTS');
+                                    throw new Error(text || response.statusText || 'Lỗi TTS');
                                 }
                             });
                         }
@@ -2932,7 +2932,7 @@
                     })
                     .catch(error => {
                         console.error('TTS error:', error);
-                        status.textContent = 'Lá»—i TTS: ' + error.message;
+                        status.textContent = 'Lỗi TTS: ' + error.message;
                     })
             );
         }
@@ -3101,7 +3101,7 @@
 
             const rate = parseFloat(rateInput ? rateInput.value : 0) || (userProfileData && userProfileData.hourlyRateVnd) || 50000;
             const amount = Math.round((currentSessionElapsedSeconds / 3600) * rate);
-            if (amountEl) amountEl.textContent = amount.toLocaleString('vi-VN') + ' Ä‘';
+            if (amountEl) amountEl.textContent = amount.toLocaleString('vi-VN') + ' đ';
         }
 
         function startSessionElapsedTimer(initialSeconds = 0) {
@@ -3155,10 +3155,10 @@
             expiredModalVisible = false;
             document.getElementById('expired-modal').style.display = 'none';
             status.className = 'status-info';
-            status.textContent = 'TÃ i khoáº£n chÆ°a cÃ³ thá»i gian sá»­ dá»¥ng. Vui lÃ²ng náº¡p thÃªm Ä‘á»ƒ tiáº¿p tá»¥c.';
+            status.textContent = 'Tài khoản chưa có thời gian sử dụng. Vui lòng nạp thêm để tiếp tục.';
         }
 
-        function showPaymentQr(message = 'TÃ i khoáº£n chÆ°a cÃ³ thá»i gian sá»­ dá»¥ng. Vui lÃ²ng náº¡p thÃªm Ä‘á»ƒ tiáº¿p tá»¥c.') {
+        function showPaymentQr(message = 'Tài khoản chưa có thời gian sử dụng. Vui lòng nạp thêm để tiếp tục.') {
             document.getElementById('expired-modal').style.display = 'none';
             expiredModalVisible = false;
             status.className = 'error';
@@ -3168,13 +3168,13 @@
 
         function requireActiveBalance() {
             if (isAccountLocked) {
-                handleLockedAccount({ message: 'TÃ i khoáº£n Ä‘Ã£ bá»‹ khÃ³a. Vui lÃ²ng liÃªn há»‡ quáº£n trá»‹ viÃªn.' });
+                handleLockedAccount({ message: 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.' });
                 return false;
             }
             if (timeBalanceSeconds <= 0 || noBalanceMode) {
                 status.className = 'error';
-                status.textContent = 'ChÆ°a cÃ³ thá»i gian sá»­ dá»¥ng hÃ£y náº¡p tiá»n';
-                openPriceModal({ title: 'ChÆ°a cÃ³ thá»i gian sá»­ dá»¥ng hÃ£y náº¡p tiá»n' });
+                status.textContent = 'Chưa có thời gian sử dụng hãy nạp tiền';
+                openPriceModal({ title: 'Chưa có thời gian sử dụng hãy nạp tiền' });
                 return false;
             }
             return true;
@@ -3202,7 +3202,7 @@
             timeBalanceSeconds = 0;
             lastKnownBalanceSeconds = 0;
             updateTimeBalanceUI();
-            setBillingSessionStatus('Háº¿t thá»i gian', 'var(--danger)');
+            setBillingSessionStatus('Hết thời gian', 'var(--danger)');
             stopBtn.disabled = true;
             startBtn.disabled = false;
             sendBtn.disabled = false;
@@ -3214,7 +3214,7 @@
             noBalanceMode = true;
             stopRuntimeForNoBalance();
             status.className = 'error';
-            status.textContent = 'TÃ i khoáº£n Ä‘Ã£ háº¿t thá»i gian sá»­ dá»¥ng. PhiÃªn live Ä‘Ã£ Ä‘Æ°á»£c dá»«ng tá»± Ä‘á»™ng.';
+            status.textContent = 'Tài khoản đã hết thời gian sử dụng. Phiên live đã được dừng tự động.';
             showExpiredModal();
         }
 
@@ -3235,7 +3235,7 @@
             const countdownEl = document.getElementById('force-logout-countdown');
             const buttonEl = document.getElementById('force-logout-button');
             if (countdownEl) countdownEl.textContent = forceLogoutRemainingSeconds;
-            if (buttonEl) buttonEl.textContent = `ÄÄƒng xuáº¥t (${forceLogoutRemainingSeconds})`;
+            if (buttonEl) buttonEl.textContent = `Đăng xuất (${forceLogoutRemainingSeconds})`;
         }
 
         function showForceLogoutModal(options) {
@@ -3304,11 +3304,11 @@
                 systemTiktokBadge.className = 'status-badge off';
             }
             status.className = 'error';
-            const message = (data && (data.message || data.error)) || 'TÃ i khoáº£n Ä‘Ã£ bá»‹ khÃ³a. Vui lÃ²ng liÃªn há»‡ quáº£n trá»‹ viÃªn.';
+            const message = (data && (data.message || data.error)) || 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.';
             status.textContent = message;
-            setBillingSessionStatus('TÃ i khoáº£n bá»‹ khÃ³a', 'var(--danger)');
+            setBillingSessionStatus('Tài khoản bị khóa', 'var(--danger)');
             showForceLogoutModal({
-                title: 'TÃ i khoáº£n bá»‹ khÃ³a',
+                title: 'Tài khoản bị khóa',
                 message
             });
         }
@@ -3325,30 +3325,30 @@
                     if (data.status === 'completed') {
                         localStorage.removeItem('active_pending_invoice_id');
                         
-                        // ÄÃ³ng cÃ¡c modal náº¡p tiá»n vÃ  xÃ¡c nháº­n náº¿u Ä‘ang má»Ÿ
+                        // Đóng các modal nạp tiền và xác nhận nếu đang mở
                         document.getElementById('qr-modal').style.display = 'none';
                         document.getElementById('cancel-confirm-modal').style.display = 'none';
                         
-                        // Hiá»ƒn thá»‹ thÃ´ng tin lÃªn payment-success-modal
+                        // Hiển thị thông tin lên payment-success-modal
                         const inv = data.invoice;
                         document.getElementById('success-det-code').textContent = inv.code;
                         document.getElementById('success-det-time').textContent = new Date().toLocaleString('vi-VN');
-                        document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNÄ';
+                        document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
                         
                         const mins = Math.floor(inv.secondsChanged / 60);
-                        document.getElementById('success-det-hours').textContent = `+${mins} phÃºt`;
+                        document.getElementById('success-det-hours').textContent = `+${mins} phút`;
                         
-                        // Má»Ÿ modal success
+                        // Mở modal success
                         document.getElementById('payment-success-modal').style.display = 'flex';
                         
-                        // XÃ³a cÃ¡c interval polling cá»¥c bá»™
+                        // Xóa các interval polling cục bộ
                         if (invoicePollingInterval) {
                             clearInterval(invoicePollingInterval);
                             invoicePollingInterval = null;
                         }
                         activeInvoiceId = null;
                         
-                        // Táº£i láº¡i profile
+                        // Tải lại profile
                         loadUserProfile();
                     } else if (data.status === 'cancelled') {
                         localStorage.removeItem('active_pending_invoice_id');
@@ -3361,7 +3361,7 @@
                         }
                         activeInvoiceId = null;
                         
-                        showAppAlert('ThÃ´ng bÃ¡o', `HÃ³a Ä‘Æ¡n ${data.invoice ? data.invoice.code : ''} Ä‘Ã£ bá»‹ há»§y.`);
+                        showAppAlert('Thông báo', `Hóa đơn ${data.invoice ? data.invoice.code : ''} đã bị hủy.`);
                         loadUserProfile();
                     }
                 }
@@ -3371,7 +3371,7 @@
         }
 
         async function loadUserProfile() {
-            // Check hÃ³a Ä‘Æ¡n pending trÆ°á»›c
+            // Check hóa đơn pending trước
             checkActivePendingInvoice();
             
             try {
@@ -3388,7 +3388,7 @@ if (isLockedResponse(data)) {
                     timeBalanceSeconds = typeof data.remainingSeconds === 'number' ? data.remainingSeconds : data.timeBalanceSeconds;
                     lastKnownBalanceSeconds = timeBalanceSeconds;
                     document.getElementById('top-username').textContent = data.username;
-                    document.getElementById('top-hourly-rate').textContent = data.hourlyRateVnd.toLocaleString('vi-VN') + ' Ä‘/h';
+                    document.getElementById('top-hourly-rate').textContent = data.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/h';
                     renderUserProfileInfo();
                     const billingRateEl = document.getElementById('billing-rate-input');
                     if (billingRateEl) billingRateEl.value = data.hourlyRateVnd;
@@ -3404,22 +3404,22 @@ if (isLockedResponse(data)) {
                             if (startTimeEl && startedAt) {
                                 startTimeEl.textContent = startedAt.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                             }
-                            setBillingSessionStatus('Äang sá»­ dá»¥ng', 'var(--success)');
+                            setBillingSessionStatus('Đang sử dụng', 'var(--success)');
                         } else {
                             currentBillingSessionId = null;
                             stopSessionElapsedTimer();
                             currentSessionElapsedSeconds = 0;
                             const startTimeEl = document.getElementById('billing-start-time');
                             if (startTimeEl) startTimeEl.textContent = '--:--:--';
-                            setBillingSessionStatus('ChÆ°a báº¯t Ä‘áº§u', '#ffffff');
+                            setBillingSessionStatus('Chưa bắt đầu', '#ffffff');
                         }
                         updateCurrentSessionUI();
                     } else if (!isRunning) {
                         currentBillingSessionId = null;
                         if (timeBalanceSeconds <= 0) {
-                            setBillingSessionStatus('Háº¿t giá»', 'var(--danger)');
+                            setBillingSessionStatus('Hết giờ', 'var(--danger)');
                         } else {
-                            setBillingSessionStatus('ChÆ°a báº¯t Ä‘áº§u', '#ffffff');
+                            setBillingSessionStatus('Chưa bắt đầu', '#ffffff');
                         }
                     }
                     updateTimeBalanceUI();
@@ -3439,8 +3439,8 @@ if (isLockedResponse(data)) {
                                 document.getElementById('qr-modal').style.display = 'none';
                             }
                             status.className = 'status-info';
-                            status.textContent = 'TÃ i khoáº£n Ä‘Ã£ Ä‘Æ°á»£c náº¡p thá»i gian. Báº¡n cÃ³ thá»ƒ tiáº¿p tá»¥c sá»­ dá»¥ng.';
-                            setBillingSessionStatus('Sáºµn sÃ ng', 'var(--success)');
+                            status.textContent = 'Tài khoản đã được nạp thời gian. Bạn có thể tiếp tục sử dụng.';
+                            setBillingSessionStatus('Sẵn sàng', 'var(--success)');
                         }
                     } else {
                         noBalanceMode = true;
@@ -3502,14 +3502,14 @@ if (isLockedResponse(data)) {
 
         function openPriceModal(options = {}) {
             const titleEl = document.getElementById('price-modal-title');
-            if (titleEl) titleEl.textContent = options.title || 'ðŸ’° Chá»n gÃ³i náº¡p tiá»n';
+            if (titleEl) titleEl.textContent = options.title || '💰 Chọn gói nạp tiền';
 
             const profile = userProfileData || {};
             const rate = profile.hourlyRateVnd || 50000;
             
-            document.getElementById('price-modal-rate').textContent = rate.toLocaleString('vi-VN') + ' Ä‘/giá»';
+            document.getElementById('price-modal-rate').textContent = rate.toLocaleString('vi-VN') + ' đ/giờ';
             
-            // Cáº­p nháº­t sá»‘ giá» quy Ä‘á»•i hiá»ƒn thá»‹ trong cÃ¡c nÃºt chá»n nhanh
+            // Cập nhật số giờ quy đổi hiển thị trong các nút chọn nhanh
             const amounts = [50000, 100000, 150000, 200000, 250000, 500000];
             const ids = ['50k', '100k', '150k', '200k', '250k', '500k'];
             
@@ -3517,16 +3517,16 @@ if (isLockedResponse(data)) {
                 const hours = Math.floor(amt / rate);
                 const minutes = Math.floor(((amt / rate) % 1) * 60);
                 let desc = `~`;
-                if (hours > 0) desc += `${hours} giá» `;
-                if (minutes > 0) desc += `${minutes} phÃºt`;
-                if (hours === 0 && minutes === 0) desc += '0 giá»';
+                if (hours > 0) desc += `${hours} giờ `;
+                if (minutes > 0) desc += `${minutes} phút`;
+                if (hours === 0 && minutes === 0) desc += '0 giờ';
                 
                 const elementId = `price-desc-${ids[idx]}`;
                 const el = document.getElementById(elementId);
                 if (el) el.textContent = desc;
             });
             
-            // Reset dá»¯ liá»‡u modal
+            // Reset dữ liệu modal
             currentSelectedAmount = null;
             document.getElementById('custom-price-input').value = '';
             document.getElementById('custom-price-hours-desc').textContent = '';
@@ -3540,7 +3540,7 @@ if (isLockedResponse(data)) {
 
         function closePriceModal() {
             const titleEl = document.getElementById('price-modal-title');
-            if (titleEl) titleEl.textContent = 'ðŸ’° Chá»n gÃ³i náº¡p tiá»n';
+            if (titleEl) titleEl.textContent = '💰 Chọn gói nạp tiền';
             if (julyPromoCountdownInterval) {
                 clearInterval(julyPromoCountdownInterval);
                 julyPromoCountdownInterval = null;
@@ -3575,14 +3575,14 @@ if (isLockedResponse(data)) {
             const bankDetails = profile.bankDetails || {};
             const qrImage = document.getElementById('qr-image');
             const waitingMessage = invoice.paymentProvider === 'sepay'
-                ? 'ðŸ•’ Äang chá» SePay xÃ¡c nháº­n chuyá»ƒn khoáº£n...'
-                : 'ðŸ•’ Äang chá» admin xÃ¡c nháº­n chuyá»ƒn khoáº£n...';
+                ? '🕒 Đang chờ SePay xác nhận chuyển khoản...'
+                : '🕒 Đang chờ admin xác nhận chuyển khoản...';
 
-            document.getElementById('modal-rate').textContent = invoice.hourlyRateSnapshot ? invoice.hourlyRateSnapshot.toLocaleString('vi-VN') + ' Ä‘/giá»' : (profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' Ä‘/giá»' : '50.000 Ä‘/giá»');
+            document.getElementById('modal-rate').textContent = invoice.hourlyRateSnapshot ? invoice.hourlyRateSnapshot.toLocaleString('vi-VN') + ' đ/giờ' : (profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '50.000 đ/giờ');
             document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
             document.getElementById('modal-bank-acc').textContent = bankDetails.accountNumber || '--';
             document.getElementById('modal-bank-owner').textContent = bankDetails.accountName || '--';
-            document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNÄ';
+            document.getElementById('modal-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
             document.getElementById('modal-bank-memo').textContent = invoice.transferContent || invoice.code || '--';
 
             const qrUrl = buildTransferQrUrl(bankDetails, invoice);
@@ -3604,7 +3604,7 @@ if (isLockedResponse(data)) {
             const val = document.getElementById('custom-price-input').value;
             const descEl = document.getElementById('custom-price-hours-desc');
             
-            // Gá»¡ active cá»§a cÃ¡c nÃºt chá»n nhanh
+            // Gỡ active của các nút chọn nhanh
             const pbuttons = document.querySelectorAll('.price-btn');
             pbuttons.forEach(btn => btn.classList.remove('active'));
             
@@ -3623,27 +3623,27 @@ if (isLockedResponse(data)) {
             const hours = Math.floor(amount / rate);
             const minutes = Math.floor(((amount / rate) % 1) * 60);
             
-            let desc = `Quy Ä‘á»•i: `;
-            if (hours > 0) desc += `${hours} giá» `;
-            if (minutes > 0) desc += `${minutes} phÃºt`;
-            if (hours === 0 && minutes === 0) desc += '0 giá»';
+            let desc = `Quy đổi: `;
+            if (hours > 0) desc += `${hours} giờ `;
+            if (minutes > 0) desc += `${minutes} phút`;
+            if (hours === 0 && minutes === 0) desc += '0 giờ';
             
             descEl.textContent = desc;
         }
 
         async function confirmPriceSelection() {
             if (!currentSelectedAmount || currentSelectedAmount < 50000) {
-                showAppAlert('Cáº£nh bÃ¡o', 'Vui lÃ²ng chá»n hoáº·c nháº­p sá»‘ tiá»n náº¡p tá»‘i thiá»ƒu 50.000 VNÄ.');
+                showAppAlert('Cảnh báo', 'Vui lòng chọn hoặc nhập số tiền nạp tối thiểu 50.000 VNĐ.');
                 return;
             }
             
             closePriceModal();
             
-            // Má»Ÿ qr-modal vá»›i tráº¡ng thÃ¡i loading
+            // Mở qr-modal với trạng thái loading
             document.getElementById('qr-modal').style.display = 'flex';
             document.getElementById('qr-loading-spinner').style.display = 'flex';
             document.getElementById('qr-image').style.display = 'none';
-            document.getElementById('polling-status-msg').textContent = 'ðŸ•’ Äang táº¡o hÃ³a Ä‘Æ¡n tá»« há»‡ thá»‘ng...';
+            document.getElementById('polling-status-msg').textContent = '🕒 Đang tạo hóa đơn từ hệ thống...';
             
             try {
                 const res = await fetch('/api/invoice/create', {
@@ -3654,7 +3654,7 @@ if (isLockedResponse(data)) {
                 
                 const data = await res.json();
                 if (!res.ok || !data.success) {
-                    showAppAlert('Lá»—i', data.error || 'Táº¡o hÃ³a Ä‘Æ¡n tháº¥t báº¡i.');
+                    showAppAlert('Lỗi', data.error || 'Tạo hóa đơn thất bại.');
                     closeQrModal();
                     return;
                 }
@@ -3662,18 +3662,18 @@ if (isLockedResponse(data)) {
                 const invoice = data.invoice;
                 activeInvoiceId = invoice._id;
                 
-                // Hiá»ƒn thá»‹ thÃ´ng tin hÃ³a Ä‘Æ¡n lÃªn QR modal
+                // Hiển thị thông tin hóa đơn lên QR modal
                 const profile = userProfileData || {};
                 applyInvoicePaymentToQrModal(invoice, profile);
                 
                 document.getElementById('qr-loading-spinner').style.display = 'none';
                 
-                // Khá»Ÿi cháº¡y Polling kiá»ƒm tra tráº¡ng thÃ¡i
+                // Khởi chạy Polling kiểm tra trạng thái
                 startInvoicePolling(invoice._id);
                 
             } catch (err) {
                 console.error(err);
-                showAppAlert('Lá»—i', 'Lá»—i káº¿t ná»‘i mÃ¡y chá»§.');
+                showAppAlert('Lỗi', 'Lỗi kết nối máy chủ.');
                 closeQrModal();
             }
         }
@@ -3685,7 +3685,7 @@ if (isLockedResponse(data)) {
         }
 
         function closeQrModal() {
-            // Chá»‰ dá»«ng polling vÃ  Ä‘Ã³ng modal (khÃ´ng há»§y hÃ³a Ä‘Æ¡n)
+            // Chỉ dừng polling và đóng modal (không hủy hóa đơn)
             if (invoicePollingInterval) {
                 clearInterval(invoicePollingInterval);
                 invoicePollingInterval = null;
@@ -3701,7 +3701,7 @@ if (isLockedResponse(data)) {
 
         function cancelPendingInvoice() {
             if (!activeInvoiceId) return;
-            // Má»Ÿ modal xÃ¡c nháº­n há»§y thay vÃ¬ confirm cá»§a trÃ¬nh duyá»‡t
+            // Mở modal xác nhận hủy thay vì confirm của trình duyệt
             document.getElementById('cancel-confirm-modal').style.display = 'flex';
         }
 
@@ -3724,7 +3724,7 @@ if (isLockedResponse(data)) {
                 const res = await fetch(`/api/invoice/cancel/${activeInvoiceId}`, { method: 'POST' });
                 const data = await res.json();
                 
-                // ÄÃ³ng modal xÃ¡c nháº­n há»§y
+                // Đóng modal xác nhận hủy
                 closeCancelConfirmModal();
                 
                 if (res.ok && data.success) {
@@ -3733,12 +3733,12 @@ if (isLockedResponse(data)) {
                         clearInterval(invoicePollingInterval);
                         invoicePollingInterval = null;
                     }
-                    showAppAlert('ThÃ nh cÃ´ng', 'ÄÃ£ há»§y hÃ³a Ä‘Æ¡n náº¡p tiá»n thÃ nh cÃ´ng.');
+                    showAppAlert('Thành công', 'Đã hủy hóa đơn nạp tiền thành công.');
                     document.getElementById('qr-modal').style.display = 'none';
                     activeInvoiceId = null;
                     loadUserProfile();
                 } else {
-                    // Náº¿u backend bÃ¡o hÃ³a Ä‘Æ¡n Ä‘Ã£ Ä‘Æ°á»£c thanh toÃ¡n thÃ nh cÃ´ng (completed) do admin vá»«a duyá»‡t
+                    // Nếu backend báo hóa đơn đã được thanh toán thành công (completed) do admin vừa duyệt
                     if (data.isCompleted || (data.invoice && data.invoice.status === 'completed')) {
                         localStorage.removeItem('active_pending_invoice_id');
                         if (invoicePollingInterval) {
@@ -3748,20 +3748,20 @@ if (isLockedResponse(data)) {
                         
                         document.getElementById('qr-modal').style.display = 'none';
                         
-                        // Hiá»ƒn thá»‹ thÃ´ng tin lÃªn payment-success-modal
+                        // Hiển thị thông tin lên payment-success-modal
                         const inv = data.invoice;
                         document.getElementById('success-det-code').textContent = inv.code;
                         document.getElementById('success-det-time').textContent = new Date().toLocaleString('vi-VN');
-                        document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNÄ';
+                        document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
                         
                         const mins = Math.floor(inv.secondsChanged / 60);
-                        document.getElementById('success-det-hours').textContent = `+${mins} phÃºt`;
+                        document.getElementById('success-det-hours').textContent = `+${mins} phút`;
                         
                         document.getElementById('payment-success-modal').style.display = 'flex';
                         activeInvoiceId = null;
                         loadUserProfile();
                     } else {
-                        showAppAlert('Lá»—i', data.error || 'Há»§y hÃ³a Ä‘Æ¡n tháº¥t báº¡i.');
+                        showAppAlert('Lỗi', data.error || 'Hủy hóa đơn thất bại.');
                         if (btnCancel) btnCancel.disabled = false;
                         if (btnExecute) btnExecute.disabled = false;
                     }
@@ -3769,14 +3769,14 @@ if (isLockedResponse(data)) {
             } catch (err) {
                 console.error('Cancel invoice error:', err);
                 closeCancelConfirmModal();
-                showAppAlert('Lá»—i', 'KhÃ´ng thá»ƒ káº¿t ná»‘i mÃ¡y chá»§ Ä‘á»ƒ há»§y hÃ³a Ä‘Æ¡n.');
+                showAppAlert('Lỗi', 'Không thể kết nối máy chủ để hủy hóa đơn.');
                 if (btnCancel) btnCancel.disabled = false;
                 if (btnExecute) btnExecute.disabled = false;
             }
         }
 
         function showAppAlert(title, message) {
-            document.getElementById('app-alert-title').textContent = title || 'ðŸ“¢ ThÃ´ng bÃ¡o';
+            document.getElementById('app-alert-title').textContent = title || '📢 Thông báo';
             document.getElementById('app-alert-message').textContent = message;
             document.getElementById('app-alert-modal').style.display = 'flex';
         }
@@ -3800,9 +3800,9 @@ if (isLockedResponse(data)) {
             setText('profile-username', profile.username || user.username);
             setText('profile-email', profile.email || user.email);
             setText('profile-phone', profile.phone || user.phone);
-            setText('profile-status', profile.isActive === false || user.isActive === false ? 'Äang khÃ³a' : 'Äang hoáº¡t Ä‘á»™ng');
+            setText('profile-status', profile.isActive === false || user.isActive === false ? 'Đang khóa' : 'Đang hoạt động');
             setText('profile-balance', profile.formattedBalance || formatBillingTime(profile.remainingSeconds || profile.timeBalanceSeconds || 0));
-            setText('profile-rate', profile.hourlyRateVnd ? `${profile.hourlyRateVnd.toLocaleString('vi-VN')} Ä‘/h` : '-');
+            setText('profile-rate', profile.hourlyRateVnd ? `${profile.hourlyRateVnd.toLocaleString('vi-VN')} đ/h` : '-');
             setText('profile-created-at', formatProfileDate(profile.createdAt || user.createdAt));
             setText('profile-last-login-at', formatProfileDate(profile.lastLoginAt || user.lastLoginAt));
         }
@@ -3843,7 +3843,7 @@ if (isLockedResponse(data)) {
 
         async function loadUserInvoices() {
             const tbody = document.getElementById('user-invoices-tbody');
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">Äang táº£i lá»‹ch sá»­ náº¡p...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">Đang tải lịch sử nạp...</td></tr>`;
             
             try {
                 const res = await fetch('/api/invoices');
@@ -3854,19 +3854,19 @@ if (isLockedResponse(data)) {
                     window.loadedInvoices = invoices;
                     
                     if (invoices.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">ChÆ°a cÃ³ lá»‹ch sá»­ náº¡p tiá»n.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">Chưa có lịch sử nạp tiền.</td></tr>`;
                         return;
                     }
                     
                     let html = '';
                     invoices.forEach(inv => {
-                        let statusText = 'Chá» thanh toÃ¡n';
+                        let statusText = 'Chờ thanh toán';
                         let statusColor = 'var(--purple)';
                         if (inv.status === 'completed') {
-                            statusText = 'ThÃ nh cÃ´ng';
+                            statusText = 'Thành công';
                             statusColor = 'var(--success)';
                         } else if (inv.status === 'cancelled') {
-                            statusText = 'ÄÃ£ há»§y';
+                            statusText = 'Đã hủy';
                             statusColor = 'var(--danger)';
                         }
                         
@@ -3876,18 +3876,18 @@ if (isLockedResponse(data)) {
                         html += `<tr onclick="handleInvoiceClick('${inv._id}')" style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='none'">
                             <td style="padding: 8px; font-family: var(--font-cyber); font-weight: bold; color: #fff;">${inv.code}</td>
                             <td style="padding: 8px; color: var(--text-muted);">${dateStr}</td>
-                            <td style="padding: 8px; font-weight: bold; color: var(--success);">${inv.amountVnd.toLocaleString('vi-VN')} Ä‘</td>
-                            <td style="padding: 8px; color: var(--primary); font-weight: bold;">+${mins} phÃºt</td>
+                            <td style="padding: 8px; font-weight: bold; color: var(--success);">${inv.amountVnd.toLocaleString('vi-VN')} đ</td>
+                            <td style="padding: 8px; color: var(--primary); font-weight: bold;">+${mins} phút</td>
                             <td style="padding: 8px;"><span style="color: ${statusColor}; font-weight: bold;">${statusText}</span></td>
                         </tr>`;
                     });
                     tbody.innerHTML = html;
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--danger);">KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--danger);">Không thể tải dữ liệu.</td></tr>`;
                 }
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--danger);">Lá»—i káº¿t ná»‘i.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--danger);">Lỗi kết nối.</td></tr>`;
             }
         }
 
@@ -3895,14 +3895,14 @@ if (isLockedResponse(data)) {
             const invoice = window.loadedInvoices.find(inv => inv._id === invoiceId);
             if (!invoice) return;
 
-            // LuÃ´n Ä‘Ã³ng modal lá»‹ch sá»­ trÆ°á»›c Ä‘á»ƒ trÃ¡nh bá»‹ Ä‘Ã¨ z-index
+            // Luôn đóng modal lịch sử trước để tránh bị đè z-index
             closeUserHistoryModal();
 
             if (invoice.status === 'pending') {
-                // Má»Ÿ QR checkout
+                // Mở QR checkout
                 showInvoiceCheckout(invoice);
             } else {
-                // Má»Ÿ chi tiáº¿t hÃ³a Ä‘Æ¡n (ThÃ nh cÃ´ng / Há»§y)
+                // Mở chi tiết hóa đơn (Thành công / Hủy)
                 showInvoiceDetail(invoice);
             }
         }
@@ -3927,20 +3927,20 @@ if (isLockedResponse(data)) {
         function showInvoiceDetail(invoice) {
             document.getElementById('det-code').textContent = invoice.code;
             document.getElementById('det-time').textContent = new Date(invoice.createdAt).toLocaleString('vi-VN');
-            document.getElementById('det-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNÄ';
+            document.getElementById('det-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
             
             const mins = Math.floor(invoice.secondsChanged / 60);
-            document.getElementById('det-hours').textContent = `+${mins} phÃºt`;
+            document.getElementById('det-hours').textContent = `+${mins} phút`;
             
             const statusEl = document.getElementById('det-status');
             if (invoice.status === 'completed') {
-                statusEl.textContent = 'ThÃ nh cÃ´ng';
+                statusEl.textContent = 'Thành công';
                 statusEl.style.color = 'var(--success)';
             } else if (invoice.status === 'cancelled') {
-                statusEl.textContent = 'ÄÃ£ há»§y';
+                statusEl.textContent = 'Đã hủy';
                 statusEl.style.color = 'var(--danger)';
             } else {
-                statusEl.textContent = 'Chá» thanh toÃ¡n';
+                statusEl.textContent = 'Chờ thanh toán';
                 statusEl.style.color = 'var(--purple)';
             }
             
@@ -3949,13 +3949,13 @@ if (isLockedResponse(data)) {
 
         function closeInvoiceDetailModal() {
             document.getElementById('invoice-detail-modal').style.display = 'none';
-            // Má»Ÿ láº¡i modal danh sÃ¡ch lá»‹ch sá»­ Ä‘á»ƒ tiáº¿p tá»¥c xem
+            // Mở lại modal danh sách lịch sử để tiếp tục xem
             openUserHistoryModal();
         }
 
         async function loadUserSessions() {
             const tbody = document.getElementById('user-sessions-tbody');
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">Äang táº£i lá»‹ch sá»­ live...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">Đang tải lịch sử live...</td></tr>`;
             
             try {
                 const res = await fetch('/api/sessions');
@@ -3964,26 +3964,26 @@ if (isLockedResponse(data)) {
                 if (res.ok && data.success) {
                     const sessions = data.sessions || [];
                     if (sessions.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">ChÆ°a cÃ³ lá»‹ch sá»­ livestream.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">Chưa có lịch sử livestream.</td></tr>`;
                         return;
                     }
                     
                     let html = '';
                     sessions.forEach(sess => {
                         const startStr = new Date(sess.startedAt).toLocaleString('vi-VN');
-                        const endStr = sess.endedAt ? new Date(sess.endedAt).toLocaleString('vi-VN') : 'Äang cháº¡y';
+                        const endStr = sess.endedAt ? new Date(sess.endedAt).toLocaleString('vi-VN') : 'Đang chạy';
                         
                         const mins = Math.floor(sess.totalUsedSeconds / 60);
                         const secs = sess.totalUsedSeconds % 60;
-                        const durationStr = sess.status === 'active' ? 'Äang cáº­p nháº­t' : `${mins} phÃºt ${secs} giÃ¢y`;
+                        const durationStr = sess.status === 'active' ? 'Đang cập nhật' : `${mins} phút ${secs} giây`;
                         
-                        let statusText = 'Äang cháº¡y';
+                        let statusText = 'Đang chạy';
                         let statusColor = 'var(--primary)';
                         if (sess.status === 'ended') {
-                            statusText = 'HoÃ n thÃ nh';
+                            statusText = 'Hoàn thành';
                             statusColor = 'var(--text-muted)';
                         } else if (sess.status === 'expired') {
-                            statusText = 'Háº¿t háº¡n';
+                            statusText = 'Hết hạn';
                             statusColor = 'var(--danger)';
                         }
                         
@@ -3996,11 +3996,11 @@ if (isLockedResponse(data)) {
                     });
                     tbody.innerHTML = html;
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--danger);">KhÃ´ng thá»ƒ táº£i dá»¯ liá»‡u.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--danger);">Không thể tải dữ liệu.</td></tr>`;
                 }
             } catch (err) {
                 console.error(err);
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--danger);">Lá»—i káº¿t ná»‘i.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--danger);">Lỗi kết nối.</td></tr>`;
             }
         }
 
@@ -4030,8 +4030,8 @@ if (isLockedResponse(data)) {
                      } else {
                          stopBtn.click();
                          status.className = 'error';
-                         status.textContent = data.error || 'Lá»—i kiá»ƒm tra phiÃªn sá»­ dá»¥ng tá»« mÃ¡y chá»§.';
-                         setBillingSessionStatus('ÄÃ£ dá»«ng', 'var(--text-muted)');
+                         status.textContent = data.error || 'Lỗi kiểm tra phiên sử dụng từ máy chủ.';
+                         setBillingSessionStatus('Đã dừng', 'var(--text-muted)');
                      }
                 } catch (err) {
                      console.error('Heartbeat error:', err);
@@ -4083,7 +4083,7 @@ if (isLockedResponse(data)) {
                         systemTtsBadge.className = 'status-badge off';
                     }
                     ttsModelHealthy = false;
-                    status.textContent = 'Cáº£nh bÃ¡o: KhÃ´ng thá»ƒ káº¿t ná»‘i hoáº·c táº£i mÃ´ hÃ¬nh giá»ng nÃ³i AI. Vui lÃ²ng káº¿t ná»‘i Internet á»•n Ä‘á»‹nh vÃ  khá»Ÿi Ä‘á»™ng láº¡i á»©ng dá»¥ng.';
+                    status.textContent = 'Cảnh báo: Không thể kết nối hoặc tải mô hình giọng nói AI. Vui lòng kết nối Internet ổn định và khởi động lại ứng dụng.';
                 }
             } catch (err) {
                 if (systemTtsBadge) {
@@ -4106,7 +4106,7 @@ if (isLockedResponse(data)) {
                 return;
             }
             if (!ttsModelHealthy) {
-                status.textContent = 'Cáº£nh bÃ¡o: MÃ´ hÃ¬nh giá»ng nÃ³i AI chÆ°a Ä‘Æ°á»£c táº£i thÃ nh cÃ´ng. Vui lÃ²ng káº¿t ná»‘i Internet á»•n Ä‘á»‹nh vÃ  khá»Ÿi Ä‘á»™ng láº¡i á»©ng dá»¥ng.';
+                status.textContent = 'Cảnh báo: Mô hình giọng nói AI chưa được tải thành công. Vui lòng kết nối Internet ổn định và khởi động lại ứng dụng.';
             }
 
             // Start session in central server
@@ -4123,7 +4123,7 @@ if (isLockedResponse(data)) {
                 }
                 if (!res.ok || !data.success) {
                     status.className = 'error';
-                    status.textContent = data.error || 'KhÃ´ng thá»ƒ khá»Ÿi Ä‘á»™ng phiÃªn lÃ m viá»‡c. Vui lÃ²ng Ä‘Äƒng nháº­p láº¡i.';
+                    status.textContent = data.error || 'Không thể khởi động phiên làm việc. Vui lòng đăng nhập lại.';
                     return;
                 }
                 currentBillingSessionId = data.sessionId;
@@ -4132,11 +4132,11 @@ if (isLockedResponse(data)) {
                 if (startTimeEl) {
                     startTimeEl.textContent = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 }
-                setBillingSessionStatus('Äang sá»­ dá»¥ng', 'var(--success)');
+                setBillingSessionStatus('Đang sử dụng', 'var(--success)');
                 startSessionElapsedTimer(data.sessionElapsedSeconds || 0);
             } catch (err) {
                 status.className = 'error';
-                status.textContent = 'KhÃ´ng thá»ƒ káº¿t ná»‘i Ä‘áº¿n mÃ¡y chá»§ xÃ¡c thá»±c.';
+                status.textContent = 'Không thể kết nối đến máy chủ xác thực.';
                 return;
             }
 
@@ -4144,7 +4144,7 @@ if (isLockedResponse(data)) {
             startBtn.disabled = true;
             stopBtn.disabled = false;
             sendBtn.disabled = false;
-            showLiveContentMessage('ChÆ°a cÃ³ ná»™i dung live. HÃ£y nháº­p chá»§ Ä‘á» vÃ  táº¡o ká»‹ch báº£n.', 'empty');
+            showLiveContentMessage('Chưa có nội dung live. Hãy nhập chủ đề và tạo kịch bản.', 'empty');
             
             startTopTimer();
             startBillingHeartbeat();
@@ -4159,8 +4159,8 @@ if (isLockedResponse(data)) {
                             placeholder.remove();
                         }
 
-                        let userName = 'NgÆ°á»i xem';
-                        const match = ev.data.match(/^ChÃ o\s+([^.]+)\./);
+                        let userName = 'Người xem';
+                        const match = ev.data.match(/^Chào\s+([^.]+)\./);
                         if (match) {
                             userName = match[1].trim();
                         }
@@ -4170,11 +4170,11 @@ if (isLockedResponse(data)) {
 
                         const viewerInfo = document.createElement('div');
                         viewerInfo.className = 'comment-viewer-info';
-                        viewerInfo.innerHTML = `<span class="viewer-name">ðŸ‘¤ @${userName}</span> <span class="viewer-action">gá»­i bÃ¬nh luáº­n</span>`;
+                        viewerInfo.innerHTML = `<span class="viewer-name">👤 @${userName}</span> <span class="viewer-action">gửi bình luận</span>`;
 
                         const aiReply = document.createElement('div');
                         aiReply.className = 'comment-ai-reply';
-                        aiReply.innerHTML = `<span class="ai-badge">ðŸ¤– AI Tráº£ Lá»i:</span>`;
+                        aiReply.innerHTML = `<span class="ai-badge">🤖 AI Trả Lời:</span>`;
 
                         const content = document.createElement('div');
                         content.className = 'comment-content';
@@ -4214,15 +4214,15 @@ if (isLockedResponse(data)) {
                 window.aiCommentReplyEnabled = !window.aiCommentReplyEnabled;
                 if (!window.aiCommentReplyEnabled) {
                     speechQueue.stopComments();
-                    muteAiCommentBtn.textContent = 'Báº¬T GIá»ŒNG AI';
+                    muteAiCommentBtn.textContent = 'BẬT GIỌNG AI';
                     muteAiCommentBtn.className = 'btn-green';
                     status.className = 'status-info';
-                    status.textContent = 'ÄÃ£ ngáº¯t giá»ng Ä‘á»c AI tráº£ lá»i bÃ¬nh luáº­n.';
+                    status.textContent = 'Đã ngắt giọng đọc AI trả lời bình luận.';
                 } else {
-                    muteAiCommentBtn.textContent = 'NGáº®T GIá»ŒNG AI';
+                    muteAiCommentBtn.textContent = 'NGẮT GIỌNG AI';
                     muteAiCommentBtn.className = 'btn-pink';
                     status.className = 'status-info';
-                    status.textContent = 'ÄÃ£ báº­t láº¡i giá»ng Ä‘á»c AI tráº£ lá»i bÃ¬nh luáº­n.';
+                    status.textContent = 'Đã bật lại giọng đọc AI trả lời bình luận.';
                 }
             });
         }
@@ -4259,9 +4259,9 @@ if (isLockedResponse(data)) {
         function friendlyTikTokError(message) {
             const raw = String(message || '');
             if (/WinError|Traceback|FileNotFoundError|No such file|system cannot find|Errno/i.test(raw)) {
-                return 'KhÃ´ng thá»ƒ khá»Ÿi Ä‘á»™ng bá»™ káº¿t ná»‘i TikTok Live. Vui lÃ²ng kiá»ƒm tra cÃ i Ä‘áº·t hoáº·c thá»­ láº¡i.';
+                return 'Không thể khởi động bộ kết nối TikTok Live. Vui lòng kiểm tra cài đặt hoặc thử lại.';
             }
-            return raw || 'KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c TikTok Live. Vui lÃ²ng kiá»ƒm tra username hoáº·c link live.';
+            return raw || 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.';
         }
 
         connectBtn.addEventListener('click', () => {
@@ -4271,13 +4271,13 @@ if (isLockedResponse(data)) {
             const user = parseTikTokUsername(tiktokUserInput.value);
             if (!user) {
                 status.className = 'error';
-                status.textContent = 'KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c TikTok Live. Vui lÃ²ng kiá»ƒm tra username hoáº·c link live.';
+                status.textContent = 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.';
                 return;
             }
             status.textContent = '';
             applyTikTokUiState('connecting');
 
-            // Láº¥y prompt hiá»‡n táº¡i Ä‘á»ƒ Ä‘á»“ng bá»™ sang live.py
+            // Lấy prompt hiện tại để đồng bộ sang live.py
             const promptVal = document.getElementById('prompt').value.trim();
             const selectEls = document.querySelectorAll('.system-prompt-selectors select');
             let fullPrompt = promptVal;
@@ -4286,7 +4286,7 @@ if (isLockedResponse(data)) {
                 const phongCach = selectEls[1].value;
                 const mucTieu = selectEls[2].value;
                 const nganhHang = selectEls[3].value;
-                fullPrompt = `Viáº¿t ká»‹ch báº£n livestream.\n- Chá»§ Ä‘á»: ${promptVal}\n- Vai trÃ²: ${vaiTro}\n- Phong cÃ¡ch: ${phongCach}\n- Má»¥c tiÃªu: ${mucTieu}\n- NgÃ nh hÃ ng: ${nganhHang}`;
+                fullPrompt = `Viết kịch bản livestream.\n- Chủ đề: ${promptVal}\n- Vai trò: ${vaiTro}\n- Phong cách: ${phongCach}\n- Mục tiêu: ${mucTieu}\n- Ngành hàng: ${nganhHang}`;
             }
 
             fetch('/start-live', {
@@ -4300,11 +4300,11 @@ if (isLockedResponse(data)) {
                         status.textContent = '';
                         applyTikTokUiState('connected', user);
                         status.className = 'status-info';
-                        status.textContent = `ÄÃ£ káº¿t ná»‘i TikTok Live: @${user}`;
+                        status.textContent = `Đã kết nối TikTok Live: @${user}`;
                         loadLiveStats();
                         syncTikTokStatus();
                     } else {
-                        const msg = (body && (body.error || body.message)) || text || 'KhÃ´ng rÃµ';
+                        const msg = (body && (body.error || body.message)) || text || 'Không rõ';
                         applyTikTokUiState('idle');
                         syncTikTokStatus();
                         status.className = 'error';
@@ -4316,7 +4316,7 @@ if (isLockedResponse(data)) {
                     applyTikTokUiState('idle');
                     syncTikTokStatus();
                     status.className = 'error';
-                    status.textContent = 'KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c TikTok Live. Vui lÃ²ng kiá»ƒm tra username hoáº·c link live.';
+                    status.textContent = 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.';
                 });
         });
 
@@ -4330,20 +4330,20 @@ if (isLockedResponse(data)) {
                 .then(({ ok, body, text }) => {
                     if (body && body.success) {
                         status.className = 'status-info';
-                        status.textContent = 'ÄÃ£ ngáº¯t káº¿t ná»‘i TikTok Live.';
+                        status.textContent = 'Đã ngắt kết nối TikTok Live.';
                         applyTikTokUiState('idle');
                         resetLiveTopbarStats();
                         syncTikTokStatus();
                     } else {
-                        const msg = (body && (body.error || body.message)) || text || 'KhÃ´ng rÃµ';
+                        const msg = (body && (body.error || body.message)) || text || 'Không rõ';
                         status.className = 'error';
-                        status.textContent = 'Ngáº¯t káº¿t ná»‘i tháº¥t báº¡i: ' + msg;
+                        status.textContent = 'Ngắt kết nối thất bại: ' + msg;
                     }
                 })
                 .catch(err => {
                     console.error(err);
                     status.className = 'error';
-                    status.textContent = 'Lá»—i khi ngáº¯t káº¿t ná»‘i: ' + (err.message || err);
+                    status.textContent = 'Lỗi khi ngắt kết nối: ' + (err.message || err);
                 })
                 .finally(() => syncTikTokStatus());
         });
@@ -4356,7 +4356,7 @@ if (isLockedResponse(data)) {
                 return;
             }
             if (!ttsModelHealthy) {
-                showLiveContentMessage('KhÃ´ng táº¡o Ä‘Æ°á»£c ná»™i dung live. Vui lÃ²ng kiá»ƒm tra káº¿t ná»‘i mÃ¡y chá»§ AI hoáº·c thá»­ láº¡i.', 'error');
+                showLiveContentMessage('Không tạo được nội dung live. Vui lòng kiểm tra kết nối máy chủ AI hoặc thử lại.', 'error');
                 return;
             }
 
@@ -4366,15 +4366,15 @@ if (isLockedResponse(data)) {
 
             const prompt = document.getElementById('prompt').value.trim();
             if (!prompt) {
-                showLiveContentMessage('ChÆ°a cÃ³ ná»™i dung live. HÃ£y nháº­p chá»§ Ä‘á» vÃ  táº¡o ká»‹ch báº£n.', 'error');
+                showLiveContentMessage('Chưa có nội dung live. Hãy nhập chủ đề và tạo kịch bản.', 'error');
                 return;
             }
 
-            showLiveContentMessage('Äang káº¿t ná»‘i mÃ¡y chá»§ AI Ä‘á»ƒ táº¡o ná»™i dung live...', 'loading');
+            showLiveContentMessage('Đang kết nối máy chủ AI để tạo nội dung live...', 'loading');
 
             // Show loading state and disable button to prevent duplicate submissions
             sendBtn.disabled = true;
-            sendBtn.innerHTML = `<span class="spinner">â³</span> Äang káº¿t ná»‘i AI...`;
+            sendBtn.innerHTML = `<span class="spinner">⏳</span> Đang kết nối AI...`;
 
             const selectEls = document.querySelectorAll('.system-prompt-selectors select');
             let fullPrompt = prompt;
@@ -4383,7 +4383,7 @@ if (isLockedResponse(data)) {
                 const phongCach = selectEls[1].value;
                 const mucTieu = selectEls[2].value;
                 const nganhHang = selectEls[3].value;
-                fullPrompt = `Viáº¿t ká»‹ch báº£n livestream.\n- Chá»§ Ä‘á»: ${prompt}\n- Vai trÃ²: ${vaiTro}\n- Phong cÃ¡ch: ${phongCach}\n- Má»¥c tiÃªu: ${mucTieu}\n- NgÃ nh hÃ ng: ${nganhHang}`;
+                fullPrompt = `Viết kịch bản livestream.\n- Chủ đề: ${prompt}\n- Vai trò: ${vaiTro}\n- Phong cách: ${phongCach}\n- Mục tiêu: ${mucTieu}\n- Ngành hàng: ${nganhHang}`;
             }
 
             window.originalPrompt = fullPrompt;
@@ -4455,7 +4455,7 @@ if (isLockedResponse(data)) {
 
                 // If connection drops before rendering any script, show connection error
                 if (llmResult.children.length === 0) {
-                    showLiveContentMessage('KhÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c mÃ¡y chá»§ AI. Vui lÃ²ng kiá»ƒm tra server hoáº·c cáº¥u hÃ¬nh.', 'error');
+                    showLiveContentMessage('Không kết nối được máy chủ AI. Vui lòng kiểm tra server hoặc cấu hình.', 'error');
                 }
             };
         });
@@ -4489,7 +4489,7 @@ if (isLockedResponse(data)) {
         }
 
         // ----------------------------------------------------
-        // BILLING TIMER CONTROLS (TÃNH TIá»€N THEO TIáº¾NG)
+        // BILLING TIMER CONTROLS (TÍNH TIỀN THEO TIẾNG)
         // ----------------------------------------------------
         let billingInterval = null;
         let billingSeconds = 0;
@@ -4516,7 +4516,7 @@ if (isLockedResponse(data)) {
             billingTimerEl.textContent = formatBillingTime(billingSeconds);
             const rate = parseFloat(billingRateInput.value) || 50000;
             const amount = Math.round((billingSeconds / 3600) * rate);
-            billingAmountEl.textContent = amount.toLocaleString('vi-VN') + ' Ä‘';
+            billingAmountEl.textContent = amount.toLocaleString('vi-VN') + ' đ';
         }
 
         btnBillingStart.addEventListener('click', () => {
@@ -4564,17 +4564,17 @@ if (isLockedResponse(data)) {
             billingSummary.className = 'comment-item active';
             billingSummary.innerHTML = `
                 <div class="comment-viewer-info">
-                    <span class="viewer-name">ðŸ’³ THÃ”NG BÃO THANH TOÃN</span>
+                    <span class="viewer-name">💳 THÔNG BÁO THANH TOÁN</span>
                     <span class="viewer-action">${billingStartTime}</span>
                 </div>
                 <div class="comment-content" style="color:var(--primary); font-weight:700;">
-                    PhiÃªn live káº¿t thÃºc thÃ nh cÃ´ng.<br>
-                    Thá»i gian cháº¡y: ${formatBillingTime(billingSeconds)}<br>
-                    Tá»•ng chi phÃ­ (ÄÆ¡n giÃ¡ ${rate.toLocaleString('vi-VN')}Ä‘/h): ${amount.toLocaleString('vi-VN')} Ä‘
+                    Phiên live kết thúc thành công.<br>
+                    Thời gian chạy: ${formatBillingTime(billingSeconds)}<br>
+                    Tổng chi phí (Đơn giá ${rate.toLocaleString('vi-VN')}đ/h): ${amount.toLocaleString('vi-VN')} đ
                 </div>
             `;
             status.className = 'status-info';
-            status.textContent = `PhiÃªn Live káº¿t thÃºc. Thá»i gian: ${formatBillingTime(billingSeconds)}. Táº¡m tÃ­nh: ${amount.toLocaleString('vi-VN')} Ä‘.`;
+            status.textContent = `Phiên Live kết thúc. Thời gian: ${formatBillingTime(billingSeconds)}. Tạm tính: ${amount.toLocaleString('vi-VN')} đ.`;
         });
 
         btnBillingReset.addEventListener('click', () => {

@@ -241,7 +241,7 @@ def local_updates_dir():
 def download_update(window, info):
     try:
         if not getattr(sys, 'frozen', False):
-            js_call(window, 'setUpdateError("Update chá»‰ cháº¡y trÃªn báº£n exe Ä‘Ã£ build.")')
+            js_call(window, 'setUpdateError("Cập nhật chỉ chạy trên bản exe đã build.")')
             return
 
         url = info.get('downloadUrl') or ''
@@ -261,7 +261,7 @@ def download_update(window, info):
                     percent = int((downloaded / total) * 100) if total else 0
                     js_call(window, f'setUpdateProgress({percent}, {downloaded}, {total})')
 
-        js_call(window, 'setUpdateStatus("ÄÃ£ táº£i xong. Äang khá»Ÿi Ä‘á»™ng trÃ¬nh cáº­p nháº­t...")')
+        js_call(window, 'setUpdateStatus("Đã tải xong. Đang khởi động trình cập nhật...")')
         updater_path = os.path.join(local_updates_dir(), 'SLiveAIUpdater.exe')
         shutil.copy2(sys.executable, updater_path)
         subprocess.Popen([
@@ -314,7 +314,7 @@ def initialize_app(window):
     print("Starting background Live AI processes...")
     
     # 1. Update status: Starting background services
-    window.evaluate_js('updateStatus("Ã„Âang khÃ¡Â»Å¸i Ã„â€˜Ã¡Â»â„¢ng dÃ¡Â»â€¹ch vÃ¡Â»Â¥ nÃ¡Â»Ân...", 10)')
+    window.evaluate_js('updateStatus("Đang khởi động dịch vụ nền...", 10)')
     
     # Create logs directory inside the app folder
     log_dir = os.path.join(app_dir, "logs")
@@ -335,7 +335,7 @@ def initialize_app(window):
         stderr=flask_log_file,
         creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith('win') else 0
     )
-    window.evaluate_js('updateStatus("Ã„Âang khÃ¡Â»Å¸i chÃ¡ÂºÂ¡y cÃ¡Â»â€¢ng dÃ¡Â»â€¹ch vÃ¡Â»Â¥ Web...", 25)')
+    window.evaluate_js('updateStatus("Đang khởi chạy dịch vụ Web...", 25)')
     
     fastapi_proc = subprocess.Popen(
         get_subprocess_cmd("--run-fastapi"), 
@@ -344,7 +344,7 @@ def initialize_app(window):
         stderr=fastapi_log_file,
         creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith('win') else 0
     )
-    window.evaluate_js('updateStatus("Ã„Âang tÃ¡ÂºÂ£i mÃƒÂ´ hÃƒÂ¬nh giÃ¡Â»Âng nÃƒÂ³i AI (LÃ¡ÂºÂ§n Ã„â€˜Ã¡ÂºÂ§u khÃ¡Â»Å¸i Ã„â€˜Ã¡Â»â„¢ng cÃƒÂ³ thÃ¡Â»Æ’ mÃ¡ÂºÂ¥t 1-2 phÃƒÂºt)...", 40)')
+    window.evaluate_js('updateStatus("Đang tải mô hình giọng nói AI (Lần đầu khởi động có thể mất 1-2 phút)...", 40)')
 
     # Poll servers until they are ready
     flask_ready = False
@@ -357,24 +357,24 @@ def initialize_app(window):
     for attempt in range(max_attempts):
         # Check if subprocesses crashed
         if flask_proc.poll() is not None:
-            window.evaluate_js('showError("DÃ¡Â»â€¹ch vÃ¡Â»Â¥ Web (Flask) bÃ¡Â»â€¹ tÃ¡ÂºÂ¯t Ã„â€˜Ã¡Â»â„¢t ngÃ¡Â»â„¢t. Vui lÃƒÂ²ng kiÃ¡Â»Æ’m tra logs/flask.log")')
+            window.evaluate_js('showError("Dịch vụ Web (Flask) bị tắt đột ngột. Vui lòng kiểm tra logs/flask.log")')
             return
             
         if fastapi_proc.poll() is not None:
-            window.evaluate_js('showError("DÃ¡Â»â€¹ch vÃ¡Â»Â¥ GiÃ¡Â»Âng nÃƒÂ³i AI (FastAPI) bÃ¡Â»â€¹ lÃ¡Â»â€”i. Vui lÃƒÂ²ng kiÃ¡Â»Æ’m tra logs/fastapi.log")')
+            window.evaluate_js('showError("Dịch vụ Giọng nói AI (FastAPI) bị lỗi. Vui lòng kiểm tra logs/fastapi.log")')
             return
 
         if not flask_ready:
             flask_ready = check_server_ready('http://127.0.0.1:5000/login')
             if flask_ready:
                 progress = max(progress, 55)
-                window.evaluate_js(f'updateStatus("DÃ¡Â»â€¹ch vÃ¡Â»Â¥ Web Ã„â€˜ÃƒÂ£ sÃ¡ÂºÂµn sÃƒÂ ng. Ã„Âang Ã„â€˜Ã¡Â»Â£i tÃ¡ÂºÂ£i mÃƒÂ´ hÃƒÂ¬nh AI...", {progress})')
+                window.evaluate_js(f'updateStatus("Dịch vụ Web đã sẵn sàng. Đang đợi tải mô hình AI...", {progress})')
                 
         if not fastapi_ready:
             fastapi_ready = check_server_ready('http://127.0.0.1:8005/')
             if fastapi_ready:
                 progress = max(progress, 85)
-                window.evaluate_js(f'updateStatus("MÃƒÂ´ hÃƒÂ¬nh AI Ã„â€˜ÃƒÂ£ sÃ¡ÂºÂµn sÃƒÂ ng!", {progress})')
+                window.evaluate_js(f'updateStatus("Mô hình AI đã sẵn sàng!", {progress})')
                 
         if flask_ready and fastapi_ready:
             break
@@ -383,12 +383,12 @@ def initialize_app(window):
         if not fastapi_ready:
             # Slow progress crawl from 40% to 90% over 180 seconds
             progress = min(90, 40 + int((attempt / max_attempts) * 50))
-            window.evaluate_js(f'updateStatus("Ã„Âang tÃ¡ÂºÂ£i mÃƒÂ´ hÃƒÂ¬nh giÃ¡Â»Âng nÃƒÂ³i AI (LÃ¡ÂºÂ§n Ã„â€˜Ã¡ÂºÂ§u chÃ¡ÂºÂ¡y cÃƒÂ³ thÃ¡Â»Æ’ mÃ¡ÂºÂ¥t 1-2 phÃƒÂºt)...", {progress})')
+            window.evaluate_js(f'updateStatus("Đang tải mô hình giọng nói AI (Lần đầu chạy có thể mất 1-2 phút)...", {progress})')
             
         time.sleep(0.5)
 
     if not flask_ready or not fastapi_ready:
-        window.evaluate_js('showError("KhÃƒÂ´ng thÃ¡Â»Æ’ kÃ¡ÂºÂ¿t nÃ¡Â»â€˜i cÃƒÂ¡c dÃ¡Â»â€¹ch vÃ¡Â»Â¥ nÃ¡Â»Ân sau 3 phÃƒÂºt. Vui lÃƒÂ²ng kiÃ¡Â»Æ’m tra logs/fastapi.log")')
+        window.evaluate_js('showError("Không thể kết nối các dịch vụ nền sau 3 phút. Vui lòng kiểm tra logs/fastapi.log")')
         return
 
     print("Services are ready. Finishing progress bar...")
@@ -620,8 +620,8 @@ if __name__ == "__main__":
     </head>
     <body>
         <div class="container">
-            <h1>HÃ¡Â»â€  THÃ¡Â»ÂNG LIVE AI - S LIVE</h1>
-            <p id="status-text">Ã„Âang khÃ¡Â»Å¸i Ã„â€˜Ã¡Â»â„¢ng dÃ¡Â»â€¹ch vÃ¡Â»Â¥ nÃ¡Â»Ân...</p>
+            <h1>HỆ THỐNG LIVE AI - S LIVE</h1>
+            <p id="status-text">Đang khởi động dịch vụ nền...</p>
             <div class="progress-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
@@ -644,12 +644,12 @@ if __name__ == "__main__":
                 statusLabel.classList.add('error-text');
                 bar.style.background = '#ef4444';
                 bar.style.width = '100%';
-                text.textContent = 'LÃ¡Â»â€“I';
+                text.textContent = 'LỖI';
                 text.style.color = '#ef4444';
             }
 
             function setComplete() {
-                statusLabel.textContent = "KhÃ¡Â»Å¸i Ã„â€˜Ã¡Â»â„¢ng hoÃƒÂ n tÃ¡ÂºÂ¥t!";
+                statusLabel.textContent = "Khởi động hoàn tất!";
                 bar.style.width = '100%';
                 text.textContent = '100%';
             }
@@ -663,18 +663,18 @@ if __name__ == "__main__":
             function showUpdateModal(info) {
                 window.updateInfo = info;
                 document.getElementById('update-modal').style.display = 'flex';
-                document.getElementById('update-title').textContent = 'ÄÃ£ cÃ³ phiÃªn báº£n má»›i ' + info.version;
-                document.getElementById('update-version').textContent = 'PhiÃªn báº£n hiá»‡n táº¡i: ' + info.currentVersion + ' - PhiÃªn báº£n má»›i: ' + info.version;
-                document.getElementById('update-notes').textContent = info.releaseNotes || 'Báº£n cáº­p nháº­t má»›i Ä‘Ã£ sáºµn sÃ ng.';
+                document.getElementById('update-title').textContent = 'Đã có phiên bản mới ' + info.version;
+                document.getElementById('update-version').textContent = 'Phiên bản hiện tại: ' + info.currentVersion + ' - Phiên bản mới: ' + info.version;
+                document.getElementById('update-notes').textContent = info.releaseNotes || 'Bản cập nhật mới đã sẵn sàng.';
                 document.getElementById('later-btn').style.display = info.required ? 'none' : 'inline-block';
-                updateStatus('Äang chá» xÃ¡c nháº­n cáº­p nháº­t...', 100);
+                updateStatus('Đang chờ xác nhận cập nhật...', 100);
             }
 
             function startUpdate() {
                 document.getElementById('download-box').style.display = 'block';
                 document.getElementById('update-btn').disabled = true;
                 document.getElementById('later-btn').disabled = true;
-                setUpdateStatus('Äang táº£i báº£n cáº­p nháº­t...');
+                setUpdateStatus('Đang tải bản cập nhật...');
                 window.pywebview.api.start_update();
             }
 
@@ -687,7 +687,7 @@ if __name__ == "__main__":
                 const safePercent = Math.max(0, Math.min(100, percent || 0));
                 document.getElementById('download-fill').style.width = safePercent + '%';
                 const totalText = total ? ' / ' + formatBytes(total) : '';
-                document.getElementById('download-meta').textContent = 'Äang táº£i: ' + safePercent + '% - ' + formatBytes(downloaded) + totalText;
+                document.getElementById('download-meta').textContent = 'Đang tải: ' + safePercent + '% - ' + formatBytes(downloaded) + totalText;
             }
 
             function setUpdateStatus(message) {
@@ -697,22 +697,22 @@ if __name__ == "__main__":
             function setUpdateError(message) {
                 document.getElementById('update-btn').disabled = false;
                 document.getElementById('later-btn').disabled = false;
-                document.getElementById('update-btn').textContent = 'Thá»­ láº¡i';
-                document.getElementById('download-meta').textContent = 'Lá»—i cáº­p nháº­t: ' + message;
+                document.getElementById('update-btn').textContent = 'Thử lại';
+                document.getElementById('download-meta').textContent = 'Lỗi cập nhật: ' + message;
             }
         </script>
         <div class="update-modal" id="update-modal">
             <div class="update-card">
-                <h2 id="update-title">ÄÃ£ cÃ³ phiÃªn báº£n má»›i</h2>
+                <h2 id="update-title">Đã có phiên bản mới</h2>
                 <p id="update-version"></p>
                 <div class="update-notes" id="update-notes"></div>
                 <div class="download-box" id="download-box">
                     <div class="download-bar"><div class="download-fill" id="download-fill"></div></div>
-                    <div class="download-meta" id="download-meta">Äang táº£i báº£n cáº­p nháº­t...</div>
+                    <div class="download-meta" id="download-meta">Đang tải bản cập nhật...</div>
                 </div>
                 <div class="update-actions">
-                    <button class="update-secondary" id="later-btn" onclick="skipUpdate()">Äá»ƒ sau</button>
-                    <button class="update-primary" id="update-btn" onclick="startUpdate()">Cáº­p nháº­t ngay</button>
+                    <button class="update-secondary" id="later-btn" onclick="skipUpdate()">Để sau</button>
+                    <button class="update-primary" id="update-btn" onclick="startUpdate()">Cập nhật ngay</button>
                 </div>
             </div>
         </div>
@@ -724,7 +724,7 @@ if __name__ == "__main__":
         import webview
         update_api = UpdateApi()
         window = webview.create_window(
-            title='HÃ¡Â»â€¡ ThÃ¡Â»â€˜ng Live AI - S Live',
+            title='Hệ thống Live AI - S Live',
             html=splash_html,
             width=1280,
             height=850,
