@@ -10,17 +10,32 @@ import shutil
 import threading
 import tempfile
 
-# Force UTF-8 for stdout and stderr to avoid encoding crashes on Windows
-if sys.stdout:
+# Force UTF-8 mode as early as possible. The UI still uses Vietnamese text,
+# but fallback logging must never crash on Windows cp1252 consoles.
+os.environ.setdefault('PYTHONUTF8', '1')
+os.environ.setdefault('PYTHONIOENCODING', 'utf-8')
+
+def configure_utf8_stream(stream):
+    if not stream:
+        return stream
     try:
-        sys.stdout.reconfigure(encoding='utf-8')
+        stream.reconfigure(encoding='utf-8', errors='backslashreplace')
     except Exception:
         pass
-if sys.stderr:
+    return stream
+
+configure_utf8_stream(sys.stdout)
+configure_utf8_stream(sys.stderr)
+
+def safe_print(*args, **kwargs):
     try:
-        sys.stderr.reconfigure(encoding='utf-8')
-    except Exception:
-        pass
+        print(*args, **kwargs)
+    except UnicodeEncodeError:
+        safe_args = [
+            str(arg).encode('utf-8', errors='backslashreplace').decode('ascii', errors='backslashreplace')
+            for arg in args
+        ]
+        print(*safe_args, **kwargs)
 
 # Setup local Model caching directory on the client machine
 if getattr(sys, 'frozen', False):
@@ -46,9 +61,9 @@ if os.path.exists(hub_dir):
             pass
 
 if model_exists:
-    print("Local model weights detected. Ready for startup.")
+    safe_print("Local model weights detected. Ready for startup.")
 else:
-    print("Local model weights not found. Online mode active for first-run download.")
+    safe_print("Local model weights not found. Online mode active for first-run download.")
 
 # Handle subprocess execution for Flask and FastAPI
 if len(sys.argv) > 1:
@@ -80,6 +95,19 @@ if len(sys.argv) > 1:
         args = parser.parse_args(sys.argv[2:])
         update_package = args.package or args.installer
 
+        def read_updater_json_file(path, default=None):
+            try:
+                with open(path, 'r', encoding='utf-8-sig') as f:
+                    return json.load(f)
+            except Exception:
+                return default if default is not None else {}
+
+        def updater_state_path():
+            base = os.environ.get('LOCALAPPDATA') or os.path.expanduser('~')
+            state_dir = os.path.join(base, 'SLiveAI')
+            os.makedirs(state_dir, exist_ok=True)
+            return os.path.join(state_dir, 'update_state.json')
+
         def pid_exists(pid):
             if pid <= 0:
                 return False
@@ -97,7 +125,22 @@ if len(sys.argv) > 1:
             except OSError:
                 return False
 
+        def find_update_source_dir(extract_dir):
+            candidates = []
+            for root, dirs, files in os.walk(extract_dir):
+                if 'Live_AI_SLive.exe' in files:
+                    candidates.append(root)
+
+            if not candidates:
+                raise RuntimeError('Update package does not contain Live_AI_SLive.exe.')
+
+            candidates.sort(key=lambda item: (0 if os.path.basename(item).lower() == 'live_ai_slive' else 1, len(item)))
+            return candidates[0]
+
         def copy_update_tree(source_dir, target_dir):
+            if not os.path.exists(os.path.join(source_dir, 'version.json')):
+                raise RuntimeError('Update package is missing version.json.')
+
             for name in os.listdir(source_dir):
                 src = os.path.join(source_dir, name)
                 dst = os.path.join(target_dir, name)
@@ -116,9 +159,16 @@ if len(sys.argv) > 1:
                 target_dir = os.path.dirname(args.restart)
                 extract_dir = tempfile.mkdtemp(prefix='slive_update_', dir=os.path.dirname(update_package))
                 shutil.unpack_archive(update_package, extract_dir, 'zip')
-                nested_dir = os.path.join(extract_dir, 'Live_AI_SLive')
-                source_dir = nested_dir if os.path.exists(os.path.join(nested_dir, 'Live_AI_SLive.exe')) else extract_dir
+                source_dir = find_update_source_dir(extract_dir)
                 copy_update_tree(source_dir, target_dir)
+                installed_version = read_updater_json_file(os.path.join(source_dir, 'version.json'), {}).get('version')
+                if installed_version:
+                    state = {
+                        'installedVersion': str(installed_version),
+                        'installedAt': time.strftime('%Y-%m-%dT%H:%M:%S')
+                    }
+                    with open(updater_state_path(), 'w', encoding='utf-8') as f:
+                        json.dump(state, f, ensure_ascii=False, indent=2)
             else:
                 installer_cmd = [update_package, '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART']
                 subprocess.run(installer_cmd, check=False)
@@ -164,17 +214,51 @@ def check_server_ready(url):
 
 def read_json_file(path, default=None):
     try:
-        with open(path, 'r', encoding='utf-8') as f:
+        with open(path, 'r', encoding='utf-8-sig') as f:
             return json.load(f)
     except Exception:
         return default if default is not None else {}
 
 
+def local_state_dir():
+    base = os.environ.get('LOCALAPPDATA') or os.path.expanduser('~')
+    state_dir = os.path.join(base, 'SLiveAI')
+    os.makedirs(state_dir, exist_ok=True)
+    return state_dir
+
+
+def update_state_path():
+    return os.path.join(local_state_dir(), 'update_state.json')
+
+
+def version_file_candidates():
+    candidates = [
+        os.path.join(app_dir, 'version.json'),
+        os.path.join(app_dir, '_internal', 'version.json'),
+        os.path.join(os.getcwd(), 'version.json')
+    ]
+    bundle_dir = getattr(sys, '_MEIPASS', '')
+    if bundle_dir:
+        candidates.append(os.path.join(bundle_dir, 'version.json'))
+    return candidates
+
+
 def read_current_version():
-    data = read_json_file(os.path.join(app_dir, 'version.json'), {})
-    return str(data.get('version') or '1.0.0')
+    versions = []
+    for path in version_file_candidates():
+        version_data = read_json_file(path, {})
+        version = str(version_data.get('version') or '')
+        if version:
+            versions.append(version)
 
+    state_data = read_json_file(update_state_path(), {})
+    installed_version = str(state_data.get('installedVersion') or '')
+    if installed_version:
+        versions.append(installed_version)
 
+    if not versions:
+        return '1.0.0'
+    return max(versions, key=parse_semver)
 def parse_semver(version):
     parts = str(version or '0.0.0').strip().split('.')
     numbers = []
@@ -216,15 +300,30 @@ def check_for_update():
             'releaseNotes': data.get('releaseNotes') or ''
         }
     except Exception as exc:
-        print(f"Update check skipped: {exc}")
+        safe_print(f"Update check skipped: {exc}")
         return None
 
 
 def js_call(window, script):
+    if not window:
+        return
     try:
         window.evaluate_js(script)
     except Exception as exc:
-        print(f"WARN: Could not update WebView UI: {exc}")
+        safe_print(f"WARN: Could not update WebView UI: {exc}")
+
+
+def navigate_window(window, url):
+    if not window:
+        return
+    try:
+        window.load_url(url)
+    except Exception as exc:
+        safe_print(f"WARN: Could not navigate WebView: {exc}")
+
+
+def get_main_window():
+    return main_window
 
 
 def js_string(value):
@@ -236,6 +335,22 @@ def local_updates_dir():
     updates = os.path.join(base, 'SLiveAI', 'updates')
     os.makedirs(updates, exist_ok=True)
     return updates
+
+
+
+
+def prepare_updater_executable():
+    updates_dir = local_updates_dir()
+    updater_dir = tempfile.mkdtemp(prefix='updater_runtime_', dir=updates_dir)
+    updater_path = os.path.join(updater_dir, 'SLiveAIUpdater.exe')
+    shutil.copy2(sys.executable, updater_path)
+
+    internal_src = os.path.join(os.path.dirname(sys.executable), '_internal')
+    internal_dst = os.path.join(updater_dir, '_internal')
+    if os.path.isdir(internal_src):
+        shutil.copytree(internal_src, internal_dst)
+
+    return updater_path
 
 
 def download_update(window, info):
@@ -262,8 +377,7 @@ def download_update(window, info):
                     js_call(window, f'setUpdateProgress({percent}, {downloaded}, {total})')
 
         js_call(window, 'setUpdateStatus("Đã tải xong. Đang khởi động trình cập nhật...")')
-        updater_path = os.path.join(local_updates_dir(), 'SLiveAIUpdater.exe')
-        shutil.copy2(sys.executable, updater_path)
+        updater_path = prepare_updater_executable()
         subprocess.Popen([
             updater_path,
             '--run-updater',
@@ -279,7 +393,6 @@ def download_update(window, info):
 
 class UpdateApi:
     def __init__(self):
-        self.window = None
         self.info = None
         self.started = False
 
@@ -301,20 +414,19 @@ class UpdateApi:
         if not self.info:
             return {'success': False, 'error': 'Không có bản cập nhật mới.'}
         self.started = True
-        threading.Thread(target=download_update, args=(self.window, self.info), daemon=True).start()
+        threading.Thread(target=download_update, args=(get_main_window(), self.info), daemon=True).start()
         return {'success': True}
 
     def skip_update(self):
-        if self.window:
-            self.window.load_url('http://127.0.0.1:5000')
+        navigate_window(get_main_window(), 'http://127.0.0.1:5000')
         return {'success': True}
 
 def initialize_app(window):
     global flask_proc, fastapi_proc, flask_log_file, fastapi_log_file
-    print("Starting background Live AI processes...")
+    safe_print("Starting background Live AI processes...")
     
     # 1. Update status: Starting background services
-    window.evaluate_js('updateStatus("Đang khởi động dịch vụ nền...", 10)')
+    js_call(window, 'updateStatus("Đang khởi động dịch vụ nền...", 10)')
     
     # Create logs directory inside the app folder
     log_dir = os.path.join(app_dir, "logs")
@@ -335,7 +447,7 @@ def initialize_app(window):
         stderr=flask_log_file,
         creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith('win') else 0
     )
-    window.evaluate_js('updateStatus("Đang khởi chạy dịch vụ Web...", 25)')
+    js_call(window, 'updateStatus("Đang khởi chạy dịch vụ Web...", 25)')
     
     fastapi_proc = subprocess.Popen(
         get_subprocess_cmd("--run-fastapi"), 
@@ -344,7 +456,7 @@ def initialize_app(window):
         stderr=fastapi_log_file,
         creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith('win') else 0
     )
-    window.evaluate_js('updateStatus("Đang tải mô hình giọng nói AI (Lần đầu khởi động có thể mất 1-2 phút)...", 40)')
+    js_call(window, 'updateStatus("Đang tải mô hình giọng nói AI (Lần đầu khởi động có thể mất 1-2 phút)...", 40)')
 
     # Poll servers until they are ready
     flask_ready = False
@@ -357,24 +469,24 @@ def initialize_app(window):
     for attempt in range(max_attempts):
         # Check if subprocesses crashed
         if flask_proc.poll() is not None:
-            window.evaluate_js('showError("Dịch vụ Web (Flask) bị tắt đột ngột. Vui lòng kiểm tra logs/flask.log")')
+            js_call(window, 'showError("Dịch vụ Web (Flask) bị tắt đột ngột. Vui lòng kiểm tra logs/flask.log")')
             return
             
         if fastapi_proc.poll() is not None:
-            window.evaluate_js('showError("Dịch vụ Giọng nói AI (FastAPI) bị lỗi. Vui lòng kiểm tra logs/fastapi.log")')
+            js_call(window, 'showError("Dịch vụ Giọng nói AI (FastAPI) bị lỗi. Vui lòng kiểm tra logs/fastapi.log")')
             return
 
         if not flask_ready:
             flask_ready = check_server_ready('http://127.0.0.1:5000/login')
             if flask_ready:
                 progress = max(progress, 55)
-                window.evaluate_js(f'updateStatus("Dịch vụ Web đã sẵn sàng. Đang đợi tải mô hình AI...", {progress})')
+                js_call(window, f'updateStatus("Dịch vụ Web đã sẵn sàng. Đang đợi tải mô hình AI...", {progress})')
                 
         if not fastapi_ready:
             fastapi_ready = check_server_ready('http://127.0.0.1:8005/')
             if fastapi_ready:
                 progress = max(progress, 85)
-                window.evaluate_js(f'updateStatus("Mô hình AI đã sẵn sàng!", {progress})')
+                js_call(window, f'updateStatus("Mô hình AI đã sẵn sàng!", {progress})')
                 
         if flask_ready and fastapi_ready:
             break
@@ -383,27 +495,27 @@ def initialize_app(window):
         if not fastapi_ready:
             # Slow progress crawl from 40% to 90% over 180 seconds
             progress = min(90, 40 + int((attempt / max_attempts) * 50))
-            window.evaluate_js(f'updateStatus("Đang tải mô hình giọng nói AI (Lần đầu chạy có thể mất 1-2 phút)...", {progress})')
+            js_call(window, f'updateStatus("Đang tải mô hình giọng nói AI (Lần đầu chạy có thể mất 1-2 phút)...", {progress})')
             
         time.sleep(0.5)
 
     if not flask_ready or not fastapi_ready:
-        window.evaluate_js('showError("Không thể kết nối các dịch vụ nền sau 3 phút. Vui lòng kiểm tra logs/fastapi.log")')
+        js_call(window, 'showError("Không thể kết nối các dịch vụ nền sau 3 phút. Vui lòng kiểm tra logs/fastapi.log")')
         return
 
-    print("Services are ready. Finishing progress bar...")
-    window.evaluate_js('setComplete()')
+    safe_print("Services are ready. Finishing progress bar...")
+    js_call(window, 'setComplete()')
     time.sleep(0.6)  # Wait for progress bar animation to complete smoothly
     
     update_info = check_for_update()
     if update_info and update_api:
-        update_api.window = window
         update_api.info = update_info
-        window.evaluate_js(f'showUpdateModal({json.dumps(update_info, ensure_ascii=False)})')
+        js_call(window, f'showUpdateModal({json.dumps(update_info, ensure_ascii=False)})')
         return
 
-    print("Loading main application interface...")
-    window.load_url('http://127.0.0.1:5000')
+    safe_print("Loading main application interface...")
+    navigate_window(window, 'http://127.0.0.1:5000')
+
 
 def terminate_process(proc, name):
     if not proc or proc.poll() is not None:
@@ -418,7 +530,7 @@ def terminate_process(proc, name):
             else:
                 proc.kill()
         except Exception as exc:
-            print(f"WARN: Could not kill {name}: {exc}")
+            safe_print(f"WARN: Could not kill {name}: {exc}")
 
 
 def shutdown_app(exit_app=False):
@@ -426,7 +538,7 @@ def shutdown_app(exit_app=False):
     if shutting_down:
         return
     shutting_down = True
-    print("Shutting down Live AI processes...")
+    safe_print("Shutting down Live AI processes...")
 
     try:
         req = urllib.request.Request('http://127.0.0.1:5000/internal/shutdown-live', data=b'{}', method='POST')
@@ -451,10 +563,10 @@ def shutdown_app(exit_app=False):
 
 class BrowserFallbackWindow:
     def evaluate_js(self, script):
-        print(f"[STARTUP] {script}")
+        safe_print(f"[STARTUP] {script}")
 
     def load_url(self, url):
-        print(f"Opening browser fallback: {url}")
+        safe_print(f"Opening browser fallback: {url}")
         webbrowser.open(url)
 
 
@@ -731,7 +843,7 @@ if __name__ == "__main__":
             resizable=True,
             js_api=update_api
         )
-        update_api.window = window
+        main_window = window
 
         # Locate icon file for window
         icon_path = None
@@ -752,7 +864,7 @@ if __name__ == "__main__":
         # Run webview start without debug=True to prevent opening devtools automatically
         webview.start(initialize_app, window, icon=icon_path)
     except Exception as exc:
-        print(f"Webview startup failed, using browser fallback: {exc}")
+        safe_print(f"Webview startup failed, using browser fallback: {exc}")
         initialize_app(BrowserFallbackWindow())
         wait_for_browser_fallback()
     finally:

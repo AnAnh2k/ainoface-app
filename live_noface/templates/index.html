@@ -618,6 +618,35 @@
             margin: 0;
         }
 
+        .modal-close {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: 1px solid rgba(239, 68, 68, 0.38);
+            background: rgba(239, 68, 68, 0.14);
+            color: #fecaca;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            line-height: 1;
+            font-weight: 800;
+            cursor: pointer;
+            transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+        }
+
+        .modal-close:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .modal-close:focus-visible {
+            outline: 2px solid rgba(34, 211, 238, 0.75);
+            outline-offset: 2px;
+        }
+
         .topup-promo-banner {
             position: relative;
             overflow: hidden;
@@ -1620,7 +1649,7 @@
                     Đơn giá hiện tại của bạn: <span id="price-modal-rate" style="color: var(--primary); font-weight: bold;">- đ/giờ</span>
                 </p>
                 <div class="topup-promo-banner" aria-live="polite">
-                    <div class="promo-eyebrow">Khuyến mãi tháng 7</div>
+                    <div class="promo-eyebrow">Khuyến mãi tháng 7.!</div>
                     <div class="promo-title">Giảm 50% giá nạp: từ 20.000đ/giờ còn 10.000đ/giờ</div>
                     <div class="promo-price-line">
                         <span class="promo-old-price">20.000đ/giờ</span>
@@ -4114,7 +4143,7 @@ if (isLockedResponse(data)) {
                 const res = await fetch('/api/session/start', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ appVersion: '1.0.0' })
+                    body: JSON.stringify({ appVersion: currentAppVersion || 'unknown' })
                 });
                 const data = await res.json();
 if (isLockedResponse(data)) {
