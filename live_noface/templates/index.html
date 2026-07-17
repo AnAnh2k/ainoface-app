@@ -82,130 +82,6 @@
             overflow: hidden;
         }
 
-        /* Left Sidebar styling */
-        .sidebar {
-            width: 260px;
-            background: rgba(8, 12, 26, 0.9);
-            border-right: 1px solid rgba(0, 240, 255, 0.1);
-            padding: 24px 20px;
-            display: flex;
-            flex-direction: column;
-            box-sizing: border-box;
-            flex-shrink: 0;
-            backdrop-filter: blur(16px);
-            z-index: 10;
-        }
-
-        .sidebar-logo {
-            font-family: var(--font-cyber);
-            font-size: 20px;
-            font-weight: 900;
-            letter-spacing: 1px;
-            background: linear-gradient(90deg, #00f0ff, #a855f7, #ff0055);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .sidebar-logo-icon {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #00f0ff, #ff0055);
-            border-radius: 6px;
-            box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: #94a3b8;
-            border-radius: 10px;
-            text-decoration: none;
-            font-size: 14.5px;
-            font-weight: 500;
-            transition: all 0.25s ease;
-            cursor: pointer;
-        }
-
-        .menu-item:hover, .menu-item.active {
-            background: rgba(0, 240, 255, 0.08);
-            color: var(--primary);
-            box-shadow: inset 0 0 8px rgba(0, 240, 255, 0.1);
-            border-left: 3px solid var(--primary);
-            padding-left: 13px;
-        }
-
-        .system-status-box {
-            background: rgba(13, 20, 38, 0.6);
-            border: 1px solid rgba(0, 240, 255, 0.1);
-            border-radius: 12px;
-            padding: 16px;
-            margin-top: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            box-sizing: border-box;
-        }
-
-        .system-status-box h4 {
-            margin: 0 0 4px 0;
-            font-size: 11px;
-            text-transform: uppercase;
-            color: #64748b;
-            letter-spacing: 1px;
-            font-family: var(--font-cyber);
-        }
-
-        .status-indicator {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12.5px;
-            color: #94a3b8;
-        }
-
-        .status-badge {
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .status-badge.on {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        .status-badge.off {
-            background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .status-chart-box {
-            margin-top: 10px;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 10px;
-        }
-
         /* Main workspace styling */
         .main-workspace {
             flex: 1;
@@ -1448,63 +1324,6 @@
 
 <body>
     <div class="app-layout">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-logo">
-                <span class="sidebar-logo-icon"></span>
-                 S-Live 
-            </div>
-            
-            <ul class="sidebar-menu">
-                <li><a href="#" class="menu-item active">📺 Tổng quan</a></li>
-                <li><a href="#" class="menu-item">🎙️ AI Sắp đọc</a></li>
-                <li><a href="#" class="menu-item">💬 Bình luận & Trả lời</a></li>
-                <li><a href="#" class="menu-item">⌨️ Nội dung live</a></li>
-                <li><a href="#" class="menu-item">📝 Kịch bản</a></li>
-                <li><a href="#" class="menu-item">📊 Thống kê</a></li>
-                <li><a href="#" class="menu-item">⚙️ Cài đặt</a></li>
-                <li><a href="#" class="menu-item">🕒 Lịch sử Live</a></li>
-            </ul>
-
-            <div class="system-status-box">
-                <h4>Trạng thái hệ thống</h4>
-                <div class="status-indicator">
-                    <span>LLM (GPT-4o)</span>
-                    <span class="status-badge on">ON</span>
-                </div>
-                <div class="status-indicator">
-                    <span>TTS (Voice AI)</span>
-                    <span id="system-tts-badge" class="status-badge on">ON</span>
-                </div>
-                <div class="status-indicator">
-                    <span>TikTok Live</span>
-                    <span id="system-tiktok-badge" class="status-badge off">OFF</span>
-                </div>
-                <div class="status-indicator">
-                    <span>AI Reply Engine</span>
-                    <span class="status-badge on">ON</span>
-                </div>
-                
-                <div class="status-chart-box">
-                    <div style="font-size:10px; color:#64748b; margin-bottom:4px; display:flex; justify-content:space-between;">
-                        <span>Độ trễ trung bình</span>
-                        <span style="color:var(--primary); font-weight:700;">0.8s</span>
-                    </div>
-                    <!-- Minimal latency wave graph SVG -->
-                    <svg width="100%" height="24" viewBox="0 0 200 30" preserveAspectRatio="none">
-                        <defs>
-                            <linearGradient id="latency-grad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.3"></stop>
-                                <stop offset="100%" stop-color="#00f0ff" stop-opacity="0"></stop>
-                            </linearGradient>
-                        </defs>
-                        <path d="M 0,25 Q 25,12 50,18 T 100,8 T 150,22 T 200,10 L 200,30 L 0,30 Z" fill="url(#latency-grad)"></path>
-                        <path d="M 0,25 Q 25,12 50,18 T 100,8 T 150,22 T 200,10" fill="none" stroke="#00f0ff" stroke-width="1.5"></path>
-                    </svg>
-                </div>
-            </div>
-        </aside>
-
         <!-- Main Workspace Area -->
         <main class="main-workspace">
             <!-- Top Status Bar -->
@@ -2194,8 +2013,10 @@
             connectBtn.disabled = isConnecting || isActive;
             disconnectBtn.disabled = !isActive;
             tiktokUserInput.disabled = isConnecting || isActive;
-            systemTiktokBadge.textContent = isActive ? 'ON' : 'OFF';
-            systemTiktokBadge.className = isActive ? 'status-badge on' : 'status-badge off';
+            if (systemTiktokBadge) {
+                systemTiktokBadge.textContent = isActive ? 'ON' : 'OFF';
+                systemTiktokBadge.className = isActive ? 'status-badge on' : 'status-badge off';
+            }
 
             if (!isActive) {
                 resetLiveTopbarStats();
@@ -3339,8 +3160,10 @@
             connectBtn.disabled = true;
             disconnectBtn.disabled = true;
             tiktokUserInput.disabled = true;
-            systemTiktokBadge.textContent = 'OFF';
-            systemTiktokBadge.className = 'status-badge off';
+            if (systemTiktokBadge) {
+                systemTiktokBadge.textContent = 'OFF';
+                systemTiktokBadge.className = 'status-badge off';
+            }
             status.className = 'error';
             const message = (data && (data.message || data.error)) || 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.';
             status.textContent = message;
@@ -4110,18 +3933,24 @@ if (isLockedResponse(data)) {
                 const response = await fetch('/tts-health');
                 const data = await response.json();
                 if (data && data.success && data.status === 'ready') {
-                    systemTtsBadge.textContent = 'ON';
-                    systemTtsBadge.className = 'status-badge on';
+                    if (systemTtsBadge) {
+                        systemTtsBadge.textContent = 'ON';
+                        systemTtsBadge.className = 'status-badge on';
+                    }
                     ttsModelHealthy = true;
                 } else {
-                    systemTtsBadge.textContent = 'ERR';
-                    systemTtsBadge.className = 'status-badge off';
+                    if (systemTtsBadge) {
+                        systemTtsBadge.textContent = 'ERR';
+                        systemTtsBadge.className = 'status-badge off';
+                    }
                     ttsModelHealthy = false;
                     status.textContent = 'Cảnh báo: Không thể kết nối hoặc tải mô hình giọng nói AI. Vui lòng kết nối Internet ổn định và khởi động lại ứng dụng.';
                 }
             } catch (err) {
-                systemTtsBadge.textContent = 'OFF';
-                systemTtsBadge.className = 'status-badge off';
+                if (systemTtsBadge) {
+                    systemTtsBadge.textContent = 'OFF';
+                    systemTtsBadge.className = 'status-badge off';
+                }
                 ttsModelHealthy = false;
             }
         }
