@@ -3612,6 +3612,9 @@ if (isLockedResponse(data)) {
         function applyInvoicePaymentToQrModal(invoice, profile = {}) {
             const bankDetails = profile.bankDetails || {};
             const qrImage = document.getElementById('qr-image');
+            const waitingMessage = invoice.paymentProvider === 'sepay'
+                ? '🕒 Đang chờ SePay xác nhận chuyển khoản...'
+                : '🕒 Đang chờ admin xác nhận chuyển khoản...';
 
             document.getElementById('modal-rate').textContent = invoice.hourlyRateSnapshot ? invoice.hourlyRateSnapshot.toLocaleString('vi-VN') + ' đ/giờ' : (profile.hourlyRateVnd ? profile.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/giờ' : '50.000 đ/giờ');
             document.getElementById('modal-bank-name').textContent = bankDetails.bankName || '--';
@@ -3631,7 +3634,7 @@ if (isLockedResponse(data)) {
 
             const msg = document.getElementById('polling-status-msg');
             if (msg) {
-                msg.textContent = '🕒 Đang chờ SePay xác nhận chuyển khoản...';
+                msg.textContent = waitingMessage;
             }
         }
 
@@ -3702,7 +3705,6 @@ if (isLockedResponse(data)) {
                 applyInvoicePaymentToQrModal(invoice, profile);
                 
                 document.getElementById('qr-loading-spinner').style.display = 'none';
-                document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ SePay xác nhận chuyển khoản...';
                 
                 // Khởi chạy Polling kiểm tra trạng thái
                 startInvoicePolling(invoice._id);
@@ -3955,7 +3957,6 @@ if (isLockedResponse(data)) {
             applyInvoicePaymentToQrModal(invoice, profile);
             
             document.getElementById('qr-loading-spinner').style.display = 'none';
-            document.getElementById('polling-status-msg').textContent = '🕒 Đang chờ SePay xác nhận chuyển khoản...';
             document.getElementById('qr-modal').style.display = 'flex';
             
             startInvoicePolling(invoice._id);
