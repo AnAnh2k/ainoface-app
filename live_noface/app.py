@@ -1,4 +1,4 @@
-﻿import os
+import os
 import time
 import json
 import threading
@@ -9,6 +9,8 @@ import sys
 CONFIG_PATH = 'config.json'
 DEFAULT_CENTRAL_API_URL = "https://ainoface-backend.onrender.com"
 DEFAULT_LLM_URL = "https://luck-tvs-schedules-palace.trycloudflare.com"
+LOCAL_APP_DIR = os.path.join(os.environ.get('LOCALAPPDATA') or os.path.expanduser('~'), 'SLiveAI')
+AUTH_STATE_PATH = os.path.join(LOCAL_APP_DIR, 'auth.json')
 
 llm_url = DEFAULT_LLM_URL
 if os.path.exists(CONFIG_PATH):
@@ -147,6 +149,7 @@ def is_force_logout_response(data):
 def clear_local_login_for_force_logout(data):
     if is_force_logout_response(data):
         session.clear()
+        delete_saved_auth()
 
 def call_central_api(endpoint, method='GET', data=None, token=None):
     url = f"{CENTRAL_API_URL}{endpoint}"
@@ -182,6 +185,92 @@ def call_central_api(endpoint, method='GET', data=None, token=None):
     except Exception as e:
         return {'success': False, 'error': str(e)}, 500
 
+
+def ensure_runtime_dir():
+    os.makedirs(LOCAL_APP_DIR, exist_ok=True)
+
+
+def load_saved_auth():
+    try:
+        if not os.path.exists(AUTH_STATE_PATH):
+            return {}
+        with open(AUTH_STATE_PATH, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception as exc:
+        print(f"WARN: Could not read saved auth: {exc}")
+        return {}
+
+
+def save_saved_auth(data):
+    try:
+        ensure_runtime_dir()
+        payload = {
+            'username': data.get('username') or '',
+            'password': data.get('password') or '',
+            'token': data.get('token') or '',
+            'savedAt': int(time.time())
+        }
+        with open(AUTH_STATE_PATH, 'w', encoding='utf-8') as f:
+            json.dump(payload, f, ensure_ascii=False, indent=2)
+    except Exception as exc:
+        print(f"WARN: Could not save auth state: {exc}")
+
+
+def delete_saved_auth():
+    try:
+        if os.path.exists(AUTH_STATE_PATH):
+            os.remove(AUTH_STATE_PATH)
+    except Exception as exc:
+        print(f"WARN: Could not delete saved auth: {exc}")
+
+
+def apply_login_state(login_data):
+    session['logged_in'] = True
+    session['auth_token'] = login_data.get('token')
+    session['username'] = login_data.get('username')
+    session.permanent = True
+
+
+def restore_saved_login():
+    if session.get('logged_in'):
+        return True
+
+    saved = load_saved_auth()
+    token = saved.get('token')
+    if token:
+        profile_data, profile_status = call_central_api('/api/user/profile', method='GET', token=token)
+        if profile_status == 200 and profile_data.get('success'):
+            apply_login_state({
+                'token': token,
+                'username': (profile_data.get('user') or {}).get('username') or saved.get('username')
+            })
+            return True
+        if is_force_logout_response(profile_data):
+            delete_saved_auth()
+            return False
+
+    username = (saved.get('username') or '').strip()
+    password = saved.get('password') or ''
+    if not username or not password:
+        return False
+
+    login_data, login_status = call_central_api('/api/auth/login', method='POST', data={
+        'username': username,
+        'password': password
+    })
+    if login_status == 200 and login_data.get('success'):
+        apply_login_state(login_data)
+        save_saved_auth({
+            'username': username,
+            'password': password,
+            'token': login_data.get('token')
+        })
+        return True
+
+    if is_force_logout_response(login_data) or login_status in (400, 401, 403):
+        delete_saved_auth()
+    return False
 # Global queue for audio stream
 tts_queue = Queue()
 comments_queue = Queue()
@@ -263,11 +352,14 @@ def require_login():
         return
     if request.path in ('/login', '/logout', '/register', '/verify-registration'):
         return
-    if request.path in ('/human', '/live-event'):
+    if request.path in ('/human', '/live-event', '/internal/shutdown-live'):
         # Allow TikTok Live local listener process to call /human
         if request.remote_addr in ('127.0.0.1', '::1', 'localhost'):
             return
             
+    if not session.get('logged_in'):
+        restore_saved_login()
+
     if not session.get('logged_in'):
         # If it's an API request, return 401 JSON error instead of redirecting
         if request.path.startswith(('/api/', '/stream', '/tts', '/add-tts', '/start-live', '/stop-live', '/comments-stream', '/audio-stream', '/set-unread-count')):
@@ -326,10 +418,12 @@ def login():
         })
 
         if status_code == 200 and res_data.get('success'):
-            session['logged_in'] = True
-            session['auth_token'] = res_data.get('token')
-            session['username'] = res_data.get('username')
-            session.permanent = True
+            apply_login_state(res_data)
+            save_saved_auth({
+                'username': username,
+                'password': password,
+                'token': res_data.get('token')
+            })
             return jsonify({'success': True})
         return jsonify({'success': False, 'error': res_data.get('error') or 'TÃ i khoáº£n hoáº·c máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c.'}), status_code
     if session.get('logged_in'):
@@ -344,6 +438,7 @@ def logout():
     if session_id and auth_token:
         call_central_api('/api/billing/session/end', method='POST', data={'sessionId': session_id}, token=auth_token)
     session.clear()
+    delete_saved_auth()
     return redirect(url_for('login'))
 
 @app.route('/api/session/start', methods=['POST'])
@@ -849,6 +944,27 @@ def start_live():
     print(f"[LIVE ERROR] {msg}")
     friendly_msg = "Không thể kết nối với phiên live TikTok. Vui lòng kiểm tra lại Username TikTok hoặc kết nối mạng của bạn."
     return jsonify({'success': False, 'error': friendly_msg}), 500
+
+
+@app.route('/internal/shutdown-live', methods=['POST'])
+def internal_shutdown_live():
+    """Local-only endpoint used by the launcher to stop TikTok before app update/exit."""
+    if request.remote_addr not in ('127.0.0.1', '::1', 'localhost'):
+        return jsonify({'success': False, 'error': 'Forbidden'}), 403
+
+    global live_process
+    if live_process is not None and live_process.poll() is None:
+        try:
+            live_process.terminate()
+            try:
+                live_process.wait(timeout=5)
+            except Exception:
+                live_process.kill()
+        except Exception as exc:
+            print(f"WARN: Could not stop live listener during shutdown: {exc}")
+    live_process = None
+    reset_live_stats()
+    return jsonify({'success': True}), 200
 
 
 @app.route('/stop-live', methods=['POST'])

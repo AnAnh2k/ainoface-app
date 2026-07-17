@@ -3,7 +3,8 @@ import subprocess
 import shutil
 import json
 
-PRODUCTION_CENTRAL_API_URL = "https://ainoface-backend.onrender.com"
+DEFAULT_CENTRAL_API_URL = "https://ainoface-backend.onrender.com"
+BUILD_CENTRAL_API_URL = os.environ.get("BUILD_CENTRAL_API_URL", DEFAULT_CENTRAL_API_URL).rstrip("/")
 
 # 1. Stop running app instances
 try:
@@ -16,11 +17,11 @@ pyinstaller_path = os.path.join("test_vieneu", "venv", "Scripts", "pyinstaller.e
 
 # 2. Build launcher
 print("Building Live_AI_SLive...")
-subprocess.run([pyinstaller_path, "--clean", "--noconfirm", "Live_AI_SLive.spec"])
+subprocess.run([pyinstaller_path, "--clean", "--noconfirm", "Live_AI_SLive.spec"], check=True)
 
 # 3. Build live_client
 print("Building live_client...")
-subprocess.run([pyinstaller_path, "--clean", "--noconfirm", "live_client.spec"])
+subprocess.run([pyinstaller_path, "--clean", "--noconfirm", "live_client.spec"], check=True)
 
 # 4. Move live_client.exe to internal folder
 src_client = os.path.join("dist", "live_client.exe")
@@ -34,18 +35,28 @@ else:
     print("Error: live_client.exe not found.")
 
 # 5. Copy config.json to dist/Live_AI_SLive/ next to the executable.
-# Keep the packaged app pointed at production even when local config.json uses localhost.
+# Keep the packaged app pointed at the selected backend URL for this build.
 src_config = "config.json"
 dest_config = os.path.join("dist", "Live_AI_SLive", "config.json")
 if os.path.exists(src_config):
     with open(src_config, "r", encoding="utf-8") as f:
         config_data = json.load(f)
-    config_data["central_api_url"] = PRODUCTION_CENTRAL_API_URL
+    config_data["central_api_url"] = BUILD_CENTRAL_API_URL
     os.makedirs(os.path.dirname(dest_config), exist_ok=True)
     with open(dest_config, "w", encoding="utf-8") as f:
         json.dump(config_data, f, ensure_ascii=False, indent=4)
-    print("Successfully wrote production config.json next to executable.")
+    print(f"Successfully wrote config.json next to executable with central_api_url={BUILD_CENTRAL_API_URL}.")
 else:
     print("Warning: config.json not found in root.")
+
+# 6. Copy version.json next to the executable so the updater reads the installed version correctly.
+src_version = "version.json"
+dest_version = os.path.join("dist", "Live_AI_SLive", "version.json")
+if os.path.exists(src_version):
+    os.makedirs(os.path.dirname(dest_version), exist_ok=True)
+    shutil.copy2(src_version, dest_version)
+    print("Successfully copied version.json next to executable.")
+else:
+    print("Warning: version.json not found in root.")
 
 print("\nRebuild completed successfully! App is inside 'dist/Live_AI_SLive'.")
