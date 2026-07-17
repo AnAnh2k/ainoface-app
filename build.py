@@ -41,7 +41,6 @@ if os.path.exists(src_config):
     with open(src_config, "r", encoding="utf-8") as f:
         config_data = json.load(f)
     config_data["central_api_url"] = PRODUCTION_CENTRAL_API_URL
-    config_data.pop("desktop_device_id", None)
     os.makedirs(os.path.dirname(dest_config), exist_ok=True)
     with open(dest_config, "w", encoding="utf-8") as f:
         json.dump(config_data, f, ensure_ascii=False, indent=4)

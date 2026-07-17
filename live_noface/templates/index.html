@@ -3975,7 +3975,7 @@ if (isLockedResponse(data)) {
                 const res = await fetch('/api/session/start', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ deviceId: 'desktop-webview', appVersion: '1.0.0' })
+                    body: JSON.stringify({ appVersion: '1.0.0' })
                 });
                 const data = await res.json();
 if (isLockedResponse(data)) {

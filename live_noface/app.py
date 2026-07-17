@@ -4,7 +4,6 @@ import json
 import threading
 import subprocess
 import sys
-import uuid
 
 # Load configuration and initialize LLM API base URLs in environment variables
 CONFIG_PATH = 'config.json'
@@ -122,10 +121,6 @@ def load_or_create_config():
 
     if "central_api_url" not in config_data:
         config_data["central_api_url"] = "https://ainoface-backend.onrender.com"
-        config_changed = True
-
-    if "desktop_device_id" not in config_data:
-        config_data["desktop_device_id"] = str(uuid.uuid4())
         config_changed = True
 
     if config_changed:
@@ -358,7 +353,6 @@ def session_start():
         return jsonify({'success': False, 'error': 'Yêu cầu đăng nhập.'}), 401
     
     data = request.get_json(silent=True) or {}
-    data['deviceId'] = config.get('desktop_device_id')
     data['appVersion'] = data.get('appVersion') or '1.0.0'
     res_data, status_code = call_central_api('/api/billing/session/start', method='POST', data=data, token=auth_token)
     if status_code == 200 and res_data.get('success'):

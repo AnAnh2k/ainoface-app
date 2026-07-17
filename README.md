@@ -50,8 +50,7 @@ Ví dụ cấu hình local:
 ```json
 {
   "central_api_url": "http://127.0.0.1:5050",
-  "llm_api_base_url": "https://your-llm-api.example.com",
-  "desktop_device_id": "auto-generated"
+  "llm_api_base_url": "https://your-llm-api.example.com"
 }
 ```
 
