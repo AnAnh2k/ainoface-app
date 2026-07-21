@@ -15,32 +15,32 @@
             --primary: #00f0ff; /* Neon Cyan */
             --primary-hover: #00c8ff;
             --primary-light: rgba(0, 240, 255, 0.08);
-            
+
             --danger: #ff0055; /* Neon Pink/Red */
             --danger-hover: #e0004c;
             --danger-light: rgba(255, 0, 85, 0.08);
-            
+
             --success: #10b981; /* Neon Green */
             --success-hover: #059669;
             --success-light: rgba(16, 185, 129, 0.08);
-            
+
             --purple: #a855f7;
             --purple-hover: #9333ea;
-            
+
             --bg-body: #060913;
             --bg-container: rgba(13, 20, 38, 0.45);
             --bg-input: rgba(10, 16, 32, 0.7);
-            
+
             --text-dark: #f8fafc;
             --text-main: #cbd5e1;
             --text-muted: #64748b;
             --text-dimmed: #475569;
-            
+
             --border: rgba(0, 240, 255, 0.1);
             --border-hover: rgba(0, 240, 255, 0.25);
-            
+
             --font-main: 'Outfit', sans-serif;
-            --font-cyber: 'Orbitron', sans-serif;
+            --font-cyber: 'Outfit', 'Orbitron', sans-serif;
         }
 
         body {
@@ -1383,7 +1383,7 @@
                         <span class="stat-label">👥 Người xem</span>
                         <span class="stat-value" id="top-viewer-count">--</span>
                     </div>
-                    
+
                     <div class="stat-item stat-group-divider" onclick="openUserHistoryModal()" style="cursor: pointer;" title="Xem lịch sử tài khoản">
                         <span class="stat-label">👤 Khách</span>
                         <span class="stat-value primary" id="top-username" style="text-decoration: underline;">-</span>
@@ -1399,9 +1399,9 @@
                     <div class="stat-item stat-action">
                         <button class="btn-green topbar-action-btn" onclick="openPriceModal()">Nạp tiền</button>
                     </div>
-                    
+
                     <div class="stat-item voice-control stat-group-divider">
-                        <span class="stat-label">🎙️ AI Voice</span>
+                        <span class="stat-label">🎙️ AI Voice</span>
                         <label class="switch">
                             <input type="checkbox" id="web-audio-toggle" checked>
                             <span class="slider"></span>
@@ -1498,6 +1498,14 @@
                                     <option value="Thục Đoan">Thục Đoan (Nữ)</option>
                                 </select>
                             </div>
+                            <div class="sound-control-item">
+                                <label>⚙️ Chế độ xử lý</label>
+                                <select id="processing-mode-select" style="padding: 2px 6px; font-size:11.5px; height:24px;">
+                                    <option value="auto" selected>Tự động (khuyến nghị)</option>
+                                    <option value="stable">Ổn định (máy yếu)</option>
+                                    <option value="fast">Nhanh (máy mạnh)</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -1573,7 +1581,7 @@
                                         <label for="prompt">Nhập chủ đề Livestream:</label>
                                         <textarea id="prompt" name="prompt" placeholder="Nhập kịch bản hoặc yêu cầu prompt tại đây..." required style="flex:1; min-height:80px;"></textarea>
                                     </div>
-                                    
+
                                     <button type="button" id="send-btn" class="btn-green" style="height:36px; padding:0 16px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>Gửi kịch bản</button>
                                 </form>
                             </div>
@@ -1642,7 +1650,7 @@
         <div class="modal-content" style="max-width: 440px;">
             <div class="modal-header">
                 <h3 id="price-modal-title">💰 Chọn gói nạp tiền</h3>
-                <button type="button" class="close-modal-btn" onclick="closePriceModal()">✕</button>
+                <button type="button" class="close-modal-btn" onclick="closePriceModal()">&times;</button>
             </div>
             <div class="modal-body" style="padding: 15px 0;">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: center;">
@@ -1662,7 +1670,7 @@
                         <div class="promo-countdown-cell"><strong id="promo-seconds">00</strong><span>Giây</span></div>
                     </div>
                 </div>
-                
+
                 <!-- Quick select grid -->
                 <div class="price-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px;">
                     <button type="button" class="price-btn" id="pbtn-50000" onclick="selectPrice(50000)">
@@ -1709,7 +1717,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>🏦 Quét mã QR để nạp thêm thời gian</h3>
-                <button type="button" class="close-modal-btn" onclick="closeQrModal()">✕</button>
+                <button type="button" class="close-modal-btn" onclick="closeQrModal()">&times;</button>
             </div>
             <div class="modal-body" style="text-align: center; padding: 15px 0;">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
@@ -1745,7 +1753,7 @@
         <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--danger); box-shadow: 0 0 40px rgba(239, 68, 68, 0.15);">
             <div class="modal-header" style="border-bottom-color: rgba(239, 68, 68, 0.15);">
                 <h3 style="color: var(--danger); display: flex; align-items: center; gap: 8px; font-size: 15px;">⚠️ Xác nhận hủy hóa đơn</h3>
-                <button type="button" class="close-modal-btn" onclick="closeCancelConfirmModal()">✕</button>
+                <button type="button" class="close-modal-btn" onclick="closeCancelConfirmModal()">&times;</button>
             </div>
             <div class="modal-body" style="padding: 20px 0; text-align: center;">
                 <p style="font-size: 14px; color: #fff; line-height: 1.5; margin: 0;">
@@ -1764,7 +1772,7 @@
         <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--primary); box-shadow: 0 0 40px rgba(0, 240, 255, 0.15);">
             <div class="modal-header" style="border-bottom-color: rgba(0, 240, 255, 0.15);">
                 <h3 id="app-alert-title" style="color: var(--primary); display: flex; align-items: center; gap: 8px; font-size: 15px;">📢 Thông báo</h3>
-                <button type="button" class="close-modal-btn" onclick="closeAppAlertModal()">✕</button>
+                <button type="button" class="close-modal-btn" onclick="closeAppAlertModal()">&times;</button>
             </div>
             <div class="modal-body" style="padding: 20px 0; text-align: center;">
                 <p id="app-alert-message" style="font-size: 14px; color: #fff; line-height: 1.5; margin: 0;"></p>
@@ -1780,7 +1788,7 @@
         <div class="modal-content" style="max-width: 400px; padding: 20px; border-color: var(--success); box-shadow: 0 0 50px rgba(16, 185, 129, 0.15);">
             <div class="modal-header" style="border-bottom-color: rgba(16, 185, 129, 0.1);">
                 <h3 style="color: var(--success); display: flex; align-items: center; gap: 8px; font-size: 15px;">🎉 Thanh toán thành công</h3>
-                <button type="button" class="close-modal-btn" onclick="closePaymentSuccessModal()">✕</button>
+                <button type="button" class="close-modal-btn" onclick="closePaymentSuccessModal()">&times;</button>
             </div>
             <div class="modal-body" style="padding: 15px 0; text-align: center;">
                 <div style="width: 50px; height: 50px; background: rgba(16, 185, 129, 0.1); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px; border: 1px solid rgba(16, 185, 129, 0.2);">✓</div>
@@ -1821,7 +1829,7 @@
         <div class="modal-content" style="max-width: 400px; padding: 20px;">
             <div class="modal-header">
                 <h3>📄 Chi tiết hóa đơn</h3>
-                <button type="button" class="close-modal-btn" onclick="closeInvoiceDetailModal()">✕</button>
+                <button type="button" class="close-modal-btn" onclick="closeInvoiceDetailModal()">&times;</button>
             </div>
             <div class="modal-body" style="padding: 15px 0;">
                 <div style="background: rgba(255, 255, 255, 0.02); padding: 15px; border-radius: 8px; font-size: 13px; border: 1px solid rgba(255,255,255,0.05);">
@@ -1858,7 +1866,7 @@
         <div class="modal-content" style="max-width: 680px; width: 90%;">
             <div class="modal-header">
                 <h3>👤 Lịch sử hoạt động tài khoản</h3>
-                <button type="button" class="close-modal-btn" onclick="closeUserHistoryModal()">✕</button>
+                <button type="button" class="close-modal-btn" onclick="closeUserHistoryModal()">&times;</button>
             </div>
             <div class="modal-body" style="padding: 10px 0;">
                 <!-- Tab Headers -->
@@ -1905,7 +1913,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Tab 1: Invoices List -->
                 <div id="tab-invoices-content" style="display: none; max-height: 350px; overflow-y: auto;">
                     <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
@@ -2157,6 +2165,8 @@
         window.originalPrompt = '';
         window.generatedSentences = [];
         window.isFetchingMore = false;
+        window.refillRetryTimer = null;
+        window.currentGenerationId = null;
 
         let audioCtx = null;
         let analyser = null;
@@ -2168,6 +2178,7 @@
         let tiktokStatusInterval = null;
         let tiktokUiState = 'idle';
         let tiktokControlsLocked = false;
+        const tiktokCommentItems = new Map();
 
         function applyTikTokUiState(state, username) {
             tiktokUiState = state;
@@ -2176,10 +2187,10 @@
             }
 
             const isConnecting = state === 'connecting';
-            const isActive = state === 'connected' || state === 'running';
+            const isActive = state === 'connected';
 
             connectBtn.disabled = isConnecting || isActive;
-            disconnectBtn.disabled = !isActive;
+            disconnectBtn.disabled = !(isActive || isConnecting);
             tiktokUserInput.disabled = isConnecting || isActive;
             if (systemTiktokBadge) {
                 systemTiktokBadge.textContent = isActive ? 'ON' : 'OFF';
@@ -2191,14 +2202,36 @@
             }
         }
 
+        function resetTikTokConnection(message, isError = true) {
+            applyTikTokUiState('idle');
+            speechQueue.stopComments();
+            tiktokCommentItems.clear();
+            if (message) {
+                status.className = isError ? 'error' : 'status-info';
+                status.textContent = friendlyTikTokError(message);
+            }
+        }
+
         async function syncTikTokStatus() {
             try {
                 const res = await fetch('/api/tiktok/status');
                 if (!res.ok) return;
                 const data = await res.json();
                 if (!data || data.success === false) return;
-                const active = !!(data.connected || data.running);
-                applyTikTokUiState(active ? (data.connected ? 'connected' : 'running') : 'idle', data.username);
+                const state = data.state || (data.connected ? 'connected' : (data.running ? 'connecting' : 'disconnected'));
+                if (state === 'connected') {
+                    applyTikTokUiState('connected', data.username);
+                    return;
+                }
+                if (state === 'connecting') {
+                    applyTikTokUiState('connecting', data.username);
+                    return;
+                }
+                if (state === 'failed') {
+                    resetTikTokConnection(data.error || 'Không kết nối được TikTok Live.');
+                    return;
+                }
+                applyTikTokUiState('idle', data.username);
             } catch (err) {
                 console.error('Error fetching TikTok status:', err);
             }
@@ -2276,34 +2309,14 @@
         // Sentence Splitting logic
         function splitTextIntoSentences(text) {
             if (!text) return [];
-            const rawSentences = text.split(/(?<=[.!?\n])\s+/);
-            const sentences = [];
 
-            rawSentences.forEach(s => {
-                const trimmed = s.trim();
-                if (trimmed) {
-                    if (trimmed.length > 65) {
-                        const subParts = trimmed.split(/(?<=[,;])\s+/);
-                        let tempSentence = "";
-                        subParts.forEach(part => {
-                            if ((tempSentence + part).length > 65) {
-                                if (tempSentence.trim()) {
-                                    sentences.push(tempSentence.trim());
-                                }
-                                tempSentence = part;
-                            } else {
-                                tempSentence += (tempSentence ? " " : "") + part;
-                            }
-                        });
-                        if (tempSentence.trim()) {
-                            sentences.push(tempSentence.trim());
-                        }
-                    } else {
-                        sentences.push(trimmed);
-                    }
-                }
-            });
-            return sentences;
+            const normalized = text.replace(/\s+/g, ' ').trim();
+            if (!normalized) return [];
+
+            return normalized
+                .split(/(?<=[.!?])\s+/)
+                .map(sentence => sentence.trim())
+                .filter(Boolean);
         }
 
         function getCumulativeOffsetTop(element, parent) {
@@ -2317,7 +2330,7 @@
 
         function scrollParentToSecondLine(parent, child) {
             if (!parent || !child) return;
-            
+
             // Không tự động cuộn nếu người dùng đang tương tác/focus vào form nhập liệu
             const activeEl = document.activeElement;
             if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')) {
@@ -2381,8 +2394,10 @@
                 this.playResolver = null;
                 this.currentItem = null;
                 this.readingIndex = 0;
-                this.buffering = true;
+                this.hasStarted = false;
+                this.startWaitTimer = null;
 
+                // Audio Players (Dual Preload Player)
                 this.audioA = new Audio();
                 this.audioB = new Audio();
                 this.audioA.crossOrigin = "anonymous";
@@ -2400,6 +2415,74 @@
                 this.audioB.onended = () => this.onEnded();
                 this.audioA.onerror = (e) => this.onError(e);
                 this.audioB.onerror = (e) => this.onError(e);
+
+                // Processing Mode and RTF metrics
+                this.mode = localStorage.getItem('processing_mode') || 'auto';
+                this.rtfSamples = [];
+                this.isFetchingProducer = false;
+            }
+
+            setMode(mode) {
+                if (['auto', 'stable', 'fast'].includes(mode)) {
+                    this.mode = mode;
+                    localStorage.setItem('processing_mode', mode);
+                    console.log("[SpeechQueue] Processing mode changed to:", mode);
+                    this.checkStartupCondition();
+                }
+            }
+
+            getModeConfig() {
+                const mode = this.mode;
+                if (mode === 'stable') {
+                    return {
+                        initialReadyTarget: 3,
+                        maxInitialWaitMs: 45000,
+                        targetReadyBuffer: 5,
+                        refillReadyThreshold: 3,
+                        maxQueue: 10
+                    };
+                } else if (mode === 'fast') {
+                    return {
+                        initialReadyTarget: 2,
+                        maxInitialWaitMs: 15000,
+                        targetReadyBuffer: 3,
+                        refillReadyThreshold: 2,
+                        maxQueue: 15
+                    };
+                } else {
+                    // Auto Mode based on RTF = synthesisMs / audioDurationMs
+                    const avgRtf = this.rtfSamples.length > 0
+                        ? (this.rtfSamples.reduce((a, b) => a + b, 0) / this.rtfSamples.length)
+                        : 0.7;
+
+                    let targetBuffer = 3;
+                    if (avgRtf >= 0.9) {
+                        targetBuffer = 4;
+                    } else if (avgRtf < 0.6) {
+                        targetBuffer = 2;
+                    }
+                    return {
+                        initialReadyTarget: Math.min(targetBuffer, 3),
+                        maxInitialWaitMs: 30000,
+                        targetReadyBuffer: targetBuffer,
+                        refillReadyThreshold: Math.max(1, targetBuffer - 1),
+                        maxQueue: 12
+                    };
+                }
+            }
+
+            recordRtf(synthesisMs, audioDurationMs) {
+                if (audioDurationMs && audioDurationMs > 0) {
+                    const rtf = synthesisMs / audioDurationMs;
+                    this.rtfSamples.push(rtf);
+                    if (this.rtfSamples.length > 5) {
+                        this.rtfSamples.shift();
+                    }
+                }
+            }
+
+            get readyAudioCount() {
+                return this.queue.filter(item => item.state === 'ready').length;
             }
 
             async updateUnreadCount() {
@@ -2422,13 +2505,34 @@
             }
 
             stop() {
+                // Revoke all blob URLs
+                this.queue.forEach(item => {
+                    if (item.audioBlobUrl) {
+                        URL.revokeObjectURL(item.audioBlobUrl);
+                        item.audioBlobUrl = null;
+                    }
+                    item.state = 'cancelled';
+                });
+                if (this.currentItem && this.currentItem.audioBlobUrl) {
+                    URL.revokeObjectURL(this.currentItem.audioBlobUrl);
+                    this.currentItem.audioBlobUrl = null;
+                }
+
                 this.queue = [];
                 this.isPlaying = false;
                 this.isHighlighting = false;
                 this.playResolver = null;
                 this.currentItem = null;
                 this.readingIndex = 0;
-                this.buffering = true;
+                this.hasStarted = false;
+
+                if (this.startWaitTimer) {
+                    clearTimeout(this.startWaitTimer);
+                    this.startWaitTimer = null;
+                }
+
+                clearTimeout(window.refillRetryTimer);
+                window.refillRetryTimer = null;
                 this.updateUnreadCount();
 
                 if (this.simulateTimeout) {
@@ -2446,8 +2550,7 @@
                 } catch (e) { }
 
                 this.currentAudio = null;
-                
-                // Clear active reading states
+
                 readingNum.textContent = '00';
                 readingText.textContent = 'Đã dừng phát âm thanh.';
                 readingProgressBar.style.width = '0%';
@@ -2455,78 +2558,21 @@
             }
 
             stopComments() {
-                // Filter out all comment items from queue
+                this.queue.forEach(item => {
+                    if (!item.isLlmItem) {
+                        if (item.audioBlobUrl) {
+                            URL.revokeObjectURL(item.audioBlobUrl);
+                            item.audioBlobUrl = null;
+                        }
+                        item.state = 'cancelled';
+                        if (item.commentCard) {
+                            item.commentCard.remove();
+                        }
+                    }
+                });
                 this.queue = this.queue.filter(item => item.isLlmItem === true);
+                tiktokCommentItems.clear();
                 this.updateUnreadCount();
-
-                // If currently playing item is a comment, stop it
-                if (this.currentItem && !this.currentItem.isLlmItem) {
-                    try {
-                        this.audioA.pause();
-                        this.audioA.src = '';
-                    } catch(e) {}
-                    try {
-                        this.audioB.pause();
-                        this.audioB.src = '';
-                    } catch(e) {}
-                    this.currentAudio = null;
-                    this.isPlaying = false;
-                    this.playNext();
-                }
-
-                // Clear comments list
-                commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ bình luận TikTok...</div>';
-            }
-
-            interruptCurrent() {
-                if (!this.currentItem || !this.currentItem.isLlmItem) return;
-
-                console.log("[SpeechQueue] Interrupting script item to read TikTok event:", this.currentItem.text);
-
-                const interruptedItem = this.currentItem;
-                this.currentItem = null;
-
-                // Reset element highlight/styling of the interrupted item
-                if (interruptedItem.containerEl) {
-                    interruptedItem.containerEl.className = 'llm-item';
-                }
-
-                // Insert it back as the first LLM item in the queue
-                const firstLlmIndex = this.queue.findIndex(qItem => qItem.isLlmItem);
-                if (firstLlmIndex === -1) {
-                    this.queue.push(interruptedItem);
-                } else {
-                    this.queue.splice(firstLlmIndex, 0, interruptedItem);
-                }
-
-                // Stop audio/simulation
-                this.isPlaying = false;
-                this.isHighlighting = false;
-
-                if (this.simulateTimeout) {
-                    clearTimeout(this.simulateTimeout);
-                    this.simulateTimeout = null;
-                }
-
-                try {
-                    this.audioA.pause();
-                    this.audioA.src = '';
-                } catch(e) {}
-                try {
-                    this.audioB.pause();
-                    this.audioB.src = '';
-                } catch(e) {}
-
-                this.currentAudio = null;
-                this.updateUnreadCount();
-
-                const resolve = this.playResolver;
-                this.playResolver = null;
-                if (resolve) {
-                    resolve(this.playNext());
-                } else {
-                    this.playNext();
-                }
             }
 
             initAudio() {
@@ -2558,21 +2604,27 @@
                 this.audioB.muted = muted;
             }
 
-            add(text, containerEl, isLlmItem = true) {
+            add(text, containerEl, isLlmItem = true, meta = {}) {
                 const item = {
+                    id: `item-${Date.now()}-${Math.random()}`,
                     text,
                     containerEl,
                     isLlmItem,
+                    state: 'queued', // 'queued' | 'synthesizing' | 'ready' | 'playing' | 'done' | 'failed' | 'cancelled'
                     audioBlobUrl: null,
-                    isFetched: false,
-                    isFetching: false
+                    audioDurationSec: 0,
+                    synthesisMs: 0,
+                    readyPromise: null,
+                    resolveReady: null,
+                    ...meta
                 };
 
-                if (!isLlmItem) {
-                    // Set buffering to false to ensure immediate play for TikTok events
-                    this.buffering = false;
+                item.readyPromise = new Promise(res => {
+                    item.resolveReady = res;
+                });
 
-                    // Insert TikTok event before any LLM items in the queue
+                if (!isLlmItem) {
+                    // Insert TikTok event before any LLM items in queue
                     const firstLlmIndex = this.queue.findIndex(qItem => qItem.isLlmItem);
                     if (firstLlmIndex === -1) {
                         this.queue.push(item);
@@ -2584,134 +2636,220 @@
                 }
 
                 this.updateUnreadCount();
-
                 containerEl.textContent = text;
-                this.triggerNextPreFetch();
 
-                // Buffer/Play policy
-                if (this.buffering) {
-                    if (this.queue.length >= 10) {
-                        this.buffering = false;
-                        if (!this.isPlaying) {
-                            this.playNext();
-                        }
-                    }
-                } else {
+                // Trigger background TTS producer
+                this.triggerProducer();
+
+                // Check startup condition
+                this.checkStartupCondition();
+            }
+
+            checkStartupCondition() {
+                if (this.hasStarted) {
                     if (!this.isPlaying) {
                         this.playNext();
-                    } else if (!isLlmItem) {
-                        // Interrupt current script item to play TikTok event immediately
-                        this.interruptCurrent();
+                    }
+                    return;
+                }
+
+                const cfg = this.getModeConfig();
+
+                if (!this.startWaitTimer) {
+                    this.startWaitTimer = setTimeout(() => {
+                        this.startWaitTimer = null;
+                        if (!this.hasStarted && this.readyAudioCount >= 1) {
+                            console.log("[SpeechQueue] Initial max wait reached, starting playback with ready count:", this.readyAudioCount);
+                            this.hasStarted = true;
+                            if (!this.isPlaying) {
+                                this.playNext();
+                            }
+                        }
+                    }, cfg.maxInitialWaitMs);
+                }
+
+                if (this.readyAudioCount >= cfg.initialReadyTarget) {
+                    if (this.startWaitTimer) {
+                        clearTimeout(this.startWaitTimer);
+                        this.startWaitTimer = null;
+                    }
+                    console.log("[SpeechQueue] Initial ready target reached (" + this.readyAudioCount + "/" + cfg.initialReadyTarget + "), starting playback!");
+                    this.hasStarted = true;
+                    if (!this.isPlaying) {
+                        this.playNext();
                     }
                 }
             }
 
-            async preFetchItem(item) {
-                if (item.isFetched || item.isFetching) return;
-
-                const playWebAudio = audioToggle.checked;
-                if (!playWebAudio) {
-                    item.isFetched = true;
-                    this.triggerNextPreFetch();
-                    return;
-                }
-
-                item.isFetching = true;
-                const voiceSelectVal = voiceSelect.value || 'Trúc Ly';
+            async triggerProducer() {
+                if (this.isFetchingProducer) return;
+                this.isFetchingProducer = true;
 
                 try {
-                    const response = await fetch('/tts', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ text: item.text, voice: voiceSelectVal })
-                    });
+                    while (true) {
+                        const cfg = this.getModeConfig();
+                        if (this.readyAudioCount >= cfg.targetReadyBuffer) {
+                            break;
+                        }
 
-                    if (response.ok) {
-                        const blob = await response.blob();
-                        item.audioBlobUrl = URL.createObjectURL(blob);
-                        item.isFetched = true;
-                        this.preloadNextIfInactive();
-                    } else {
-                        console.error("Failed to pre-fetch TTS", response.statusText);
-                        item.isFetched = true;
+                        // Find next item needing TTS
+                        const itemToFetch = this.queue.find(item => item.state === 'queued');
+                        if (!itemToFetch) {
+                            break;
+                        }
+
+                        await this.fetchTtsForItem(itemToFetch);
                     }
-                } catch (err) {
-                    console.error("Error pre-fetching TTS", err);
-                    item.isFetched = true;
                 } finally {
-                    item.isFetching = false;
-                    this.triggerNextPreFetch();
+                    this.isFetchingProducer = false;
                 }
             }
 
-            triggerNextPreFetch() {
-                const isQueueFetching = this.queue.some(item => item.isFetching);
-                const isCurrentFetching = this.currentItem && this.currentItem.isFetching;
+            async fetchTtsForItem(item) {
+                if (item.state !== 'queued') return;
 
-                if (isQueueFetching || isCurrentFetching) {
+                const playWebAudio = audioToggle ? audioToggle.checked : true;
+                if (!playWebAudio) {
+                    item.state = 'ready';
+                    if (item.resolveReady) item.resolveReady();
                     return;
                 }
 
-                const nextToFetch = this.queue.find(item => !item.isFetched && !item.isFetching);
-                if (nextToFetch) {
-                    this.preFetchItem(nextToFetch);
+                item.state = 'synthesizing';
+                const voiceSelectVal = (voiceSelect && voiceSelect.value) || 'Trúc Ly';
+                const priority = item.isLlmItem ? 1 : 0; // Comment/Gift = 0, Script = 1
+
+                const t0 = performance.now();
+                let success = false;
+
+                for (let attempt = 0; attempt < 3; attempt++) {
+                    if (item.state === 'cancelled') return;
+                    try {
+                        const response = await fetch('/tts', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: item.text, voice: voiceSelectVal, priority: priority })
+                        });
+
+                        const contentType = response.headers.get('Content-Type') || '';
+                        if (response.ok && contentType.startsWith('audio/')) {
+                            const blob = await response.blob();
+                            if (item.state === 'cancelled') return;
+
+                            const t1 = performance.now();
+                            item.synthesisMs = t1 - t0;
+                            item.audioBlobUrl = URL.createObjectURL(blob);
+                            item.state = 'ready';
+
+                            const tempAudio = new Audio(item.audioBlobUrl);
+                            tempAudio.onloadedmetadata = () => {
+                                item.audioDurationSec = tempAudio.duration || (item.text.length * 0.08 + 0.5);
+                                this.recordRtf(item.synthesisMs, item.audioDurationSec * 1000);
+                            };
+
+                            this.preloadNextIfInactive();
+                            if (item.resolveReady) item.resolveReady();
+                            success = true;
+                            break;
+                        } else {
+                            let errMsg = response.statusText;
+                            try {
+                                const jsonErr = await response.json();
+                                errMsg = jsonErr.error || jsonErr.detail || errMsg;
+                            } catch (e) {}
+                            console.warn(`[SpeechQueue] TTS fetch failed (attempt ${attempt + 1}/3):`, errMsg);
+                        }
+                    } catch (err) {
+                        console.warn(`[SpeechQueue] Network error fetching TTS (attempt ${attempt + 1}/3):`, err);
+                    }
+
+                    if (attempt < 2) {
+                        await new Promise(r => setTimeout(r, (attempt + 1) * 800));
+                    }
                 }
+
+                if (!success) {
+                    item.state = 'failed';
+                    console.error("[SpeechQueue] Failed to generate TTS for item:", item.text);
+                    if (item.resolveReady) item.resolveReady();
+                }
+
+                this.checkStartupCondition();
             }
 
             preloadNextIfInactive() {
-                if (this.queue.length > 0) {
-                    const nextItem = this.queue[0];
-                    if (nextItem.isFetched && nextItem.audioBlobUrl) {
-                        if (this.inactivePlayer.src !== nextItem.audioBlobUrl) {
-                            this.inactivePlayer.src = nextItem.audioBlobUrl;
-                            this.inactivePlayer.load();
-                        }
+                const readyItem = this.queue.find(item => item.state === 'ready' && item.audioBlobUrl);
+                if (readyItem) {
+                    if (this.inactivePlayer.src !== readyItem.audioBlobUrl) {
+                        this.inactivePlayer.src = readyItem.audioBlobUrl;
+                        this.inactivePlayer.load();
                     }
                 }
             }
 
             async playNext() {
+                if (!this.hasStarted) {
+                    this.checkStartupCondition();
+                    if (!this.hasStarted) return;
+                }
+
                 if (this.queue.length === 0) {
                     this.isPlaying = false;
                     this.currentAudio = null;
                     this.currentItem = null;
                     this.updateUnreadCount();
-                    this.buffering = true;
+                    if (isRunning) {
+                        scheduleSentenceRefill(250);
+                    }
                     return;
                 }
 
-                this.isPlaying = true;
-                const item = this.queue.shift();
-                this.currentItem = item;
-                this.readingIndex++;
-                this.updateUnreadCount();
+                // Trigger producer to keep pipeline full
+                this.triggerProducer();
 
-                this.triggerNextPreFetch();
-
-                // Refill policy: trigger request when queue falls below 7
-                if (this.queue.length < 7 && !window.isFetchingMore) {
+                // Check refill threshold
+                const cfg = this.getModeConfig();
+                if (this.readyAudioCount < cfg.refillReadyThreshold && !window.isFetchingMore && isRunning) {
                     if (typeof window.requestMoreSentences === 'function') {
                         window.requestMoreSentences();
                     }
                 }
 
-                const playWebAudio = audioToggle.checked;
-                const volume = parseFloat(volumeInput.value);
-
-                if (playWebAudio && !item.isFetched) {
-                    if (!item.isFetching) {
-                        await this.preFetchItem(item);
-                    } else {
-                        await new Promise(resolve => {
-                            const checkInterval = setInterval(() => {
-                                if (item.isFetched) {
-                                    clearInterval(checkInterval);
-                                    resolve();
-                                }
-                            }, 30);
-                        });
-                    }
+                // Pick next item: Priority to TikTok reply items (!isLlmItem)
+                let itemIndex = this.queue.findIndex(i => !i.isLlmItem && i.state === 'ready');
+                if (itemIndex === -1) {
+                    itemIndex = this.queue.findIndex(i => i.state === 'ready');
                 }
+
+                if (itemIndex === -1) {
+                    // Next item in queue is not ready yet!
+                    const firstPending = this.queue[0];
+                    if (!firstPending) return;
+
+                    status.className = 'status-info';
+                    status.textContent = 'Đang chuẩn bị giọng đọc...';
+
+                    // Wait for item to become ready using its Promise
+                    await firstPending.readyPromise;
+
+                    if (firstPending.state === 'failed') {
+                        const idx = this.queue.indexOf(firstPending);
+                        if (idx !== -1) this.queue.splice(idx, 1);
+                        return this.playNext();
+                    }
+
+                    return this.playNext();
+                }
+
+                this.isPlaying = true;
+                const item = this.queue.splice(itemIndex, 1)[0];
+                this.currentItem = item;
+                item.state = 'playing';
+                this.readingIndex++;
+                this.updateUnreadCount();
+
+                const playWebAudio = audioToggle ? audioToggle.checked : true;
+                const volume = parseFloat(volumeInput ? volumeInput.value : 1.0);
 
                 // Update Active reading panel layout
                 readingNum.textContent = this.readingIndex.toString().padStart(2, '0');
@@ -2734,13 +2872,11 @@
                     }
 
                     this.activePlayer.volume = volume;
-                    const speed = parseFloat(speedInput.value) || 0.8;
+                    const speed = parseFloat(speedInput ? speedInput.value : 0.8) || 0.8;
                     this.activePlayer.playbackRate = speed;
 
                     this.playResolver = null;
                     this.preloadNextIfInactive();
-
-                    queueAudio(item.text);
 
                     return new Promise((resolve) => {
                         this.playResolver = resolve;
@@ -2769,6 +2905,7 @@
 
             onEnded() {
                 if (this.currentItem) {
+                    this.currentItem.state = 'done';
                     this.highlightProgressDone(this.currentItem);
                     if (this.currentItem.audioBlobUrl) {
                         URL.revokeObjectURL(this.currentItem.audioBlobUrl);
@@ -2803,8 +2940,6 @@
                 const durationMs = Math.max(1000, (item.text.length / 15) * 1000);
 
                 this.highlightProgress(item, durationMs / 1000);
-                queueAudio(item.text);
-
                 this.simulateTimeout = setTimeout(() => {
                     this.simulateTimeout = null;
                     if (this.playResolver === resolve) {
@@ -2839,7 +2974,6 @@
                     scrollParentToSecondLine(scrollParent, item.containerEl);
                 }
 
-                // Animate progress bar in AI Sắp đọc panel
                 let start = null;
                 let lastScrollAt = 0;
                 const progressFill = (timestamp) => {
@@ -2851,7 +2985,7 @@
                         lastScrollAt = timestamp;
                         keepReadingSentenceInView(scrollParent, item.containerEl);
                     }
-                    
+
                     readingProgressBar.style.width = percent + '%';
                     readingProgressPercent.textContent = percent + '%';
 
@@ -2870,22 +3004,23 @@
                     if (commentItem) {
                         commentItem.className = 'comment-item read';
 
-                        // Find all sentence-block elements inside commentItem
                         const sentences = Array.from(commentItem.querySelectorAll('.sentence-block'));
                         const currentIndex = sentences.indexOf(item.containerEl);
 
-                        // If it is the last sentence of the comment, delete it after a short delay
                         if (currentIndex === sentences.length - 1) {
                             setTimeout(() => {
                                 commentItem.remove();
+                                if (item.eventId) {
+                                    tiktokCommentItems.delete(item.eventId);
+                                }
                                 if (commentsDiv.children.length === 0) {
-                                    commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ bình luận TikTok...</div>';
+                                    commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ AI trả lời bình luận TikTok...</div>';
                                 }
                             }, 1000);
                         }
                     }
                 }
-                
+
                 readingProgressBar.style.width = '100%';
                 readingProgressPercent.textContent = '100%';
             }
@@ -2894,12 +3029,13 @@
         const speechQueue = new SpeechQueue();
 
         function stopStream() {
+            window.currentGenerationId = null;
             speechQueue.stop();
             stopTopTimer();
             stopBillingHeartbeat();
             stopSessionElapsedTimer();
             isRunning = false;
-            
+
             // Send end session call to proxy
             fetch('/api/session/end', { method: 'POST' })
                 .then(res => res.json())
@@ -2923,7 +3059,7 @@
             }
             stopBtn.disabled = true;
             sendBtn.disabled = true;
-            
+
             if (isAccountLocked) {
                 startBtn.disabled = true;
                 status.className = 'error';
@@ -3049,7 +3185,7 @@
                     else canvasCtx.lineTo(i, y);
                 }
                 canvasCtx.stroke();
-                
+
                 // Reset shadow blur
                 canvasCtx.shadowBlur = 0;
             } else {
@@ -3084,7 +3220,16 @@
 
         // Global Billing state variables (Net Cafe Style)
         let userProfileData = null;
-        let timeBalanceSeconds = 0;
+
+        // Single Source of Truth for Balance Clock (Chống giật ngược 4 -> 5 -> 3)
+        let authoritativeBalanceSeconds = 0;
+        let balanceAnchorMonotonicMs = performance.now();
+        let lastRenderedBalanceSeconds = -1;
+        let lastAcceptedSnapshotSeq = -1;
+        let lastAcceptedSnapshotTime = 0;
+        let heartbeatSeq = 0;
+        let localBalanceRenderInterval = null;
+
         let billingHeartbeatInterval = null;
         let localCountdownInterval = null;
         let profilePollingInterval = null;
@@ -3098,6 +3243,28 @@
         let forceLogoutTimer = null;
         let forceLogoutRemainingSeconds = 10;
         let forceLogoutModalVisible = false;
+        let billingHeartbeatInFlight = false;
+        let billingHeartbeatFailures = 0;
+
+        function getCalculatedBalanceSeconds() {
+            if (authoritativeBalanceSeconds <= 0) return 0;
+            if (!isRunning) {
+                return Math.max(0, authoritativeBalanceSeconds);
+            }
+            const elapsed = Math.floor((performance.now() - balanceAnchorMonotonicMs) / 1000);
+            return Math.max(0, authoritativeBalanceSeconds - elapsed);
+        }
+
+        // Variable property proxy for legacy references to timeBalanceSeconds
+        Object.defineProperty(window, 'timeBalanceSeconds', {
+            get() {
+                return getCalculatedBalanceSeconds();
+            },
+            set(val) {
+                setAuthoritativeBalance(val, 'direct_assign');
+            },
+            configurable: true
+        });
 
         function formatSecondsToHHMMSS(totalSeconds) {
             if (totalSeconds <= 0) return '00:00:00';
@@ -3107,11 +3274,73 @@
             return `${hrs}:${mins}:${secs}`;
         }
 
+        function renderBalanceUI() {
+            const currentSec = getCalculatedBalanceSeconds();
+
+            if (currentSec === lastRenderedBalanceSeconds) return;
+            lastRenderedBalanceSeconds = currentSec;
+
+            const timeStr = formatSecondsToHHMMSS(currentSec);
+            const topEl = document.getElementById('top-time-balance');
+            const leftEl = document.getElementById('billing-balance-left');
+
+            if (topEl) topEl.textContent = timeStr;
+            if (leftEl) leftEl.textContent = timeStr;
+        }
+
         function updateTimeBalanceUI() {
-            const timeStr = formatSecondsToHHMMSS(timeBalanceSeconds);
-            document.getElementById('top-time-balance').textContent = timeStr;
-            const balanceEl = document.getElementById('billing-balance-left');
-            if (balanceEl) balanceEl.textContent = timeStr;
+            renderBalanceUI();
+        }
+
+        function setAuthoritativeBalance(newBalance, source = 'system', meta = {}) {
+            const num = Math.max(0, typeof newBalance === 'number' ? newBalance : 0);
+
+            if (source === 'heartbeat') {
+                if (typeof meta.seq === 'number' && meta.seq < lastAcceptedSnapshotSeq) {
+                    console.log(`[BalanceClock] Dropped stale heartbeat seq ${meta.seq} < ${lastAcceptedSnapshotSeq}`);
+                    return;
+                }
+                if (meta.snapshotAt && meta.snapshotAt < lastAcceptedSnapshotTime) {
+                    console.log(`[BalanceClock] Dropped stale heartbeat snapshotAt ${meta.snapshotAt} < ${lastAcceptedSnapshotTime}`);
+                    return;
+                }
+                if (typeof meta.seq === 'number') lastAcceptedSnapshotSeq = meta.seq;
+                if (meta.snapshotAt) lastAcceptedSnapshotTime = meta.snapshotAt;
+            }
+
+            if (isRunning) {
+                const currentCalculated = getCalculatedBalanceSeconds();
+                const isTopup = meta.isTopup || num > authoritativeBalanceSeconds + 5;
+
+                if (!isTopup && num > currentCalculated) {
+                    console.log(`[BalanceClock] Prevented backward jump: backend snapshot (${num}s) > calculated (${currentCalculated}s).`);
+                    authoritativeBalanceSeconds = currentCalculated;
+                    balanceAnchorMonotonicMs = performance.now();
+                } else {
+                    authoritativeBalanceSeconds = num;
+                    balanceAnchorMonotonicMs = performance.now();
+                }
+            } else {
+                authoritativeBalanceSeconds = num;
+                balanceAnchorMonotonicMs = performance.now();
+            }
+
+            renderBalanceUI();
+        }
+
+        function startLocalBalanceRenderer() {
+            if (localBalanceRenderInterval) clearInterval(localBalanceRenderInterval);
+            localBalanceRenderInterval = setInterval(() => {
+                renderBalanceUI();
+            }, 300);
+        }
+
+        function stopLocalBalanceRenderer() {
+            if (localBalanceRenderInterval) {
+                clearInterval(localBalanceRenderInterval);
+                localBalanceRenderInterval = null;
+            }
+            renderBalanceUI();
         }
 
         function setBillingSessionStatus(label, color = '#ffffff') {
@@ -3150,13 +3379,21 @@
             }
         }
 
-        function applyBillingSnapshot(data) {
+        function applyBillingSnapshot(data, source = 'system') {
             if (!data) return;
-            if (typeof data.remainingSeconds === 'number') {
-                timeBalanceSeconds = data.remainingSeconds;
-            } else if (typeof data.timeBalanceSeconds === 'number') {
-                timeBalanceSeconds = data.timeBalanceSeconds;
+
+            const newBalance = (typeof data.remainingSeconds === 'number')
+                ? data.remainingSeconds
+                : ((typeof data.timeBalanceSeconds === 'number') ? data.timeBalanceSeconds : null);
+
+            if (newBalance !== null) {
+                setAuthoritativeBalance(newBalance, source, {
+                    seq: data.seq,
+                    snapshotAt: data.snapshotAt || data.serverTime,
+                    isTopup: data.isTopup || data.topup
+                });
             }
+
             let snapshotElapsedSeconds = null;
             if (typeof data.sessionElapsedSeconds === 'number') {
                 snapshotElapsedSeconds = data.sessionElapsedSeconds;
@@ -3165,13 +3402,13 @@
             } else if (data.session && typeof data.session.sessionElapsedSeconds === 'number') {
                 snapshotElapsedSeconds = data.session.sessionElapsedSeconds;
             }
+
             if (typeof snapshotElapsedSeconds === 'number') {
                 if (!isRunning || snapshotElapsedSeconds > currentSessionElapsedSeconds) {
                     currentSessionElapsedSeconds = snapshotElapsedSeconds;
+                    updateCurrentSessionUI();
                 }
             }
-            updateTimeBalanceUI();
-            updateCurrentSessionUI();
         }
 
         function showExpiredModal() {
@@ -3349,47 +3586,47 @@
             try {
                 const res = await fetch(`/api/invoice/status/${activeId}`);
                 const data = await res.json();
-                
+
                 if (res.ok && data.success) {
                     if (data.status === 'completed') {
                         localStorage.removeItem('active_pending_invoice_id');
-                        
+
                         // Đóng các modal nạp tiền và xác nhận nếu đang mở
                         document.getElementById('qr-modal').style.display = 'none';
                         document.getElementById('cancel-confirm-modal').style.display = 'none';
-                        
+
                         // Hiển thị thông tin lên payment-success-modal
                         const inv = data.invoice;
                         document.getElementById('success-det-code').textContent = inv.code;
                         document.getElementById('success-det-time').textContent = new Date().toLocaleString('vi-VN');
                         document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
-                        
+
                         const mins = Math.floor(inv.secondsChanged / 60);
                         document.getElementById('success-det-hours').textContent = `+${mins} phút`;
-                        
+
                         // Mở modal success
                         document.getElementById('payment-success-modal').style.display = 'flex';
-                        
+
                         // Xóa các interval polling cục bộ
                         if (invoicePollingInterval) {
                             clearInterval(invoicePollingInterval);
                             invoicePollingInterval = null;
                         }
                         activeInvoiceId = null;
-                        
+
                         // Tải lại profile
                         loadUserProfile();
                     } else if (data.status === 'cancelled') {
                         localStorage.removeItem('active_pending_invoice_id');
                         document.getElementById('qr-modal').style.display = 'none';
                         document.getElementById('cancel-confirm-modal').style.display = 'none';
-                        
+
                         if (invoicePollingInterval) {
                             clearInterval(invoicePollingInterval);
                             invoicePollingInterval = null;
                         }
                         activeInvoiceId = null;
-                        
+
                         showAppAlert('Thông báo', `Hóa đơn ${data.invoice ? data.invoice.code : ''} đã bị hủy.`);
                         loadUserProfile();
                     }
@@ -3402,20 +3639,26 @@
         async function loadUserProfile() {
             // Check hóa đơn pending trước
             checkActivePendingInvoice();
-            
+
             try {
                 const res = await fetch('/api/user/profile');
                 const data = await res.json();
-if (isLockedResponse(data)) {
+                if (isLockedResponse(data)) {
                     handleLockedAccount(data);
                     return;
                 }
                 if (data && data.success) {
                     const hadProfileData = !!userProfileData;
                     userProfileData = data;
-                    const previousBalance = timeBalanceSeconds;
-                    timeBalanceSeconds = typeof data.remainingSeconds === 'number' ? data.remainingSeconds : data.timeBalanceSeconds;
-                    lastKnownBalanceSeconds = timeBalanceSeconds;
+                    const previousBalance = authoritativeBalanceSeconds;
+                    const profileBalance = typeof data.remainingSeconds === 'number' ? data.remainingSeconds : data.timeBalanceSeconds;
+
+                    // Chỉ cập nhật số dư từ loadUserProfile khi phiên KHÔNG chạy, hoặc khi phát hiện có nạp tiền mới
+                    if (!isRunning || profileBalance > previousBalance + 5) {
+                        setAuthoritativeBalance(profileBalance, 'profile', { isTopup: profileBalance > previousBalance + 5 });
+                    }
+                    lastKnownBalanceSeconds = authoritativeBalanceSeconds;
+
                     document.getElementById('top-username').textContent = data.username;
                     document.getElementById('top-hourly-rate').textContent = data.hourlyRateVnd.toLocaleString('vi-VN') + ' đ/h';
                     renderUserProfileInfo();
@@ -3445,18 +3688,18 @@ if (isLockedResponse(data)) {
                         updateCurrentSessionUI();
                     } else if (!isRunning) {
                         currentBillingSessionId = null;
-                        if (timeBalanceSeconds <= 0) {
+                        if (authoritativeBalanceSeconds <= 0) {
                             setBillingSessionStatus('Hết giờ', 'var(--danger)');
                         } else {
                             setBillingSessionStatus('Chưa bắt đầu', '#ffffff');
                         }
                     }
-                    updateTimeBalanceUI();
-                    
+                    renderBalanceUI();
+
                     document.getElementById('top-server-status').style.color = 'var(--success)';
                     document.getElementById('top-server-status').innerHTML = '<span style="display:inline-block; width:5px; height:5px; background:var(--success); border-radius:50%; box-shadow:0 0 6px var(--success)"></span> Online';
-                    
-                    if (timeBalanceSeconds > 0) {
+
+                    if (authoritativeBalanceSeconds > 0) {
                         noBalanceMode = false;
                         expiredModalVisible = false;
                         document.getElementById('expired-modal').style.display = 'none';
@@ -3535,13 +3778,13 @@ if (isLockedResponse(data)) {
 
             const profile = userProfileData || {};
             const rate = profile.hourlyRateVnd || 50000;
-            
+
             document.getElementById('price-modal-rate').textContent = rate.toLocaleString('vi-VN') + ' đ/giờ';
-            
+
             // Cập nhật số giờ quy đổi hiển thị trong các nút chọn nhanh
             const amounts = [50000, 100000, 150000, 200000, 250000, 500000];
             const ids = ['50k', '100k', '150k', '200k', '250k', '500k'];
-            
+
             amounts.forEach((amt, idx) => {
                 const hours = Math.floor(amt / rate);
                 const minutes = Math.floor(((amt / rate) % 1) * 60);
@@ -3549,20 +3792,20 @@ if (isLockedResponse(data)) {
                 if (hours > 0) desc += `${hours} giờ `;
                 if (minutes > 0) desc += `${minutes} phút`;
                 if (hours === 0 && minutes === 0) desc += '0 giờ';
-                
+
                 const elementId = `price-desc-${ids[idx]}`;
                 const el = document.getElementById(elementId);
                 if (el) el.textContent = desc;
             });
-            
+
             // Reset dữ liệu modal
             currentSelectedAmount = null;
             document.getElementById('custom-price-input').value = '';
             document.getElementById('custom-price-hours-desc').textContent = '';
-            
+
             const pbuttons = document.querySelectorAll('.price-btn');
             pbuttons.forEach(btn => btn.classList.remove('active'));
-            
+
             startJulyPromoCountdown();
             document.getElementById('price-modal').style.display = 'flex';
         }
@@ -3581,10 +3824,10 @@ if (isLockedResponse(data)) {
             currentSelectedAmount = amount;
             document.getElementById('custom-price-input').value = '';
             document.getElementById('custom-price-hours-desc').textContent = '';
-            
+
             const pbuttons = document.querySelectorAll('.price-btn');
             pbuttons.forEach(btn => btn.classList.remove('active'));
-            
+
             const activeBtn = document.getElementById(`pbtn-${amount}`);
             if (activeBtn) activeBtn.classList.add('active');
         }
@@ -3632,31 +3875,31 @@ if (isLockedResponse(data)) {
         function calculateCustomHours() {
             const val = document.getElementById('custom-price-input').value;
             const descEl = document.getElementById('custom-price-hours-desc');
-            
+
             // Gỡ active của các nút chọn nhanh
             const pbuttons = document.querySelectorAll('.price-btn');
             pbuttons.forEach(btn => btn.classList.remove('active'));
-            
+
             if (!val || val <= 0) {
                 currentSelectedAmount = null;
                 descEl.textContent = '';
                 return;
             }
-            
+
             const amount = parseInt(val);
             currentSelectedAmount = amount;
-            
+
             const profile = userProfileData || {};
             const rate = profile.hourlyRateVnd || 50000;
-            
+
             const hours = Math.floor(amount / rate);
             const minutes = Math.floor(((amount / rate) % 1) * 60);
-            
+
             let desc = `Quy đổi: `;
             if (hours > 0) desc += `${hours} giờ `;
             if (minutes > 0) desc += `${minutes} phút`;
             if (hours === 0 && minutes === 0) desc += '0 giờ';
-            
+
             descEl.textContent = desc;
         }
 
@@ -3665,41 +3908,41 @@ if (isLockedResponse(data)) {
                 showAppAlert('Cảnh báo', 'Vui lòng chọn hoặc nhập số tiền nạp tối thiểu 50.000 VNĐ.');
                 return;
             }
-            
+
             closePriceModal();
-            
+
             // Mở qr-modal với trạng thái loading
             document.getElementById('qr-modal').style.display = 'flex';
             document.getElementById('qr-loading-spinner').style.display = 'flex';
             document.getElementById('qr-image').style.display = 'none';
             document.getElementById('polling-status-msg').textContent = '🕒 Đang tạo hóa đơn từ hệ thống...';
-            
+
             try {
                 const res = await fetch('/api/invoice/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ amountVnd: currentSelectedAmount })
                 });
-                
+
                 const data = await res.json();
                 if (!res.ok || !data.success) {
                     showAppAlert('Lỗi', data.error || 'Tạo hóa đơn thất bại.');
                     closeQrModal();
                     return;
                 }
-                
+
                 const invoice = data.invoice;
                 activeInvoiceId = invoice._id;
-                
+
                 // Hiển thị thông tin hóa đơn lên QR modal
                 const profile = userProfileData || {};
                 applyInvoicePaymentToQrModal(invoice, profile);
-                
+
                 document.getElementById('qr-loading-spinner').style.display = 'none';
-                
+
                 // Khởi chạy Polling kiểm tra trạng thái
                 startInvoicePolling(invoice._id);
-                
+
             } catch (err) {
                 console.error(err);
                 showAppAlert('Lỗi', 'Lỗi kết nối máy chủ.');
@@ -3748,14 +3991,14 @@ if (isLockedResponse(data)) {
             const btnExecute = document.getElementById('btn-execute-cancel-invoice');
             if (btnCancel) btnCancel.disabled = true;
             if (btnExecute) btnExecute.disabled = true;
-            
+
             try {
                 const res = await fetch(`/api/invoice/cancel/${activeInvoiceId}`, { method: 'POST' });
                 const data = await res.json();
-                
+
                 // Đóng modal xác nhận hủy
                 closeCancelConfirmModal();
-                
+
                 if (res.ok && data.success) {
                     localStorage.removeItem('active_pending_invoice_id');
                     if (invoicePollingInterval) {
@@ -3774,18 +4017,18 @@ if (isLockedResponse(data)) {
                             clearInterval(invoicePollingInterval);
                             invoicePollingInterval = null;
                         }
-                        
+
                         document.getElementById('qr-modal').style.display = 'none';
-                        
+
                         // Hiển thị thông tin lên payment-success-modal
                         const inv = data.invoice;
                         document.getElementById('success-det-code').textContent = inv.code;
                         document.getElementById('success-det-time').textContent = new Date().toLocaleString('vi-VN');
                         document.getElementById('success-det-amount').textContent = inv.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
-                        
+
                         const mins = Math.floor(inv.secondsChanged / 60);
                         document.getElementById('success-det-hours').textContent = `+${mins} phút`;
-                        
+
                         document.getElementById('payment-success-modal').style.display = 'flex';
                         activeInvoiceId = null;
                         loadUserProfile();
@@ -3839,11 +4082,11 @@ if (isLockedResponse(data)) {
         function switchHistoryTab(tab) {
             const tabs = document.querySelectorAll('.history-tab-btn');
             tabs.forEach(btn => btn.classList.remove('active'));
-            
+
             document.getElementById('tab-profile-content').style.display = 'none';
             document.getElementById('tab-invoices-content').style.display = 'none';
             document.getElementById('tab-sessions-content').style.display = 'none';
-            
+
             if (tab === 'profile') {
                 document.getElementById('tab-profile-btn').classList.add('active');
                 document.getElementById('tab-profile-content').style.display = 'block';
@@ -3873,20 +4116,20 @@ if (isLockedResponse(data)) {
         async function loadUserInvoices() {
             const tbody = document.getElementById('user-invoices-tbody');
             tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">Đang tải lịch sử nạp...</td></tr>`;
-            
+
             try {
                 const res = await fetch('/api/invoices');
                 const data = await res.json();
-                
+
                 if (res.ok && data.success) {
                     const invoices = data.invoices || [];
                     window.loadedInvoices = invoices;
-                    
+
                     if (invoices.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 15px; color: var(--text-muted);">Chưa có lịch sử nạp tiền.</td></tr>`;
                         return;
                     }
-                    
+
                     let html = '';
                     invoices.forEach(inv => {
                         let statusText = 'Chờ thanh toán';
@@ -3898,10 +4141,10 @@ if (isLockedResponse(data)) {
                             statusText = 'Đã hủy';
                             statusColor = 'var(--danger)';
                         }
-                        
+
                         const mins = Math.floor(inv.secondsChanged / 60);
                         const dateStr = new Date(inv.createdAt).toLocaleString('vi-VN');
-                        
+
                         html += `<tr onclick="handleInvoiceClick('${inv._id}')" style="border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='none'">
                             <td style="padding: 8px; font-family: var(--font-cyber); font-weight: bold; color: #fff;">${inv.code}</td>
                             <td style="padding: 8px; color: var(--text-muted);">${dateStr}</td>
@@ -3938,7 +4181,7 @@ if (isLockedResponse(data)) {
 
         function showInvoiceCheckout(invoice) {
             activeInvoiceId = invoice._id;
-            
+
             const btnCancel = document.getElementById('btn-cancel-invoice');
             const btnExecute = document.getElementById('btn-execute-cancel-invoice');
             if (btnCancel) btnCancel.disabled = false;
@@ -3946,10 +4189,10 @@ if (isLockedResponse(data)) {
 
             const profile = userProfileData || {};
             applyInvoicePaymentToQrModal(invoice, profile);
-            
+
             document.getElementById('qr-loading-spinner').style.display = 'none';
             document.getElementById('qr-modal').style.display = 'flex';
-            
+
             startInvoicePolling(invoice._id);
         }
 
@@ -3957,10 +4200,10 @@ if (isLockedResponse(data)) {
             document.getElementById('det-code').textContent = invoice.code;
             document.getElementById('det-time').textContent = new Date(invoice.createdAt).toLocaleString('vi-VN');
             document.getElementById('det-amount').textContent = invoice.amountVnd.toLocaleString('vi-VN') + ' VNĐ';
-            
+
             const mins = Math.floor(invoice.secondsChanged / 60);
             document.getElementById('det-hours').textContent = `+${mins} phút`;
-            
+
             const statusEl = document.getElementById('det-status');
             if (invoice.status === 'completed') {
                 statusEl.textContent = 'Thành công';
@@ -3972,7 +4215,7 @@ if (isLockedResponse(data)) {
                 statusEl.textContent = 'Chờ thanh toán';
                 statusEl.style.color = 'var(--purple)';
             }
-            
+
             document.getElementById('invoice-detail-modal').style.display = 'flex';
         }
 
@@ -3985,27 +4228,27 @@ if (isLockedResponse(data)) {
         async function loadUserSessions() {
             const tbody = document.getElementById('user-sessions-tbody');
             tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">Đang tải lịch sử live...</td></tr>`;
-            
+
             try {
                 const res = await fetch('/api/sessions');
                 const data = await res.json();
-                
+
                 if (res.ok && data.success) {
                     const sessions = data.sessions || [];
                     if (sessions.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 15px; color: var(--text-muted);">Chưa có lịch sử livestream.</td></tr>`;
                         return;
                     }
-                    
+
                     let html = '';
                     sessions.forEach(sess => {
                         const startStr = new Date(sess.startedAt).toLocaleString('vi-VN');
                         const endStr = sess.endedAt ? new Date(sess.endedAt).toLocaleString('vi-VN') : 'Đang chạy';
-                        
+
                         const mins = Math.floor(sess.totalUsedSeconds / 60);
                         const secs = sess.totalUsedSeconds % 60;
                         const durationStr = sess.status === 'active' ? 'Đang cập nhật' : `${mins} phút ${secs} giây`;
-                        
+
                         let statusText = 'Đang chạy';
                         let statusColor = 'var(--primary)';
                         if (sess.status === 'ended') {
@@ -4015,7 +4258,7 @@ if (isLockedResponse(data)) {
                             statusText = 'Hết hạn';
                             statusColor = 'var(--danger)';
                         }
-                        
+
                         html += `<tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 8px; color: #fff;">${startStr}</td>
                             <td style="padding: 8px; color: var(--text-muted);">${endStr}</td>
@@ -4034,50 +4277,55 @@ if (isLockedResponse(data)) {
         }
 
         function startBillingHeartbeat() {
+            startLocalBalanceRenderer();
             if (billingHeartbeatInterval) clearInterval(billingHeartbeatInterval);
             billingHeartbeatInterval = setInterval(async () => {
+                if (billingHeartbeatInFlight || !isRunning) return;
+                billingHeartbeatInFlight = true;
+                const currentSeq = ++heartbeatSeq;
                 try {
-                     const res = await fetch('/api/session/heartbeat', { method: 'POST' });
+                     const res = await fetch('/api/session/heartbeat', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ seq: currentSeq })
+                     });
                      const data = await res.json();
-if (isLockedResponse(data)) {
+                     if (isLockedResponse(data)) {
                          handleLockedAccount(data);
                          return;
                      }
-                     if (data && data.success) {
-                         applyBillingSnapshot(data);
-                         if (data.status === 'expired' || data.action === 'stop_live') {
-                             handleExpiredBalance(data);
-                         } else {
-                             timeBalanceSeconds = typeof data.remainingSeconds === 'number' ? data.remainingSeconds : data.timeBalanceSeconds;
-                             lastKnownBalanceSeconds = timeBalanceSeconds;
-                             updateTimeBalanceUI();
-                             if (typeof data.sessionElapsedSeconds === 'number' && data.sessionElapsedSeconds > currentSessionElapsedSeconds) {
-                                 currentSessionElapsedSeconds = data.sessionElapsedSeconds;
-                                 updateCurrentSessionUI();
-                             }
+                     const remaining = data && (typeof data.remainingSeconds === 'number' ? data.remainingSeconds : data.timeBalanceSeconds);
+                     const mustStopForBalance = data && (remaining <= 0 || data.action === 'show_topup' || data.action === 'stop_live');
+                     if (mustStopForBalance && remaining <= 0) {
+                         handleExpiredBalance(data);
+                         return;
+                     }
+                     if (res.ok && data && data.success) {
+                         billingHeartbeatFailures = 0;
+                         applyBillingSnapshot(data, 'heartbeat');
+                         if (data.recovered) {
+                             status.className = 'status-info';
+                             status.textContent = 'Phiên tính giờ đã được khôi phục, ứng dụng đang tiếp tục.';
+                             setBillingSessionStatus('Đang sử dụng', 'var(--success)');
                          }
+                     } else if (data && data.recovering) {
+                         billingHeartbeatFailures++;
+                         setBillingSessionStatus('Đang khôi phục phiên', 'var(--warning)');
                      } else {
-                         stopBtn.click();
-                         status.className = 'error';
-                         status.textContent = data.error || 'Lỗi kiểm tra phiên sử dụng từ máy chủ.';
-                         setBillingSessionStatus('Đã dừng', 'var(--text-muted)');
+                         billingHeartbeatFailures++;
+                         status.className = 'status-info';
+                         status.textContent = 'Kết nối máy chủ tạm thời gián đoạn, ứng dụng đang thử lại...';
+                         setBillingSessionStatus('Đang thử kết nối lại', 'var(--warning)');
                      }
                 } catch (err) {
+                     billingHeartbeatFailures++;
                      console.error('Heartbeat error:', err);
                      document.getElementById('top-server-status').style.color = 'var(--danger)';
                      document.getElementById('top-server-status').innerHTML = '<span style="display:inline-block; width:5px; height:5px; background:var(--danger); border-radius:50%; box-shadow:0 0 6px var(--danger)"></span> Offline';
+                } finally {
+                     billingHeartbeatInFlight = false;
                 }
-            }, 10000); // 10s heartbeat
-            
-            if (localCountdownInterval) clearInterval(localCountdownInterval);
-            localCountdownInterval = setInterval(() => {
-                if (timeBalanceSeconds > 0) {
-                    timeBalanceSeconds--;
-                    updateTimeBalanceUI();
-                } else {
-                    clearInterval(localCountdownInterval);
-                }
-            }, 1000);
+            }, 5000);
         }
 
         function stopBillingHeartbeat() {
@@ -4085,10 +4333,7 @@ if (isLockedResponse(data)) {
                 clearInterval(billingHeartbeatInterval);
                 billingHeartbeatInterval = null;
             }
-            if (localCountdownInterval) {
-                clearInterval(localCountdownInterval);
-                localCountdownInterval = null;
-            }
+            stopLocalBalanceRenderer();
             stopSessionElapsedTimer();
         }
 
@@ -4174,60 +4419,75 @@ if (isLockedResponse(data)) {
             stopBtn.disabled = false;
             sendBtn.disabled = false;
             showLiveContentMessage('Chưa có nội dung live. Hãy nhập chủ đề và tạo kịch bản.', 'empty');
-            
+
             startTopTimer();
             startBillingHeartbeat();
 
             if (!commentsSource) {
                 commentsSource = new EventSource('/comments-stream');
                 commentsSource.onmessage = ev => {
-                    if (ev.data) {
+                    if (!ev.data) return;
+                    let eventData = null;
+                    try {
+                        eventData = JSON.parse(ev.data);
+                    } catch (parseErr) {
+                        eventData = { type: 'reply', eventId: `legacy-${Date.now()}`, text: ev.data };
+                    }
+
+                    if (eventData.type === 'comment') {
                         applyTikTokUiState('connected');
+                        return;
+                    }
+
+                    if (eventData.type === 'reply') {
+                        const eventId = eventData.eventId || `reply-${Date.now()}`;
                         const placeholder = commentsDiv.querySelector('div');
                         if (placeholder && placeholder.style.color) {
                             placeholder.remove();
                         }
-
-                        let userName = 'Người xem';
-                        const match = ev.data.match(/^Chào\s+([^.]+)\./);
-                        if (match) {
-                            userName = match[1].trim();
+                        let target = tiktokCommentItems.get(eventId);
+                        if (!target) {
+                            const item = document.createElement('div');
+                            item.className = 'comment-item';
+                            const aiReply = document.createElement('div');
+                            aiReply.className = 'comment-ai-reply';
+                            aiReply.innerHTML = `<span class="ai-badge">AI TRẢ LỜI</span>`;
+                            const replyContent = document.createElement('div');
+                            replyContent.className = 'comment-content';
+                            aiReply.appendChild(replyContent);
+                            item.appendChild(aiReply);
+                            commentsDiv.appendChild(item);
+                            target = { item, replyContent, aiReply };
+                            tiktokCommentItems.set(eventId, target);
                         }
-
-                        const item = document.createElement('div');
-                        item.className = 'comment-item';
-
-                        const viewerInfo = document.createElement('div');
-                        viewerInfo.className = 'comment-viewer-info';
-                        viewerInfo.innerHTML = `<span class="viewer-name">👤 @${userName}</span> <span class="viewer-action">gửi bình luận</span>`;
-
-                        const aiReply = document.createElement('div');
-                        aiReply.className = 'comment-ai-reply';
-                        aiReply.innerHTML = `<span class="ai-badge">🤖 AI Trả Lời:</span>`;
-
-                        const content = document.createElement('div');
-                        content.className = 'comment-content';
-                        aiReply.appendChild(content);
-
-                        item.appendChild(viewerInfo);
-                        item.appendChild(aiReply);
-                        commentsDiv.appendChild(item);
-
-                        const sentences = splitTextIntoSentences(ev.data);
+                        target.aiReply.style.display = '';
+                        const sentences = splitTextIntoSentences(eventData.text || '');
                         sentences.forEach((sentence, idx) => {
                             const sentenceEl = document.createElement('span');
                             sentenceEl.className = 'sentence-block';
                             sentenceEl.style.display = 'block';
                             sentenceEl.style.margin = '4px 0';
-                            content.appendChild(sentenceEl);
+                            target.replyContent.appendChild(sentenceEl);
 
                             if (window.aiCommentReplyEnabled !== false) {
-                                speechQueue.add(sentence, sentenceEl, false);
+                                speechQueue.add(sentence, sentenceEl, false, { eventId, commentCard: target.item });
                             } else {
                                 sentenceEl.textContent = sentence;
                                 sentenceEl.style.color = 'var(--text-muted)';
+                                setTimeout(() => {
+                                    target.item.remove();
+                                    tiktokCommentItems.delete(eventId);
+                                    if (commentsDiv.children.length === 0) {
+                                        commentsDiv.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align:center; padding-top:20px;">Đang chờ AI trả lời bình luận TikTok...</div>';
+                                    }
+                                }, 1500);
                             }
                         });
+                        return;
+                    }
+
+                    if (eventData.type === 'error') {
+                        resetTikTokConnection(eventData.message || eventData.error || 'Không kết nối được TikTok Live.');
                     }
                 };
             }
@@ -4327,25 +4587,21 @@ if (isLockedResponse(data)) {
                 .then(({ ok, body, text }) => {
                     if (body && body.success) {
                         status.textContent = '';
-                        applyTikTokUiState('connected', user);
+                        applyTikTokUiState(body.pending ? 'connecting' : 'connected', user);
                         status.className = 'status-info';
-                        status.textContent = `Đã kết nối TikTok Live: @${user}`;
+                        status.textContent = body.pending ? `Đang kết nối TikTok Live: @${user}` : `Đã kết nối TikTok Live: @${user}`;
                         loadLiveStats();
                         syncTikTokStatus();
                     } else {
                         const msg = (body && (body.error || body.message)) || text || 'Không rõ';
-                        applyTikTokUiState('idle');
+                        resetTikTokConnection(msg);
                         syncTikTokStatus();
-                        status.className = 'error';
-                        status.textContent = friendlyTikTokError(msg);
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    applyTikTokUiState('idle');
+                    resetTikTokConnection('Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.');
                     syncTikTokStatus();
-                    status.className = 'error';
-                    status.textContent = 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.';
                 });
         });
 
@@ -4354,6 +4610,9 @@ if (isLockedResponse(data)) {
                 return;
             }
             disconnectBtn.disabled = true;
+            resetTikTokConnection('', false);
+            status.className = 'status-info';
+            status.textContent = 'Đang ngắt kết nối TikTok Live...';
             fetch('/stop-live', { method: 'POST' })
                 .then(parseResponse)
                 .then(({ ok, body, text }) => {
@@ -4417,13 +4676,15 @@ if (isLockedResponse(data)) {
 
             window.originalPrompt = fullPrompt;
             window.generatedSentences = [];
-            window.isFetchingMore = false;
+            window.isFetchingMore = true;
+            const generationId = (window.crypto && window.crypto.randomUUID) ? window.crypto.randomUUID() : `gen-${Date.now()}-${Math.random()}`;
+            window.currentGenerationId = generationId;
             speechQueue.stop();
 
             if (source) {
                 source.close();
             }
-            source = new EventSource(`/stream?prompt=${encodeURIComponent(fullPrompt)}`);
+            source = new EventSource(`/stream?prompt=${encodeURIComponent(fullPrompt)}&requestId=${encodeURIComponent(generationId)}`);
 
             let currentTypingEl = null;
             let startTime = performance.now();
@@ -4431,7 +4692,15 @@ if (isLockedResponse(data)) {
             let totalTokens = 0;
 
             // Listen for Business/AI process errors sent from backend
+            source.addEventListener('ai_status', event => {
+                if (generationId !== window.currentGenerationId) return;
+                status.className = 'status-info';
+                status.textContent = event.data || 'Máy chủ AI phản hồi chậm, đang thử lại...';
+            });
+
             source.addEventListener('ai_error', event => {
+                if (generationId !== window.currentGenerationId) return;
+                window.isFetchingMore = false;
                 showLiveContentMessage(event.data, 'error');
                 if (source) {
                     source.close();
@@ -4439,9 +4708,13 @@ if (isLockedResponse(data)) {
                 }
                 sendBtn.disabled = false;
                 sendBtn.innerHTML = originalBtnHtml;
+                if (isRunning && speechQueue.queue.length < 3) {
+                    scheduleSentenceRefill(5000);
+                }
             });
 
             source.addEventListener('sentence', event => {
+                if (generationId !== window.currentGenerationId) return;
                 if (!isRunning) return;
                 const sentence = event.data;
 
@@ -4474,9 +4747,14 @@ if (isLockedResponse(data)) {
             });
 
             source.onerror = () => {
+                if (generationId !== window.currentGenerationId) return;
                 if (source) {
                     source.close();
                     source = null;
+                }
+                window.isFetchingMore = false;
+                if (isRunning && speechQueue.queue.length < 3) {
+                    scheduleSentenceRefill();
                 }
                 // Restore button state and icon text
                 sendBtn.disabled = false;
@@ -4514,6 +4792,14 @@ if (isLockedResponse(data)) {
                 if (speechQueue.currentAudio && !speechQueue.currentAudio.paused) {
                     speechQueue.currentAudio.playbackRate = speed;
                 }
+            });
+        }
+
+        const processingModeSelect = document.getElementById('processing-mode-select');
+        if (processingModeSelect) {
+            processingModeSelect.value = speechQueue.mode;
+            processingModeSelect.addEventListener('change', () => {
+                speechQueue.setMode(processingModeSelect.value);
             });
         }
 
@@ -4555,7 +4841,7 @@ if (isLockedResponse(data)) {
             btnBillingPause.disabled = false;
             btnBillingEnd.disabled = false;
             btnBillingReset.disabled = true;
-            
+
             if (!billingStartTime) {
                 const now = new Date();
                 billingStartTime = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -4584,10 +4870,10 @@ if (isLockedResponse(data)) {
             btnBillingEnd.disabled = true;
             btnBillingReset.disabled = false;
             clearInterval(billingInterval);
-            
+
             const rate = parseFloat(billingRateInput.value) || 50000;
             const amount = Math.round((billingSeconds / 3600) * rate);
-            
+
             // Appending a summary item in the logs list
             const billingSummary = document.createElement('div');
             billingSummary.className = 'comment-item active';
@@ -4618,6 +4904,16 @@ if (isLockedResponse(data)) {
 
         billingRateInput.addEventListener('input', updateBillingUI);
 
+        function scheduleSentenceRefill(delay = 1500) {
+            if (!isRunning || !window.originalPrompt || window.isFetchingMore || window.refillRetryTimer) {
+                return;
+            }
+            window.refillRetryTimer = setTimeout(() => {
+                window.refillRetryTimer = null;
+                window.requestMoreSentences();
+            }, delay);
+        }
+
         // SpeechQueue Refill logic when queue size falls below 7
         window.requestMoreSentences = function() {
             if (window.isFetchingMore || !isRunning || !window.originalPrompt) {
@@ -4632,12 +4928,17 @@ if (isLockedResponse(data)) {
                 historyParams = '&' + historyParams;
             }
 
-            const url = `/stream?prompt=${encodeURIComponent(window.originalPrompt)}${historyParams}`;
+            const generationId = window.currentGenerationId || `gen-${Date.now()}`;
+            const url = `/stream?prompt=${encodeURIComponent(window.originalPrompt)}${historyParams}&requestId=${encodeURIComponent(generationId)}`;
             const contSource = new EventSource(url);
 
             let currentTypingEl = null;
 
             contSource.addEventListener('sentence', event => {
+                if (generationId !== window.currentGenerationId) {
+                    contSource.close();
+                    return;
+                }
                 if (!isRunning) {
                     contSource.close();
                     window.isFetchingMore = false;
@@ -4670,13 +4971,30 @@ if (isLockedResponse(data)) {
 
             contSource.onerror = () => {
                 contSource.close();
+                if (generationId !== window.currentGenerationId) return;
                 window.isFetchingMore = false;
+                if (isRunning && speechQueue.queue.length < 3) {
+                    scheduleSentenceRefill();
+                }
             };
 
             contSource.addEventListener('ai_error', event => {
+                if (generationId !== window.currentGenerationId) {
+                    contSource.close();
+                    return;
+                }
                 console.error("[SpeechQueue refill error]", event.data);
                 contSource.close();
                 window.isFetchingMore = false;
+                if (isRunning && speechQueue.queue.length < 3) {
+                    scheduleSentenceRefill(2500);
+                }
+            });
+
+            contSource.addEventListener('ai_status', event => {
+                if (generationId !== window.currentGenerationId) return;
+                status.className = 'status-info';
+                status.textContent = event.data || 'Máy chủ AI phản hồi chậm, đang thử lại...';
             });
         };
         setTimeout(refreshVersionInfo, 1200);

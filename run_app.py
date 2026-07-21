@@ -439,6 +439,14 @@ def initialize_app(window):
     env = os.environ.copy()
     env['PYTHONIOENCODING'] = 'utf-8'
     env['PYTHONUTF8'] = '1'
+    # Keep CPU-heavy TTS from starving Flask, TikTok and the desktop UI.
+    for thread_env in ('OMP_NUM_THREADS', 'MKL_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'NUMEXPR_NUM_THREADS'):
+        env.setdefault(thread_env, '2')
+    fastapi_creation_flags = 0
+    if sys.platform.startswith('win'):
+        fastapi_creation_flags = subprocess.CREATE_NO_WINDOW
+        fastapi_creation_flags |= getattr(subprocess, 'BELOW_NORMAL_PRIORITY_CLASS', 0)
+
 
     flask_proc = subprocess.Popen(
         get_subprocess_cmd("--run-flask"), 
@@ -454,7 +462,7 @@ def initialize_app(window):
         env=env,
         stdout=fastapi_log_file, 
         stderr=fastapi_log_file,
-        creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith('win') else 0
+        creationflags=fastapi_creation_flags
     )
     js_call(window, 'updateStatus("Đang tải mô hình giọng nói AI (Lần đầu khởi động có thể mất 1-2 phút)...", 40)')
 
@@ -543,7 +551,7 @@ def shutdown_app(exit_app=False):
     try:
         req = urllib.request.Request('http://127.0.0.1:5000/internal/shutdown-live', data=b'{}', method='POST')
         req.add_header('Content-Type', 'application/json')
-        urllib.request.urlopen(req, timeout=2).read()
+        urllib.request.urlopen(req, timeout=12).read()
     except Exception:
         pass
 

@@ -4,9 +4,21 @@ import json
 import threading
 import subprocess
 import sys
+import uuid
+
+
+def get_runtime_base_dir():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
+
+
+def resolve_config_path():
+    return os.path.join(get_runtime_base_dir(), 'config.json')
+
 
 # Load configuration and initialize LLM API base URLs in environment variables
-CONFIG_PATH = 'config.json'
+CONFIG_PATH = resolve_config_path()
 DEFAULT_CENTRAL_API_URL = "https://ainoface-backend.onrender.com"
 DEFAULT_LLM_URL = "https://luck-tvs-schedules-palace.trycloudflare.com"
 LOCAL_APP_DIR = os.path.join(os.environ.get('LOCALAPPDATA') or os.path.expanduser('~'), 'SLiveAI')
@@ -41,12 +53,12 @@ except ImportError:
 
 
 _tts_cache = {}
-def call_tts_service(text: str, voice: str = 'Trúc Ly') -> tuple[bytes, str, int]:
-    cache_key = (text, voice)
+def call_tts_service(text: str, voice: str = 'Trúc Ly', priority: int = 1) -> tuple[bytes, str, int]:
+    cache_key = (text, voice, priority)
     if cache_key in _tts_cache:
         print(f"[CACHE HIT] Returning cached TTS for: '{text[:20]}...'")
         return _tts_cache[cache_key]
-    result = _call_tts_service(text, voice)
+    result = _call_tts_service(text, voice, priority=priority)
     if len(_tts_cache) > 50:
         _tts_cache.pop(next(iter(_tts_cache)))
     _tts_cache[cache_key] = result
@@ -105,8 +117,6 @@ def add_header(response):
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '-1'
     return response
-
-CONFIG_PATH = 'config.json'
 
 def load_or_create_config():
     if not os.path.exists(CONFIG_PATH):
@@ -274,10 +284,14 @@ def restore_saved_login():
 # Global queue for audio stream
 tts_queue = Queue()
 comments_queue = Queue()
+live_event_queue = Queue()
 live_stats_lock = threading.Lock()
 live_stats = {
+    'state': 'disconnected',
     'connected': False,
     'username': None,
+    'lastError': None,
+    'exitCode': None,
     'currentViewers': None,
     'commentEvents': deque(),
     'heartEvents': deque(),
@@ -286,6 +300,48 @@ live_stats = {
 }
 # Process handle for the external live listener
 live_process = None
+live_process_lock = threading.Lock()
+live_stop_requested = False
+
+_active_billing_session = {'session_id': None, 'auth_token': None}
+_active_billing_session_lock = threading.Lock()
+_billing_recovery_lock = threading.Lock()
+_last_billing_recovery_at = 0
+
+
+def remember_active_billing_session(session_id, auth_token):
+    with _active_billing_session_lock:
+        _active_billing_session['session_id'] = session_id
+        _active_billing_session['auth_token'] = auth_token
+
+
+def forget_active_billing_session(session_id=None):
+    with _active_billing_session_lock:
+        if session_id is None or _active_billing_session['session_id'] == session_id:
+            _active_billing_session['session_id'] = None
+            _active_billing_session['auth_token'] = None
+
+
+def end_remembered_billing_session():
+    with _active_billing_session_lock:
+        session_id = _active_billing_session['session_id']
+        auth_token = _active_billing_session['auth_token']
+        _active_billing_session['session_id'] = None
+        _active_billing_session['auth_token'] = None
+
+    if not session_id or not auth_token:
+        return None, 200
+
+    try:
+        return call_central_api(
+            '/api/billing/session/end',
+            method='POST',
+            data={'sessionId': session_id},
+            token=auth_token,
+        )
+    except Exception as exc:
+        print(f'WARN: Could not end billing session during app shutdown: {exc}')
+        return None, 500
 
 
 def parse_tiktok_username(value: str) -> str:
@@ -311,10 +367,13 @@ def tiktok_connect_error_response(status_code=500):
     }), status_code
 
 
-def reset_live_stats(username=None, connected=False):
+def reset_live_stats(username=None, connected=False, state=None, error=None, exit_code=None):
     with live_stats_lock:
+        live_stats['state'] = state or ('connected' if connected else 'disconnected')
         live_stats['connected'] = connected
         live_stats['username'] = username
+        live_stats['lastError'] = error
+        live_stats['exitCode'] = exit_code
         live_stats['currentViewers'] = None
         live_stats['commentEvents'].clear()
         live_stats['heartEvents'].clear()
@@ -337,14 +396,101 @@ def live_stats_snapshot():
         hearts_per_minute = sum(item[1] for item in live_stats['heartEvents'])
         return {
             'success': True,
+            'state': live_stats['state'],
             'connected': live_stats['connected'],
             'username': live_stats['username'],
+            'error': live_stats['lastError'],
+            'exitCode': live_stats['exitCode'],
             'currentViewers': live_stats['currentViewers'],
             'commentsPerMinute': len(live_stats['commentEvents']),
             'heartsPerMinute': hearts_per_minute,
             'ordersCount': live_stats['ordersCount'],
             'lastEventAt': live_stats['lastEventAt'],
         }
+
+
+def consume_live_output(proc, stream, label, room):
+    try:
+        for raw_line in iter(stream.readline, ''):
+            line = raw_line.rstrip()
+            if not line:
+                continue
+            print(f'[LIVE {label}] {line}')
+            if label == 'OUT' and 'LIVE:CONNECTED:' in line:
+                with live_stats_lock:
+                    live_stats['state'] = 'connected'
+                    live_stats['connected'] = True
+                    live_stats['username'] = room
+                    live_stats['lastError'] = None
+                    live_stats['lastEventAt'] = time.time()
+            elif label == 'ERR':
+                with live_stats_lock:
+                    live_stats['lastError'] = line
+    except Exception as exc:
+        print(f'[LIVE {label} ERROR] {exc}')
+    finally:
+        try:
+            stream.close()
+        except Exception:
+            pass
+
+
+def monitor_live_process(proc, room):
+    global live_process, live_stop_requested
+    readers = [
+        threading.Thread(target=consume_live_output, args=(proc, proc.stdout, 'OUT', room), daemon=True),
+        threading.Thread(target=consume_live_output, args=(proc, proc.stderr, 'ERR', room), daemon=True),
+    ]
+    for reader in readers:
+        reader.start()
+    exit_code = proc.wait()
+    for reader in readers:
+        reader.join(timeout=1)
+    with live_process_lock:
+        if live_process is proc:
+            requested = live_stop_requested
+            live_process = None
+            live_stop_requested = False
+            with live_stats_lock:
+                last_error = live_stats.get('lastError')
+                was_connected = live_stats.get('connected')
+            if requested:
+                reset_live_stats(username=room, connected=False, state='disconnected', exit_code=exit_code)
+            elif exit_code == 0 and was_connected:
+                reset_live_stats(username=room, connected=False, state='disconnected', exit_code=exit_code)
+            else:
+                reset_live_stats(
+                    username=room,
+                    connected=False,
+                    state='failed',
+                    error=last_error or 'TikTok Live connector exited before connecting.',
+                    exit_code=exit_code,
+                )
+
+
+def recover_billing_session(auth_token):
+    global _last_billing_recovery_at
+    now = time.time()
+    if now - _last_billing_recovery_at < 5:
+        return None, 429
+    if not _billing_recovery_lock.acquire(blocking=False):
+        return None, 429
+    try:
+        _last_billing_recovery_at = time.time()
+        data, status_code = call_central_api(
+            '/api/billing/session/start',
+            method='POST',
+            data={'appVersion': 'recovered'},
+            token=auth_token,
+        )
+        if status_code == 200 and data.get('success') and data.get('sessionId'):
+            session['session_id'] = data.get('sessionId')
+            remember_active_billing_session(data.get('sessionId'), auth_token)
+            data['recovered'] = True
+            data['status'] = 'active'
+        return data, status_code
+    finally:
+        _billing_recovery_lock.release()
 
 @app.before_request
 def require_login():
@@ -425,7 +571,7 @@ def login():
                 'token': res_data.get('token')
             })
             return jsonify({'success': True})
-        return jsonify({'success': False, 'error': res_data.get('error') or 'TÃ i khoáº£n hoáº·c máº­t kháº©u khÃ´ng chÃ­nh xÃ¡c.'}), status_code
+        return jsonify({'success': False, 'error': res_data.get('error') or 'T\u00e0i kho\u1ea3n ho\u1eb7c m\u1eadt kh\u1ea9u kh\u00f4ng ch\u00ednh x\u00e1c.'}), status_code
     if session.get('logged_in'):
         return redirect(url_for('index'))
     return render_template('login.html')
@@ -437,6 +583,7 @@ def logout():
     auth_token = session.get('auth_token')
     if session_id and auth_token:
         call_central_api('/api/billing/session/end', method='POST', data={'sessionId': session_id}, token=auth_token)
+    forget_active_billing_session(session_id)
     session.clear()
     delete_saved_auth()
     return redirect(url_for('login'))
@@ -452,6 +599,7 @@ def session_start():
     res_data, status_code = call_central_api('/api/billing/session/start', method='POST', data=data, token=auth_token)
     if status_code == 200 and res_data.get('success'):
         session['session_id'] = res_data.get('sessionId')
+        remember_active_billing_session(res_data.get('sessionId'), auth_token)
     clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
@@ -466,9 +614,32 @@ def session_heartbeat():
         return jsonify({'success': False, 'error': 'Không tìm thấy phiên làm việc.'}), 400
         
     res_data, status_code = call_central_api('/api/billing/session/heartbeat', method='POST', data={'sessionId': session_id}, token=auth_token)
-    # If expired, clear session_id
-    if res_data.get('status') in ('expired', 'ended', 'stopped', 'locked') or res_data.get('action') in ('stop_live', 'force_logout'):
+    remaining = res_data.get('remainingSeconds', res_data.get('timeBalanceSeconds'))
+    should_force_stop = (
+        res_data.get('status') == 'locked'
+        or res_data.get('action') == 'force_logout'
+        or remaining == 0
+        or res_data.get('action') == 'show_topup'
+    )
+    can_recover = (
+        status_code == 200
+        and not should_force_stop
+        and res_data.get('status') in ('expired', 'ended', 'stopped')
+        and isinstance(remaining, (int, float))
+        and remaining > 0
+    )
+    if can_recover:
+        recovered_data, recovered_status = recover_billing_session(auth_token)
+        if recovered_status == 200 and recovered_data and recovered_data.get('success'):
+            forget_active_billing_session(session_id)
+            clear_local_login_for_force_logout(recovered_data)
+            return jsonify(recovered_data), recovered_status
+        res_data['recovering'] = True
+        res_data['action'] = 'retry_heartbeat'
+        return jsonify(res_data), 200
+    if should_force_stop:
         session.pop('session_id', None)
+        forget_active_billing_session(session_id)
     clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
@@ -484,6 +655,7 @@ def session_end():
         
     res_data, status_code = call_central_api('/api/billing/session/end', method='POST', data={'sessionId': session_id}, token=auth_token)
     session.pop('session_id', None)
+    forget_active_billing_session(session_id)
     clear_local_login_for_force_logout(res_data)
     return jsonify(res_data), status_code
 
@@ -549,14 +721,147 @@ def user_sessions():
     return jsonify(res_data), status_code
 
 
+@app.route('/api/tiktok/status', methods=['GET'])
+def api_tiktok_status():
+    process = live_process
+    running = process is not None and process.poll() is None
+    snapshot = live_stats_snapshot()
+    state = snapshot['state']
+    if running and state == 'disconnected':
+        state = 'connecting'
+    return jsonify({
+        'success': True,
+        'state': state,
+        'running': running,
+        'connected': running and bool(snapshot['connected']),
+        'username': snapshot['username'],
+        'error': snapshot['error'],
+        'exitCode': snapshot['exitCode'],
+    })
+
+
 @app.route('/api/live/stats', methods=['GET'])
 def api_live_stats():
     return jsonify(live_stats_snapshot())
+
+
+def create_llm_stream_response(prompt, history, request_id):
+    quit_event = threading.Event()
+    sentence_queue = Queue()
+    retry_backoffs = [2, 5, 10]
+    max_attempts = 1 + len(retry_backoffs)
+
+    def enqueue(event_type, text='', **extra):
+        payload = {
+            'type': event_type,
+            'text': text,
+            'requestId': request_id,
+        }
+        payload.update(extra)
+        sentence_queue.put(payload)
+
+    def run_continuous():
+        generated_sentences = []
+        generated_keys = set(history)
+
+        def local_on_sentence(sentence):
+            key = (sentence or '').strip()
+            if not key or key in generated_keys:
+                return
+            generated_keys.add(key)
+            generated_sentences.append(sentence)
+            enqueue('sentence', sentence)
+
+        last_error = None
+        for attempt in range(max_attempts):
+            if quit_event.is_set():
+                enqueue('ai_done')
+                return
+            try:
+                llm_continuous(
+                    prompt,
+                    quit_event,
+                    on_sentence=local_on_sentence,
+                    history=list(history) + generated_sentences,
+                    max_sentences=10,
+                )
+                enqueue('ai_done')
+                return
+            except Exception as exc:
+                if quit_event.is_set():
+                    enqueue('ai_done')
+                    return
+                if hasattr(exc, 'to_dict'):
+                    last_error = exc.to_dict()
+                    error_text = last_error.get('message') or str(exc)
+                    error_kind = last_error.get('kind')
+                else:
+                    error_text = f'Loi goi AI: {exc}'
+                    error_kind = 'unknown'
+                    last_error = {'kind': error_kind, 'message': error_text, 'detail': str(exc)}
+
+                safe_error_text = str(error_text).encode('ascii', errors='replace').decode('ascii')
+                print(f'[AI ERROR] attempt={attempt + 1}/{max_attempts} kind={error_kind}: {safe_error_text}')
+                if attempt < len(retry_backoffs):
+                    delay = retry_backoffs[attempt]
+                    enqueue('ai_status', 'M\u00e1y ch\u1ee7 AI ph\u1ea3n h\u1ed3i ch\u1eadm, \u0111ang th\u1eed l\u1ea1i...', attempt=attempt + 1, delay=delay)
+                    quit_event.wait(delay)
+                    continue
+
+                enqueue('ai_error', error_text, error=last_error)
+                return
+
+    thread = threading.Thread(target=run_continuous, daemon=True)
+    thread.start()
+
+    def event_stream():
+        sent_any = False
+        last_keepalive = time.time()
+        keepalive_interval = 12.0
+
+        def sse_event(event_type, data):
+            if isinstance(data, (dict, list)):
+                text = json.dumps(data, ensure_ascii=False)
+            else:
+                text = str(data or '')
+            lines = text.splitlines() or ['']
+            return f"event: {event_type}\n" + ''.join(f"data: {line}\n" for line in lines) + "\n"
+
+        try:
+            while not quit_event.is_set():
+                try:
+                    msg = sentence_queue.get(timeout=1)
+                    if msg['type'] in ('sentence', 'token'):
+                        sent_any = True
+                    if msg['type'] == 'ai_done':
+                        break
+                    yield sse_event(msg['type'], msg.get('text') or msg)
+                except Empty:
+                    now = time.time()
+                    if now - last_keepalive >= keepalive_interval:
+                        last_keepalive = now
+                        yield ': keepalive\n\n'
+                    if not thread.is_alive():
+                        break
+
+            if not sent_any and not quit_event.is_set():
+                yield sse_event('ai_error', 'M\u00e1y ch\u1ee7 AI kh\u00f4ng ph\u1ea3n h\u1ed3i ho\u1eb7c tr\u1ea3 v\u1ec1 n\u1ed9i dung r\u1ed7ng.')
+
+            while not sentence_queue.empty():
+                msg = sentence_queue.get_nowait()
+                if msg['type'] != 'ai_done':
+                    yield sse_event(msg['type'], msg.get('text') or msg)
+        finally:
+            quit_event.set()
+
+    return Response(event_stream(), mimetype='text/event-stream')
+
 
 @app.route('/stream')
 def stream():
     prompt = request.args.get('prompt', '').strip()
     history = request.args.getlist('history')
+    request_id = request.args.get('requestId') or request.args.get('generationId') or str(uuid.uuid4())
     if not prompt:
         return 'Prompt không được để trống.', 400
 
@@ -568,92 +873,8 @@ def stream():
     except Exception as e:
         print(f"WARN: Failed to save prompt to live_prompt.txt: {e}")
 
-    quit_event = threading.Event()
-    sentence_queue = Queue()
+    return create_llm_stream_response(prompt, history, request_id)
 
-    def on_sentence(sentence: str):
-        sentence_queue.put({"type": "sentence", "text": sentence})
-
-    def run_continuous():
-        import requests
-        original_post = requests.post
-        error_msg = [None]
-
-        def mock_post(*args, **kwargs):
-            try:
-                resp = original_post(*args, **kwargs)
-                orig_raise = resp.raise_for_status
-                def mock_raise():
-                    try:
-                        orig_raise()
-                    except Exception as e:
-                        if resp.status_code == 404:
-                            error_msg[0] = "Sai endpoint API AI hoặc server AI chưa mở route tạo kịch bản."
-                        else:
-                            error_msg[0] = f"Lỗi HTTP {resp.status_code} từ máy chủ AI tại {args[0]}."
-                        raise e
-                resp.raise_for_status = mock_raise
-                return resp
-            except Exception as e:
-                error_msg[0] = f"Không thể kết nối tới máy chủ AI tại {args[0]}. Chi tiết: {str(e)}"
-                raise e
-
-        requests.post = mock_post
-        
-        generated_sentences = []
-        def local_on_sentence(sentence):
-            generated_sentences.append(sentence)
-            on_sentence(sentence)
-
-        try:
-            # Call LLM to generate exactly 10 sentences with history
-            llm_continuous(prompt, quit_event, on_sentence=local_on_sentence, history=history, max_sentences=10)
-                
-            if error_msg[0]:
-                print(f"[AI ERROR] {error_msg[0]}")
-                sentence_queue.put({"type": "ai_error", "text": error_msg[0]})
-        except Exception as e:
-            if not error_msg[0]:
-                error_msg[0] = f"Lỗi gọi AI: {str(e)}"
-            print(f"[AI ERROR Exception] {error_msg[0]}")
-            sentence_queue.put({"type": "ai_error", "text": error_msg[0]})
-        finally:
-            requests.post = original_post
-
-    thread = threading.Thread(target=run_continuous, daemon=True)
-    thread.start()
-
-    def event_stream():
-        sent_any = False
-        last_activity = time.time()
-        timeout_limit = 60.0  # 60 seconds inactivity timeout
-        try:
-            while not quit_event.is_set():
-                if time.time() - last_activity > timeout_limit:
-                    yield f"event: ai_error\ndata: Hết thời gian chờ phản hồi từ máy chủ AI (Timeout).\n\n"
-                    break
-
-                try:
-                    msg = sentence_queue.get(timeout=1)
-                    last_activity = time.time()
-                    if msg['type'] in ('sentence', 'token'):
-                        sent_any = True
-                    yield f"event: {msg['type']}\ndata: {msg['text']}\n\n"
-                except Empty:
-                    if not thread.is_alive():
-                        break
-            
-            # If the stream finished and we never sent anything, send an error to close connection
-            if not sent_any and not quit_event.is_set():
-                yield f"event: ai_error\ndata: Máy chủ AI không phản hồi hoặc trả về nội dung rỗng.\n\n"
-
-            while not sentence_queue.empty():
-                msg = sentence_queue.get_nowait()
-                yield f"event: {msg['type']}\ndata: {msg['text']}\n\n"
-        finally:
-            quit_event.set()
-
-    return Response(event_stream(), mimetype='text/event-stream')
 
 @app.route('/tts-health', methods=['GET'])
 def tts_health():
@@ -666,18 +887,51 @@ def tts_health():
         return jsonify({'success': False, 'error': str(exc)}), 500
 
 
+_tts_cache_lock = threading.Lock()
+_tts_cache = {}
+_TTS_CACHE_MAX_SIZE = 200
+
+def get_cached_tts(key):
+    with _tts_cache_lock:
+        if key in _tts_cache:
+            val = _tts_cache.pop(key)
+            _tts_cache[key] = val
+            return val
+    return None
+
+def put_cached_tts(key, val):
+    audio_data, content_type, status_code = val
+    if status_code != 200 or not (content_type and content_type.startswith("audio/")):
+        return
+    with _tts_cache_lock:
+        if key in _tts_cache:
+            _tts_cache.pop(key)
+        elif len(_tts_cache) >= _TTS_CACHE_MAX_SIZE:
+            first_key = next(iter(_tts_cache))
+            _tts_cache.pop(first_key)
+        _tts_cache[key] = val
+
 @app.route('/tts', methods=['POST'])
 def tts():
     payload = request.get_json(silent=True) or {}
     text = (payload.get('text') or '').strip()
     voice = (payload.get('voice') or 'Trúc Ly').strip() or 'Trúc Ly'
+    priority = int(payload.get('priority', 1))
 
     if not text:
         return jsonify({'success': False, 'error': 'Text không được để trống.'}), 400
 
+    cache_key = (text, voice)
+    cached = get_cached_tts(cache_key)
+    if cached:
+        audio_data, content_type, status_code = cached
+        return Response(audio_data, mimetype=content_type, status=status_code)
+
     try:
-        audio_data, content_type, status_code = call_tts_service(text, voice)
-        return Response(audio_data, mimetype=content_type)
+        audio_data, content_type, status_code = call_tts_service(text, voice, priority=priority)
+        if status_code == 200 and content_type and content_type.startswith("audio/"):
+            put_cached_tts(cache_key, (audio_data, content_type, status_code))
+        return Response(audio_data, mimetype=content_type, status=status_code)
     except urllib.error.HTTPError as exc:
         body = exc.read().decode('utf-8', errors='ignore') if hasattr(exc, 'read') else str(exc)
         return jsonify({'success': False, 'error': body or str(exc)}), exc.code
@@ -699,6 +953,12 @@ def human():
         # Chỉ cần đẩy text vào comments_queue. Client sẽ tự động lấy và gọi /tts để phát.
         # Điều này giúp giảm 50% thời gian xử lý và phản hồi ngay lập tức cho TikTok listener.
         try:
+            event_id = payload.get('eventId') or payload.get('event_id') or str(uuid.uuid4())
+            live_event_queue.put({
+                'type': 'reply',
+                'eventId': str(event_id),
+                'text': text,
+            })
             comments_queue.put(text)
         except Exception:
             pass
@@ -726,9 +986,12 @@ def live_event():
     with live_stats_lock:
         prune_live_stats(now)
         if event_type == 'connect':
+            live_stats['state'] = 'connected'
             live_stats['connected'] = True
             live_stats['username'] = payload.get('username') or live_stats['username']
+            live_stats['lastError'] = None
         elif event_type == 'disconnect':
+            live_stats['state'] = 'disconnected'
             live_stats['connected'] = False
         elif event_type == 'comment':
             live_stats['connected'] = True
@@ -746,6 +1009,13 @@ def live_event():
             live_stats['currentViewers'] = viewer_count
         live_stats['lastEventAt'] = now
 
+    if event_type in ('comment', 'reply', 'status', 'error'):
+        event_payload = dict(payload)
+        event_payload['type'] = event_type
+        if not event_payload.get('eventId'):
+            event_payload['eventId'] = str(uuid.uuid4())
+        live_event_queue.put(event_payload)
+
     return jsonify({'success': True})
 
 
@@ -756,8 +1026,8 @@ def comments_stream():
         try:
             while True:
                 try:
-                    comment = comments_queue.get(timeout=1)
-                    yield f"data: {comment}\n\n"
+                    event = live_event_queue.get(timeout=1)
+                    yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
                 except Empty:
                     continue
         finally:
@@ -821,15 +1091,16 @@ def start_live():
     """Start the `live.py` listener as a subprocess with TIKTOK_USER env var.
     Expects JSON: {"room": "s_live_ai"} or {"username": "s_live_ai"}.
     """
-    global live_process
-    if live_process is not None and live_process.poll() is None:
-        return jsonify({'success': False, 'error': 'Live listener already running.'}), 400
+    global live_process, live_stop_requested
+    with live_process_lock:
+        if live_process is not None and live_process.poll() is None:
+            return jsonify({'success': False, 'error': 'Live listener already running.'}), 400
 
     payload = request.get_json(silent=True) or {}
     room = parse_tiktok_username(payload.get('room') or payload.get('username') or '')
     if not room:
         return jsonify({'success': False, 'error': 'Không kết nối được TikTok Live. Vui lòng kiểm tra username hoặc link live.'}), 400
-    reset_live_stats(username=room, connected=False)
+    reset_live_stats(username=room, connected=False, state='connecting')
 
     # Save prompt to live_prompt.txt if provided in start-live payload
     prompt = payload.get('prompt', '').strip()
@@ -885,66 +1156,17 @@ def start_live():
             bufsize=1,
             creationflags=subprocess.CREATE_NO_WINDOW if sys.platform.startswith('win') else 0,
         )
-        live_process = proc
+        with live_process_lock:
+            live_stop_requested = False
+            live_process = proc
     except FileNotFoundError as e:
         print(f"[LIVE ERROR] TikTok connector command not found: {e}")
         return tiktok_connect_error_response()
     except Exception as e:
         print(f"[LIVE ERROR] Failed to start TikTok connector: {e}")
         return tiktok_connect_error_response()
-
-    # Wait for a live-ready marker from stdout
-    start_t = time.time()
-    marker = f'LIVE:CONNECTED:'
-    stdout_lines = []
-    stderr_lines = []
-    timeout = 10.0
-    try:
-        while time.time() - start_t < timeout:
-            # Read a line if available
-            line = ''
-            try:
-                line = proc.stdout.readline()
-            except Exception:
-                line = ''
-            if line:
-                stdout_lines.append(line.strip())
-                if marker in line:
-                    with live_stats_lock:
-                        live_stats['connected'] = True
-                        live_stats['username'] = room
-                        live_stats['lastEventAt'] = time.time()
-                    return jsonify({'success': True}), 200
-            else:
-                # no new stdout; check stderr
-                try:
-                    err_line = proc.stderr.readline()
-                except Exception:
-                    err_line = ''
-                if err_line:
-                    stderr_lines.append(err_line.strip())
-                if proc.poll() is not None:
-                    break
-                time.sleep(0.1)
-    except Exception:
-        pass
-
-    # If we get here, marker not found; collect any remaining output and return error
-    try:
-        out_rem = proc.stdout.read()
-        err_rem = proc.stderr.read()
-        if out_rem:
-            stdout_lines.append(out_rem.strip())
-        if err_rem:
-            stderr_lines.append(err_rem.strip())
-    except Exception:
-        pass
-
-    msg = '\n'.join(stderr_lines or stdout_lines) or 'No live connection marker received.'
-    print(f"[LIVE ERROR] {msg}")
-    friendly_msg = "Không thể kết nối với phiên live TikTok. Vui lòng kiểm tra lại Username TikTok hoặc kết nối mạng của bạn."
-    return jsonify({'success': False, 'error': friendly_msg}), 500
-
+    threading.Thread(target=monitor_live_process, args=(proc, room), daemon=True).start()
+    return jsonify({'success': True, 'pending': True}), 202
 
 @app.route('/internal/shutdown-live', methods=['POST'])
 def internal_shutdown_live():
@@ -952,9 +1174,10 @@ def internal_shutdown_live():
     if request.remote_addr not in ('127.0.0.1', '::1', 'localhost'):
         return jsonify({'success': False, 'error': 'Forbidden'}), 403
 
-    global live_process
+    global live_process, live_stop_requested
     if live_process is not None and live_process.poll() is None:
         try:
+            live_stop_requested = True
             live_process.terminate()
             try:
                 live_process.wait(timeout=5)
@@ -963,6 +1186,7 @@ def internal_shutdown_live():
         except Exception as exc:
             print(f"WARN: Could not stop live listener during shutdown: {exc}")
     live_process = None
+    end_remembered_billing_session()
     reset_live_stats()
     return jsonify({'success': True}), 200
 
@@ -970,11 +1194,13 @@ def internal_shutdown_live():
 @app.route('/stop-live', methods=['POST'])
 def stop_live():
     """Stop the running live.py subprocess if any."""
-    global live_process
+    global live_process, live_stop_requested
     if live_process is None or live_process.poll() is not None:
         live_process = None
-        return jsonify({'success': False, 'error': 'No live listener running.'}), 400
+        reset_live_stats(state='disconnected')
+        return jsonify({'success': True, 'alreadyStopped': True}), 200
     try:
+        live_stop_requested = True
         live_process.terminate()
         try:
             live_process.wait(timeout=5)

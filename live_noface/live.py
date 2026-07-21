@@ -6,6 +6,8 @@ import json
 import re
 import random
 import time
+import asyncio
+import uuid
 
 
 # Force sys.stdout and sys.stderr to UTF-8 with character replacement on Windows
@@ -57,9 +59,9 @@ if '@' in unique_id:
 else:
     unique_id = '@' + unique_id
 client: TikTokLiveClient = TikTokLiveClient(unique_id=unique_id)
-client_llm = OpenAI(
-    api_key=os.getenv('LIVE_LLM_API_KEY', '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'),
-    base_url=OLLAMA_BASE_URL,
+DEFAULT_LIVE_LLM_API_KEY = os.getenv(
+    'LIVE_LLM_API_KEY',
+    ''
 )
 
 connection_time = time.time()
@@ -192,7 +194,7 @@ def _enforce_comment_response(user_name: str, llm_response: str, comment_text: s
 
     return f'{greeting}. {cta}'
 
-def send_to_tts(text: str, sessionid: str = 'current', event: bool = False, priority: int | bool = None) -> bool:
+def send_to_tts(text: str, sessionid: str = 'current', event: bool = False, priority: int | bool = None, event_id: str | None = None) -> bool:
     """Send text to LiveTalking app via /human endpoint for TTS."""
     try:
         url = LIVE_APP_URL.rstrip('/') + '/human'
@@ -206,6 +208,8 @@ def send_to_tts(text: str, sessionid: str = 'current', event: bool = False, prio
             payload_data['event'] = False
         if priority is not None:
             payload_data['priority'] = priority
+        if event_id is not None:
+            payload_data['eventId'] = event_id
         payload = json.dumps(payload_data).encode('utf-8')
         req = urllib.request.Request(
             url,
@@ -265,7 +269,7 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
 
         llm_url = current_llm_url
         llm_model = OLLAMA_MODEL
-        llm_api_key = os.getenv('LIVE_LLM_API_KEY', 'api_key')
+        llm_api_key = os.getenv('LIVE_LLM_API_KEY') or DEFAULT_LIVE_LLM_API_KEY
         
         extra_params = {
             'max_tokens': 48,
@@ -287,9 +291,11 @@ def generate_live_response(user_name: str, event_text: str, event_type: str = 'c
                 },
             }
 
-        client_llm.base_url = llm_url
-        client_llm.api_key = llm_api_key
-        completion = client_llm.chat.completions.create(
+        active_llm_client = OpenAI(
+            api_key=llm_api_key,
+            base_url=llm_url,
+        )
+        completion = active_llm_client.chat.completions.create(
             model=llm_model,
             messages=[
                 {'role': 'system', 'content': system_prompt},
@@ -347,26 +353,30 @@ async def on_connect(event: ConnectEvent):
         pass
 
 
+_comment_semaphore = asyncio.Semaphore(2)
+
 async def on_comment(event: CommentEvent) -> None:
     global connection_time
     if connection_time is None or (time.time() - connection_time < 1.5):
         return
     user_name = event.user.nickname
     comment_text = event.comment
+    event_id = str(uuid.uuid4())
     print(f'COMMENT: {user_name} -> {comment_text}')
     _debug_event_payload('comment', event)
-    post_live_event('comment', viewerCount=_extract_viewer_count(event))
+    await asyncio.to_thread(post_live_event, 'comment', eventId=event_id, username=user_name, comment=comment_text, viewerCount=_extract_viewer_count(event))
 
-    ai_response = generate_live_response(user_name, comment_text, event_type='comment')
-    if not ai_response:
-        print('[INFO] Comment ignored (unrelated to prompt)')
-        return
-    print(f'AI Response: {ai_response}')
+    async with _comment_semaphore:
+        ai_response = await asyncio.to_thread(generate_live_response, user_name, comment_text, event_type='comment')
+        if not ai_response:
+            print('[INFO] Comment ignored (unrelated to prompt)')
+            return
+        print(f'AI Response: {ai_response}')
 
-    if send_to_tts(ai_response, event=True, priority=0):
-        print('[OK] Sent to TTS')
-    else:
-        print('[ERR] Failed to send to TTS')
+        if await asyncio.to_thread(send_to_tts, ai_response, event=True, priority=0, event_id=event_id):
+            print('[OK] Sent to TTS')
+        else:
+            print('[ERR] Failed to send to TTS')
 
 
 client.add_listener(CommentEvent, on_comment)

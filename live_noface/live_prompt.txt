@@ -1,5 +1,5 @@
 Viết kịch bản livestream.
-- Chủ đề: sản phẩm là mì tôm, giá sản phẩm là 20000 đồng
+- Chủ đề: mì tôm
 - Vai trò: MC bán hàng
 - Phong cách: Nhiệt tình, gần gũi
 - Mục tiêu: Chốt đơn hàng

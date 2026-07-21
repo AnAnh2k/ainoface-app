@@ -2,7 +2,7 @@ import json
 import urllib.request
 import urllib.error
 
-def call_tts_service(text: str, voice: str = 'Trúc Ly') -> tuple[bytes, str, int]:
+def call_tts_service(text: str, voice: str = 'Trúc Ly', priority: int = 1) -> tuple[bytes, str, int]:
     """
     Calls the local FastAPI TTS service to synthesize speech.
     Returns:
@@ -11,14 +11,16 @@ def call_tts_service(text: str, voice: str = 'Trúc Ly') -> tuple[bytes, str, in
     url = "http://127.0.0.1:8005/v1/audio/speech"
     payload = {
         "input": text,
-        "voice": voice
+        "voice": voice,
+        "priority": priority
     }
     try:
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(url, data=data, method="POST")
         req.add_header("Content-Type", "application/json")
         
-        with urllib.request.urlopen(req, timeout=15) as response:
+        # Weak CPUs need more time; a short timeout leaves inference backlogged.
+        with urllib.request.urlopen(req, timeout=60) as response:
             audio_bytes = response.read()
             content_type = response.getheader("Content-Type") or "audio/wav"
             return audio_bytes, content_type, response.status
